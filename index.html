@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>html-storage</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: monospace;
+      background: #0d1117;
+      color: #c9d1d9;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 1.4rem;
+      color: #58a6ff;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      color: #6e7681;
+      font-size: 0.85rem;
+      margin-bottom: 32px;
+    }
+    ul {
+      list-style: none;
+      max-width: 600px;
+    }
+    li {
+      border-left: 2px solid #21262d;
+      margin-bottom: 4px;
+    }
+    li:hover {
+      border-left-color: #58a6ff;
+    }
+    a {
+      display: block;
+      padding: 10px 16px;
+      color: #c9d1d9;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.1s;
+    }
+    a:hover { color: #58a6ff; }
+    a::before { content: "📄 "; font-size: 0.85em; }
+    .msg {
+      color: #6e7681;
+      font-size: 0.9rem;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>html-storage</h1>
+  <p class="subtitle">Pages/</p>
+  <ul id="list"><li class="msg">불러오는 중...</li></ul>
+
+  <script>
+    const OWNER = "bloblab217";
+    const REPO  = "html-storage";
+    const DIR   = "Pages";
+
+    fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${DIR}`)
+      .then(r => r.json())
+      .then(files => {
+        const ul = document.getElementById("list");
+        const htmlFiles = files.filter(f => f.name.endsWith(".html"));
+
+        if (htmlFiles.length === 0) {
+          ul.innerHTML = `<li class="msg">아직 파일이 없습니다.</li>`;
+          return;
+        }
+
+        ul.innerHTML = htmlFiles
+          .map(f => `<li><a href="${DIR}/${f.name}">${f.name}</a></li>`)
+          .join("");
+      })
+      .catch(() => {
+        document.getElementById("list").innerHTML =
+          `<li class="msg">파일 목록을 불러오지 못했습니다.</li>`;
+      });
+  </script>
+</body>
+</html>
