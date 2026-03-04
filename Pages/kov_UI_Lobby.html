@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project kov - Lobby UI/UX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #ffffff; }
+        
+        .wf-box {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background-color: rgba(15, 15, 15, 0.6); 
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 400;
+            color: #d1d5db;
+            transition: all 0.2s ease;
+        }
+        
+        .wf-box-dashed {
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        .steam-text-menu {
+            font-size: 1.25rem;
+            letter-spacing: 0.1em;
+            color: #6b7280;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+            text-align: left;
+            position: relative;
+        }
+        
+        .steam-text-menu:hover { color: #ffffff; transform: translateX(5px); }
+        .steam-text-menu.active { color: #ffffff; font-weight: bold; }
+        .steam-text-menu.active::before {
+            content: '';
+            position: absolute; left: -15px; top: 50%; transform: translateY(-50%);
+            width: 4px; height: 100%; background-color: #ffffff;
+        }
+
+        .wf-text-sm { font-size: 0.75rem; }
+        .wf-text-xs { font-size: 0.65rem; }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body class="h-screen flex flex-col font-sans overflow-hidden">
+
+    <!-- 상단 네비게이션 -->
+    <header class="bg-[#0f0f0f] border-b border-[#222] p-4 flex justify-between items-center z-10 shrink-0">
+        <h1 class="text-xl font-bold tracking-[0.2em] text-white">PROJECT <span class="text-gray-500">kov</span> <span class="text-xs font-normal text-[#00adee] ml-2 border border-[#00adee] px-2 py-1 rounded">Lobby Standalone</span></h1>
+        
+        <div class="flex items-center space-x-6">
+            <nav class="flex space-x-2" id="nav-buttons-v2">
+                <!-- 간소화 버전이므로 로비 버튼만 활성화 상태로 둡니다. -->
+                <button class="px-4 py-2 text-sm border border-white bg-white text-black transition-colors rounded active-btn">Lobby (Main)</button>
+            </nav>
+            <!-- 텍스트 키 모드 토글 버튼 -->
+            <button onclick="toggleStringKeyMode()" id="string-key-toggle-btn" class="px-3 py-2 text-xs border border-yellow-500 text-yellow-400 bg-black/50 hover:bg-yellow-500 hover:text-black font-bold tracking-widest transition-colors rounded shadow-[0_0_10px_rgba(234,179,8,0.2)]">
+                [?] 텍스트 키 확인
+            </button>
+        </div>
+    </header>
+
+    <!-- 메인 캔버스 영역 -->
+    <main class="flex-1 flex items-center justify-center p-8 relative bg-[#050505]">
+        <div class="w-full max-w-[1280px] aspect-video relative overflow-hidden bg-[#111] shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-[#222]">
+            
+            <!-- 2-1. Lobby Screen -->
+            <div id="lobby" class="w-full h-full absolute inset-0">
+                <div class="absolute inset-0 opacity-10 bg-gradient-to-r from-black via-transparent to-black pointer-events-none"></div>
+                
+                <!-- Operator Info (Top Right) -->
+                <div class="absolute top-6 right-8 flex justify-end items-center space-x-6">
+                    <div class="flex flex-col items-end w-72">
+                        <div class="flex items-end justify-between w-full mb-1">
+                            <span class="text-[10px] text-sky-400 font-bold tracking-widest uppercase" data-i18n-key="LOBBY_TIER_NAME" data-i18n-type="local">Vanguard Tier</span>
+                            <span class="text-lg text-white font-bold leading-none">
+                                <span data-i18n-key="USER_NICKNAME" data-i18n-type="local">PlayerName</span> 
+                                <span class="text-sm text-gray-400 ml-1" data-i18n-key="USER_LEVEL" data-i18n-type="local">Lv.12</span>
+                            </span>
+                        </div>
+                        <!-- EXP Gauge -->
+                        <div class="w-full h-1.5 bg-gray-800 border border-gray-600 relative">
+                            <div class="absolute top-0 left-0 h-full bg-sky-500 w-[65%] shadow-[0_0_5px_rgba(14,165,233,0.5)]"></div>
+                        </div>
+                        <div class="w-full text-right mt-1">
+                            <span class="text-[9px] text-gray-500 tracking-widest" data-i18n-key="LOBBY_EXP_FORMAT" data-i18n-type="local">EXP 6,500 / 10,000</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Left Menu -->
+                <div class="absolute top-1/3 left-12 w-64 space-y-6">
+                    <div class="steam-text-menu active" data-i18n-key="MENU_LOBBY" data-i18n-type="local">PLAY / LOBBY</div>
+                    <div class="steam-text-menu" data-i18n-key="MENU_STASH" data-i18n-type="local">STASH / LOADOUT</div>
+                    <div class="steam-text-menu" data-i18n-key="MENU_CRAFTING" data-i18n-type="local">CRAFTING</div>
+                    <div class="steam-text-menu" data-i18n-key="MENU_COLLECTION" data-i18n-type="local">CARD COLLECTION</div>
+                    <div class="steam-text-menu" data-i18n-key="MENU_CODEX" data-i18n-type="local">POKER HANDS CODEX</div>
+                    <div class="steam-text-menu" data-i18n-key="MENU_SETTINGS" data-i18n-type="local">SETTINGS</div>
+                </div>
+                
+                <!-- 3D Character Model Placeholder -->
+                <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/3 h-3/4 wf-box-dashed border-none flex-col justify-end pb-12 opacity-50">
+                    <div class="w-full h-full border border-dashed border-gray-600 rounded-t-full flex items-center justify-center">
+                        <span class="text-lg tracking-widest text-gray-500">[ 3D CHARACTER MODEL ]</span>
+                    </div>
+                </div>
+                
+                <!-- Lobby Loadout & Deploy (Right Side) -->
+                <div class="absolute top-1/2 right-12 transform -translate-y-1/2 flex flex-col items-end z-20 w-[280px]">
+                    <button onclick="toggleLobbyLoadout()" class="mb-3 px-3 py-1.5 border border-sky-500/50 bg-sky-900/30 text-sky-400 text-[10px] tracking-widest uppercase hover:bg-sky-500/30 transition-colors shadow-[0_0_10px_rgba(56,189,248,0.2)]">
+                        TEST: 로드아웃 상태
+                    </button>
+                    <div class="wf-box flex-col p-5 items-center justify-start border border-[rgba(255,255,255,0.1)] mb-4 bg-black/60 backdrop-blur-md w-full relative">
+                        <!-- Title & Info Popover -->
+                        <div class="w-full flex items-center justify-between mb-4 relative">
+                            <span class="text-[10px] tracking-widest text-gray-400 uppercase" data-i18n-key="LOBBY_LOADOUT_TITLE" data-i18n-type="local">Current Loadout</span>
+                            <div class="relative group cursor-pointer">
+                                <div class="w-4 h-4 rounded-full border border-yellow-500 text-yellow-500 flex items-center justify-center text-[10px] font-bold hover:bg-yellow-500 hover:text-black transition-colors">?</div>
+                                <!-- Popover Content -->
+                                <div class="absolute bottom-full right-0 mb-2 w-[280px] p-4 bg-[#111] border border-yellow-500/50 shadow-[0_0_20px_rgba(234,179,8,0.15)] hidden group-hover:block z-50 cursor-default pointer-events-none text-left">
+                                    <div class="text-yellow-400 font-bold text-xs tracking-widest mb-2 border-b border-yellow-500/30 pb-1">SPEC: CURRENT LOADOUT</div>
+                                    <div class="text-[10px] text-gray-300 space-y-1.5 leading-relaxed">
+                                        <p>① 현재 로드아웃에 배치된 첫번째 카드와 두번째 캐릭터가 좌측에 크게 비춰집니다.</p>
+                                        <p>② 배치한 카드가 없는 경우에도 빈 카드가 출력됩니다.</p>
+                                        <p>③ 로드아웃 UI에 마우스 오버 시, 간단한 카드 정보가 출력됩니다.</p>
+                                        <p>④ 카드를 0장 혹은 1장만 장착한 경우에는 경고 팝업이 출력됩니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="lobby-loadout-slots" class="w-full flex justify-center space-x-4 mb-2">
+                            <!-- Dynamic via JS -->
+                        </div>
+                    </div>
+                    
+                    <button class="w-full py-3 mb-10 border border-white bg-white/5 hover:bg-white hover:text-black transition-colors text-xs tracking-[0.2em] uppercase font-bold text-center shadow-[0_0_15px_rgba(255,255,255,0.1)]" data-i18n-key="BTN_CARD_SETTING" data-i18n-type="local">
+                        카드 세팅 (UI Only)
+                    </button>
+                </div>
+
+                <!-- Target Location & Deploy Button -->
+                <div class="absolute bottom-12 right-12 flex flex-col items-end">
+                    <div class="text-right mb-4">
+                        <div class="text-xs tracking-widest text-gray-500 mb-1 uppercase" data-i18n-key="LOBBY_TARGET_LOC" data-i18n-type="local">Target Location</div>
+                        <div class="text-3xl font-bold text-white tracking-widest" data-i18n-key="STAGE_ABANDONED_LAB" data-i18n-type="ref">ABANDONED LAB</div>
+                    </div>
+                    <div class="wf-box w-72 h-16 text-2xl tracking-[0.3em] font-bold bg-white text-black cursor-pointer hover:bg-gray-300 border-none transition-all" data-i18n-key="BTN_DEPLOY" data-i18n-type="local">
+                        DEPLOY
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // 로비 관련 변수 상태
+        let lobbyLoadoutState = 2; // 0: empty, 1: one card, 2: two cards
+        let isStringKeyMode = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 로비 로드아웃 초기화
+            renderLobbyLoadout();
+        });
+
+        // --- String Key Mode Toggle Logic ---
+        function toggleStringKeyMode() {
+            isStringKeyMode = !isStringKeyMode;
+            const btn = document.getElementById('string-key-toggle-btn');
+            if (isStringKeyMode) {
+                btn.classList.add('bg-yellow-500', 'text-black');
+                btn.classList.remove('text-yellow-400', 'bg-black/50');
+                btn.innerText = "[?] 텍스트 복구";
+            } else {
+                btn.classList.remove('bg-yellow-500', 'text-black');
+                btn.classList.add('text-yellow-400', 'bg-black/50');
+                btn.innerText = "[?] 텍스트 키 확인";
+            }
+            
+            applyStringKeyModeToContainer(document.getElementById('lobby'));
+        }
+
+        function applyStringKeyModeToContainer(container) {
+            if(!container) return;
+            const elements = container.querySelectorAll('[data-i18n-key]');
+            elements.forEach(el => {
+                if (isStringKeyMode) {
+                    if (!el.hasAttribute('data-original-html')) {
+                        el.setAttribute('data-original-html', el.innerHTML);
+                    }
+                    const key = el.getAttribute('data-i18n-key');
+                    const type = el.getAttribute('data-i18n-type');
+                    let badge = '';
+                    if (type === 'ref') {
+                        badge = `<span class="inline-block bg-green-500 text-black text-[9px] font-bold px-1.5 py-0.5 mr-1.5 rounded-full leading-none tracking-normal align-middle shadow border border-green-700">RefItem</span>`;
+                    } else if (type === 'local') {
+                        badge = `<span class="inline-block bg-yellow-400 text-black text-[9px] font-bold px-1.5 py-0.5 mr-1.5 rounded-sm leading-none tracking-normal align-middle shadow border border-yellow-600">Local</span>`;
+                    }
+                    el.innerHTML = `<span class="inline-flex items-center w-fit">${badge}<span class="text-yellow-200 font-mono text-[11px] tracking-normal break-all leading-tight drop-shadow-md">${key}</span></span>`;
+                } else {
+                    if (el.hasAttribute('data-original-html')) {
+                        el.innerHTML = el.getAttribute('data-original-html');
+                    }
+                }
+            });
+        }
+
+        // --- 로비 로드아웃 UI 토글 로직 ---
+        function toggleLobbyLoadout() {
+            lobbyLoadoutState = (lobbyLoadoutState + 1) % 3;
+            renderLobbyLoadout();
+        }
+
+        function renderLobbyLoadout() {
+            const container = document.getElementById('lobby-loadout-slots');
+            if(!container) return;
+
+            let html = '';
+            const emptySlotHtml = `
+                <div class="wf-box w-20 h-28 text-xs flex-col justify-center border-dashed border-gray-600 text-gray-500 relative bg-black/40">
+                    <span class="text-gray-500 text-[8px] uppercase font-bold tracking-widest text-center leading-tight px-1" data-i18n-key="MSG_EMPTY_CARD" data-i18n-type="local">빈 카드로<br>시작됩니다</span>
+                </div>
+            `;
+            const card1Html = `
+                <div class="wf-box w-20 h-28 text-xs flex-col border-[rgba(255,255,255,0.3)] shadow-[0_0_10px_rgba(255,255,255,0.05)] overflow-hidden relative">
+                    <span class="absolute top-2 left-2 text-white font-bold text-xs">♠ A</span>
+                    <span class="mt-auto mb-2 wf-text-xs font-bold bg-black/80 px-1 py-0.5 w-full z-10 text-white text-[9px]" data-i18n-key="CARD_FIREBALL" data-i18n-type="ref">화염구 투척</span>
+                </div>
+            `;
+            const card2Html = `
+                <div class="wf-box w-20 h-28 text-xs flex-col border-[rgba(255,255,255,0.3)] shadow-[0_0_10px_rgba(255,255,255,0.05)] overflow-hidden relative">
+                    <span class="absolute top-2 left-2 text-white font-bold text-xs">♠ K</span>
+                    <span class="mt-auto mb-2 wf-text-xs font-bold bg-black/80 px-1 py-0.5 w-full z-10 text-gray-300 text-[9px]" data-i18n-key="CARD_KINGSMASH" data-i18n-type="ref">킹 스매시</span>
+                </div>
+            `;
+
+            if(lobbyLoadoutState === 0) {
+                html = emptySlotHtml + emptySlotHtml;
+            } else if(lobbyLoadoutState === 1) {
+                html = card1Html + emptySlotHtml;
+            } else {
+                html = card1Html + card2Html;
+            }
+            container.innerHTML = html;
+            
+            // 토글 모드가 켜져있다면 방금 그린 요소에도 바로 다국어 키를 적용합니다.
+            if(isStringKeyMode) {
+                applyStringKeyModeToContainer(container);
+            }
+        }
+    </script>
+</body>
+</html>
