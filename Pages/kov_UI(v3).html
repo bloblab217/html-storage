@@ -202,7 +202,6 @@
                 </div>
 
                 <div class="absolute bottom-12 right-12 flex flex-col items-end z-20">
-                    <!-- 요청하신 [5]번 로직 배지 복구 및 내용 추가 -->
                     <span class="logic-badge hidden-badge absolute -top-8 -left-6 z-30" onmouseenter="showTooltip(event, '[⑤ 게임 시작 정보 (DEPLOY)]', '● 타겟 목표 지역 출력 (현재는 하수도 고정 예정. 추후 업데이트 대비용)<br>● 게임 시작 버튼<br>&nbsp;&nbsp;○ 카드 세팅이 2장 미만일 경우, 경고 팝업 출력 필요.<br>&nbsp;&nbsp;○ 시작 시 로딩 화면과 현재 세팅한 카드 정보를 바탕으로 캐릭터가 생성되고, 싱글 스테이지로 진입한다.')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
                     <div class="text-right mb-4">
                         <div class="text-xs tracking-widest text-gray-500 mb-1 uppercase" data-i18n-key="LOBBY_TARGET_LOC" data-i18n-type="local">Target Location</div>
@@ -382,7 +381,7 @@
             </div>
 
             <!-- ========================================== -->
-            <!-- 3. In-Game HUD Screen (UPDATED v3.3 - Layout Match & Side Deck Fix) -->
+            <!-- 3. In-Game HUD Screen (UPDATED v3.4 - Deck Toggle Fixed) -->
             <!-- ========================================== -->
             <div id="ingame" class="screen-container active w-full h-full absolute inset-0 bg-[#1e2330] overflow-hidden">
                 <!-- Background Grid -->
@@ -515,7 +514,7 @@
                 <div class="absolute top-1/2 right-6 transform -translate-y-1/2 flex flex-col items-end z-20">
                     <div class="flex items-center flex-row-reverse space-x-2 space-x-reverse relative group">
                         
-                        <!-- Bag Icon Wrapper (with Popup attached relative to it) -->
+                        <!-- Bag Icon Wrapper -->
                         <div class="relative">
                             <!-- Inventory Popup Panel -->
                             <div id="ingame-inventory-panel" class="hidden absolute right-[calc(100%+12px)] top-1/2 transform -translate-y-1/2 wf-box flex-col p-4 w-64 bg-[#111]/95 backdrop-blur-md border border-gray-600 shadow-2xl items-start">
@@ -562,34 +561,24 @@
                 </div>
 
                 <!-- Bottom Left: Deck & HP Bar -->
-                <div class="absolute bottom-8 left-6 flex items-end space-x-8 z-20 w-[600px]">
-                    <!-- 1. Side Deck / Main Deck Area -->
-                    <div class="relative flex flex-col justify-end h-full">
-                        <!-- Side Deck Overlay Area (Positioned higher) -->
-                        <div class="absolute bottom-36 left-0 flex flex-col items-start z-30">
-                             <!-- Circle Button (Shown when side deck is hidden) -->
-                            <button id="deck-toggle-btn" onclick="toggleDeckView()" class="w-14 h-14 rounded-full bg-sky-300 hover:bg-sky-200 transition-colors shadow-[0_0_20px_rgba(125,211,252,0.6)] flex items-center justify-center text-black font-bold"></button>
-                            
-                            <!-- Side Deck (Hidden by default, replaces button) -->
-                            <div id="ingame-side-deck" class="hidden flex items-end space-x-2 transition-opacity duration-300 p-3 bg-black/90 border border-[rgba(255,255,255,0.2)] backdrop-blur-md rounded-sm w-max shadow-2xl">
-                                <div class="flex flex-col items-center justify-center h-20 px-2 mr-2 border-r border-gray-700">
-                                    <span class="text-[10px] text-gray-400 uppercase tracking-widest rotate-180" style="writing-mode: vertical-rl;" data-i18n-key="INGAME_SIDE_DECK" data-i18n-type="local">Side Deck</span>
-                                </div>
-                                <div class="w-14 h-20 border border-white/80 bg-[#1a1a1a] flex justify-center p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.1)]"><span class="text-[10px] text-white font-bold">♠ 3</span></div>
-                                <div class="w-14 h-20 border border-white/80 bg-[#1a1a1a] flex justify-center p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.1)]"><span class="text-[10px] text-white font-bold">♥ 3</span></div>
-                                <div class="w-14 h-20 border border-white/80 bg-[#1a1a1a] flex justify-center p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.1)]"><span class="text-[10px] text-white font-bold">♦ 4</span></div>
-                                <div class="w-14 h-20 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50"><span class="text-xl text-gray-600">+</span></div>
-                                <div class="w-14 h-20 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50"><span class="text-xl text-gray-600">+</span></div>
-                                <!-- Close Button inside Side Deck -->
-                                <button onclick="toggleDeckView()" class="ml-4 px-2 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white border border-gray-600 transition-colors flex flex-col items-center justify-center text-[10px] tracking-widest uppercase h-20">
-                                    <span class="mb-1">▶</span>
-                                    <span style="writing-mode: vertical-rl;" data-i18n-key="BTN_CLOSE" data-i18n-type="local">Close</span>
-                                </button>
+                <div class="absolute bottom-8 left-6 flex items-end z-20 w-[600px]">
+                    <!-- 1. Deck Area -->
+                    <div class="relative flex items-end">
+                        
+                        <!-- Side Deck (Elevated position, current position maintained) -->
+                        <div id="ingame-side-deck" class="hidden absolute bottom-[110%] left-0 flex items-end space-x-2 transition-opacity duration-300 p-3 bg-black/90 border border-[rgba(255,255,255,0.2)] backdrop-blur-md rounded-sm w-max shadow-2xl z-30">
+                            <div class="flex flex-col items-center justify-center h-20 px-2 mr-2 border-r border-gray-700">
+                                <span class="text-[10px] text-gray-400 uppercase tracking-widest rotate-180" style="writing-mode: vertical-rl;" data-i18n-key="INGAME_SIDE_DECK" data-i18n-type="local">Side Deck</span>
                             </div>
+                            <div class="w-14 h-20 border border-white/80 bg-[#1a1a1a] flex justify-center p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.1)]"><span class="text-[10px] text-white font-bold">♠ 3</span></div>
+                            <div class="w-14 h-20 border border-white/80 bg-[#1a1a1a] flex justify-center p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.1)]"><span class="text-[10px] text-white font-bold">♥ 3</span></div>
+                            <div class="w-14 h-20 border border-white/80 bg-[#1a1a1a] flex justify-center p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.1)]"><span class="text-[10px] text-white font-bold">♦ 4</span></div>
+                            <div class="w-14 h-20 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50"><span class="text-xl text-gray-600">+</span></div>
+                            <div class="w-14 h-20 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50"><span class="text-xl text-gray-600">+</span></div>
                         </div>
 
                         <!-- Main Deck View (2 Cards only) -->
-                        <div id="ingame-main-deck" class="flex space-x-[-20px] items-end relative z-10 pl-4 mt-auto">
+                        <div id="ingame-main-deck" class="flex space-x-[-20px] items-end relative z-10 pl-6">
                             <!-- Slot 2 (Background) -->
                             <div class="w-16 h-24 border border-gray-500 bg-[#111] transform -rotate-6 flex items-start justify-start p-2 shadow-lg brightness-50">
                                 <span class="text-xs text-gray-400 font-bold">♥ 7</span>
@@ -598,17 +587,20 @@
                             <div class="w-16 h-24 border border-white bg-[#1a1a1a] transform rotate-2 flex items-start justify-start p-2 shadow-[0_0_15px_rgba(255,255,255,0.2)] -translate-y-4">
                                 <span class="text-xs text-white font-bold">♠ K</span>
                             </div>
+
+                            <!-- Circle Button (Overlapping bottom-left of Main Deck) -->
+                            <button id="deck-toggle-btn" onclick="toggleDeckView()" class="absolute left-0 -bottom-2 w-12 h-12 rounded-full bg-sky-300 hover:bg-sky-200 transition-colors shadow-[0_0_15px_rgba(125,211,252,0.6)] z-30 flex items-center justify-center text-black font-bold"></button>
                         </div>
                     </div>
 
-                    <!-- 2. HP Bar Group (Moved to the left, next to deck) -->
-                    <div class="flex flex-col items-start w-64 mb-1 pl-4 relative">
-                        <button onclick="toggleHPState()" class="absolute -top-10 left-4 px-2 py-1 border border-red-500/50 bg-red-900/30 text-red-400 text-[8px] tracking-widest uppercase hover:bg-red-500/30 transition-colors z-20 shadow-[0_0_5px_rgba(239,68,68,0.2)]">
+                    <!-- 2. HP Bar Group -->
+                    <div class="flex flex-col items-start w-64 mb-1 ml-4 relative">
+                        <button onclick="toggleHPState()" class="absolute -top-10 left-0 px-2 py-1 border border-red-500/50 bg-red-900/30 text-red-400 text-[8px] tracking-widest uppercase hover:bg-red-500/30 transition-colors z-20 shadow-[0_0_5px_rgba(239,68,68,0.2)]">
                             Test: 체력 상태
                         </button>
                         <div id="ingame-main-hp-container" class="flex flex-col w-full items-center transition-all">
                             <!-- Debuffs -->
-                            <div class="flex flex-wrap w-full justify-center gap-1 mb-1.5">
+                            <div class="flex flex-wrap w-full justify-start gap-1 mb-1.5 pl-1">
                                 <div class="w-3 h-3 bg-red-500 border border-red-300 shadow-[0_0_5px_rgba(239,68,68,0.8)]"></div>
                                 <div class="w-3 h-3 bg-sky-400 border border-sky-200 shadow-[0_0_5px_rgba(56,189,248,0.8)]"></div>
                                 <div class="w-3 h-3 bg-sky-400 border border-sky-200 shadow-[0_0_5px_rgba(56,189,248,0.8)]"></div>
@@ -620,7 +612,7 @@
                                 <div id="ingame-hp-bar" class="h-full bg-white w-[90%] shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-300"></div>
                             </div>
                             <!-- HP Numerical Value -->
-                            <div id="ingame-hp-text" class="text-[9px] tracking-widest font-bold text-white/80 mt-1 transition-colors">
+                            <div id="ingame-hp-text" class="text-[9px] tracking-widest font-bold text-white/80 mt-1 transition-colors w-full text-center">
                                 450 / 500
                             </div>
                         </div>
@@ -1697,16 +1689,13 @@
 
         function toggleDeckView() {
             const sideDeck = document.getElementById('ingame-side-deck');
-            const toggleBtn = document.getElementById('deck-toggle-btn');
             
             if(sideDeck.classList.contains('hidden')) {
                 sideDeck.classList.remove('hidden');
                 sideDeck.classList.add('flex');
-                toggleBtn.classList.add('hidden'); // 동그라미 버튼 숨기기
             } else {
                 sideDeck.classList.add('hidden');
                 sideDeck.classList.remove('flex');
-                toggleBtn.classList.remove('hidden'); // 동그라미 버튼 보이기
             }
         }
 
