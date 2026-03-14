@@ -80,7 +80,7 @@
                 <div id="result-subtitle" class="text-sm tracking-widest text-green-500/70" data-i18n-key="RESULT_SUB_SUCCESS" data-i18n-type="local">무사히 귀환 포탈을 통해 탈출했습니다.</div>
             </div>
 
-            <!-- 중단: 경험치 & 스탯 & 완성 족보 내역 -->
+            <!-- 중단: 경험치 & 스탯 & 완성 족보/덱 -->
             <div class="flex-1 flex w-full h-0 relative z-10">
                 
                 <!-- 좌측: 유저 성장 및 통계 -->
@@ -111,10 +111,10 @@
                                 <span class="text-gray-400" data-i18n-key="STAT_ZONES_CLEARED" data-i18n-type="local">돌파한 구역</span>
                                 <span class="text-white font-bold block">3 구역</span>
                             </div>
-                            <div class="flex justify-between text-xs text-gray-500">
-                                <span data-i18n-key="STAT_ZONE_SEWER" data-i18n-type="local">지하도 : <span class="text-white font-bold">1개 구역</span></span>
-                                <span data-i18n-key="STAT_ZONE_ALLEY" data-i18n-type="local">뒷골목 : <span class="text-white font-bold">1개 구역</span></span>
-                                <span data-i18n-key="STAT_ZONE_FACTORY" data-i18n-type="local">공장 : <span class="text-white font-bold">1개 구역</span></span>
+                            <div class="flex justify-between text-[11px] text-gray-400 bg-black/30 p-2 rounded">
+                                <span data-i18n-key="STAT_ZONE_SEWER" data-i18n-type="local">지하도: <span class="text-white font-bold">1개 구역</span></span>
+                                <span data-i18n-key="STAT_ZONE_ALLEY" data-i18n-type="local">뒷골목: <span class="text-white font-bold">1개 구역</span></span>
+                                <span data-i18n-key="STAT_ZONE_FACTORY" data-i18n-type="local">공장: <span class="text-white font-bold">1개 구역</span></span>
                             </div>
                         </div>
 
@@ -151,111 +151,120 @@
                 </div>
 
                 <!-- 우측: 이번 게임에서 완성한 전체 족보 리스트 & 덱 상태 -->
-                <div class="w-7/12 h-full p-8 flex flex-col relative overflow-hidden">
-                    <span class="logic-badge hidden-badge absolute top-8 right-8 z-20" onmouseenter="showTooltip(event, '[③ 달성 족보 기록]', '- 이번 게임 플레이 도중 유저가 완성했던 모든 족보의 종류를 노출<br>- 스크롤을 통해 전체 족보 확인 가능<br>- 생존/사망 여부와 무관하게 표시')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
+                <div class="w-7/12 h-full py-8 pr-8 pl-6 flex flex-col relative overflow-hidden">
                     
-                    <!-- 헤더 -->
-                    <div class="flex justify-between items-end mb-6 border-b border-gray-800 pb-2 shrink-0">
-                        <div class="text-xl font-light tracking-widest text-white uppercase" data-i18n-key="RESULT_LBL_HANDS" data-i18n-type="local">Completed Poker Hands</div>
-                        <div class="text-xs text-purple-400 tracking-widest" data-i18n-key="RESULT_HANDS_SUB" data-i18n-type="local">총 8개의 족보 활성화</div>
+                    <!-- 1. 상단: 족보 영역 (고정 영역) -->
+                    <div class="h-[60%] flex flex-col border-b border-gray-800 pb-4 mb-4 relative">
+                        <span class="logic-badge hidden-badge absolute -top-4 right-4 z-20" onmouseenter="showTooltip(event, '[③ 달성 족보 기록]', '- 이번 게임 플레이 도중 유저가 완성했던 모든 족보의 종류를 노출<br>- 스크롤을 통해 전체 족보 확인 가능<br>- 생존/사망 여부와 무관하게 표시')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
+                        
+                        <!-- 헤더 -->
+                        <div class="flex justify-between items-end mb-4 shrink-0 px-2">
+                            <div class="text-xl font-light tracking-widest text-white uppercase" data-i18n-key="RESULT_LBL_HANDS" data-i18n-type="local">Completed Poker Hands</div>
+                            <div class="text-xs text-purple-400 tracking-widest" data-i18n-key="RESULT_HANDS_SUB" data-i18n-type="local">총 8개의 족보 활성화</div>
+                        </div>
+
+                        <!-- Hands List (Scrollable Grid) - 3 Columns -->
+                        <div class="flex-1 overflow-y-auto px-2 grid grid-cols-3 gap-4 content-start" id="result-hands-list">
+                            
+                            <!-- Item 1 -->
+                            <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
+                                <div class="absolute top-0 left-0 right-0 h-1 bg-purple-500"></div>
+                                <div class="w-14 h-14 flex items-center justify-center border border-purple-500/50 bg-purple-900/20 text-3xl text-purple-300 mb-3 mt-2 shadow-[0_0_10px_rgba(168,85,247,0.2)]">🃏</div>
+                                <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FLUSH" data-i18n-type="ref">FLUSH</div>
+                            </div>
+
+                            <!-- Item 2 -->
+                            <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
+                                <div class="absolute top-0 left-0 right-0 h-1 bg-yellow-500"></div>
+                                <div class="w-14 h-14 flex items-center justify-center border border-yellow-500/50 bg-yellow-900/20 text-3xl text-yellow-300 mb-3 mt-2 shadow-[0_0_10px_rgba(234,179,8,0.2)]">🎴</div>
+                                <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FULLHOUSE" data-i18n-type="ref">FULL HOUSE</div>
+                            </div>
+
+                            <!-- Item 3 -->
+                            <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
+                                <div class="absolute top-0 left-0 right-0 h-1 bg-gray-500"></div>
+                                <div class="w-14 h-14 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-3xl text-gray-300 mb-3 mt-2">🎴</div>
+                                <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_ONEPAIR" data-i18n-type="ref">ONE PAIR</div>
+                            </div>
+
+                            <!-- Item 4 -->
+                            <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
+                                <div class="absolute top-0 left-0 right-0 h-1 bg-gray-500"></div>
+                                <div class="w-14 h-14 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-3xl text-gray-300 mb-3 mt-2">🎴</div>
+                                <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_TWOPAIR" data-i18n-type="ref">TWO PAIR</div>
+                            </div>
+                            
+                            <!-- Item 5 -->
+                            <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
+                                <div class="absolute top-0 left-0 right-0 h-1 bg-red-500"></div>
+                                <div class="w-14 h-14 flex items-center justify-center border border-red-500/50 bg-red-900/20 text-3xl text-red-300 mb-3 mt-2 shadow-[0_0_10px_rgba(239,68,68,0.2)]">🃏</div>
+                                <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_STRAIGHT" data-i18n-type="ref">STRAIGHT</div>
+                            </div>
+
+                            <!-- Item 6 -->
+                            <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
+                                <div class="absolute top-0 left-0 right-0 h-1 bg-orange-500"></div>
+                                <div class="w-14 h-14 flex items-center justify-center border border-orange-500/50 bg-orange-900/20 text-3xl text-orange-300 mb-3 mt-2 shadow-[0_0_10px_rgba(249,115,22,0.2)]">🃏</div>
+                                <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_ROYALFLUSH" data-i18n-type="ref">ROYAL FLUSH</div>
+                            </div>
+
+                            <!-- Item 7 -->
+                            <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
+                                <div class="absolute top-0 left-0 right-0 h-1 bg-blue-500"></div>
+                                <div class="w-14 h-14 flex items-center justify-center border border-blue-500/50 bg-blue-900/20 text-3xl text-blue-300 mb-3 mt-2 shadow-[0_0_10px_rgba(59,130,246,0.2)]">🎴</div>
+                                <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_TRIPLE" data-i18n-type="ref">TRIPLE</div>
+                            </div>
+
+                            <!-- Item 8 -->
+                            <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
+                                <div class="absolute top-0 left-0 right-0 h-1 bg-green-500"></div>
+                                <div class="w-14 h-14 flex items-center justify-center border border-green-500/50 bg-green-900/20 text-3xl text-green-300 mb-3 mt-2 shadow-[0_0_10px_rgba(34,197,94,0.2)]">🃏</div>
+                                <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FOURCARD" data-i18n-type="ref">FOUR CARD</div>
+                            </div>
+                            
+                        </div>
                     </div>
 
-                    <!-- Hands List (Scrollable Grid) - 3 Columns -->
-                    <div class="flex-1 overflow-y-auto pr-4 grid grid-cols-3 gap-4 content-start mb-6" id="result-hands-list">
+                    <!-- 2. 하단: 덱 상태 영역 (고정 영역) -->
+                    <div class="h-[40%] flex flex-col justify-start px-2 relative">
+                        <span class="logic-badge hidden-badge absolute -top-1 right-4 z-20" onmouseenter="showTooltip(event, '[④ 덱 상태 확인]', '- 게임 종료(탈출/사망) 시점의 메인 덱과 사이드 덱 상태를 표시<br>- 다음 게임을 위한 피드백 용도')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
                         
-                        <!-- Item 1 -->
-                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
-                            <div class="absolute top-0 left-0 right-0 h-1 bg-purple-500"></div>
-                            <div class="w-14 h-14 flex items-center justify-center border border-purple-500/50 bg-purple-900/20 text-3xl text-purple-300 mb-3 mt-2 shadow-[0_0_10px_rgba(168,85,247,0.2)]">🃏</div>
-                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FLUSH" data-i18n-type="ref">FLUSH</div>
-                        </div>
+                        <div class="text-lg font-light tracking-widest text-white uppercase mb-4" data-i18n-key="RESULT_LBL_FINAL_DECK" data-i18n-type="local">Final Deck Status</div>
 
-                        <!-- Item 2 -->
-                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
-                            <div class="absolute top-0 left-0 right-0 h-1 bg-yellow-500"></div>
-                            <div class="w-14 h-14 flex items-center justify-center border border-yellow-500/50 bg-yellow-900/20 text-3xl text-yellow-300 mb-3 mt-2 shadow-[0_0_10px_rgba(234,179,8,0.2)]">🎴</div>
-                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FULLHOUSE" data-i18n-type="ref">FULL HOUSE</div>
-                        </div>
-
-                        <!-- Item 3 -->
-                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
-                            <div class="absolute top-0 left-0 right-0 h-1 bg-gray-500"></div>
-                            <div class="w-14 h-14 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-3xl text-gray-300 mb-3 mt-2">🎴</div>
-                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_ONEPAIR" data-i18n-type="ref">ONE PAIR</div>
-                        </div>
-
-                        <!-- Item 4 -->
-                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
-                            <div class="absolute top-0 left-0 right-0 h-1 bg-gray-500"></div>
-                            <div class="w-14 h-14 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-3xl text-gray-300 mb-3 mt-2">🎴</div>
-                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_TWOPAIR" data-i18n-type="ref">TWO PAIR</div>
-                        </div>
-                        
-                        <!-- Item 5 -->
-                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
-                            <div class="absolute top-0 left-0 right-0 h-1 bg-red-500"></div>
-                            <div class="w-14 h-14 flex items-center justify-center border border-red-500/50 bg-red-900/20 text-3xl text-red-300 mb-3 mt-2 shadow-[0_0_10px_rgba(239,68,68,0.2)]">🃏</div>
-                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_STRAIGHT" data-i18n-type="ref">STRAIGHT</div>
-                        </div>
-
-                        <!-- Item 6 -->
-                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
-                            <div class="absolute top-0 left-0 right-0 h-1 bg-orange-500"></div>
-                            <div class="w-14 h-14 flex items-center justify-center border border-orange-500/50 bg-orange-900/20 text-3xl text-orange-300 mb-3 mt-2 shadow-[0_0_10px_rgba(249,115,22,0.2)]">🃏</div>
-                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_ROYALFLUSH" data-i18n-type="ref">ROYAL FLUSH</div>
-                        </div>
-
-                        <!-- Item 7 -->
-                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
-                            <div class="absolute top-0 left-0 right-0 h-1 bg-blue-500"></div>
-                            <div class="w-14 h-14 flex items-center justify-center border border-blue-500/50 bg-blue-900/20 text-3xl text-blue-300 mb-3 mt-2 shadow-[0_0_10px_rgba(59,130,246,0.2)]">🎴</div>
-                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_TRIPLE" data-i18n-type="ref">TRIPLE</div>
-                        </div>
-
-                        <!-- Item 8 -->
-                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
-                            <div class="absolute top-0 left-0 right-0 h-1 bg-green-500"></div>
-                            <div class="w-14 h-14 flex items-center justify-center border border-green-500/50 bg-green-900/20 text-3xl text-green-300 mb-3 mt-2 shadow-[0_0_10px_rgba(34,197,94,0.2)]">🃏</div>
-                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FOURCARD" data-i18n-type="ref">FOUR CARD</div>
-                        </div>
-                        
-                    </div>
-
-                    <!-- 하단: 탈출 시점 덱 구성 (내부로 편입) -->
-                    <div class="shrink-0 border-t border-gray-800 pt-6 flex items-end space-x-8 relative">
-                        <span class="logic-badge hidden-badge absolute -top-3 left-0 z-20" onmouseenter="showTooltip(event, '[④ 덱 상태 확인]', '- 게임 종료(탈출/사망) 시점의 메인 덱과 사이드 덱 상태를 표시<br>- 다음 게임을 위한 피드백 용도')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
-                        
-                        <!-- Main Deck -->
-                        <div class="flex flex-col items-start">
-                            <span class="text-[10px] text-gray-400 tracking-widest mb-2 uppercase" data-i18n-key="RESULT_DECK_MAIN" data-i18n-type="local">Main Deck (2/2)</span>
-                            <div class="flex space-x-[-15px]">
-                                <div class="w-12 h-16 border border-gray-500 bg-[#111] flex items-start justify-start p-1.5 shadow-lg brightness-75">
-                                    <span class="text-[10px] text-gray-400 font-bold">♥ 7</span>
-                                </div>
-                                <div class="w-12 h-16 border border-white bg-[#1a1a1a] flex items-start justify-start p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                                    <span class="text-[10px] text-white font-bold">♠ K</span>
+                        <!-- 탈출 시점 Deck UI -->
+                        <div class="flex items-end space-x-12">
+                            <!-- Main Deck -->
+                            <div class="flex flex-col items-start">
+                                <span class="text-[10px] text-gray-400 tracking-widest mb-3 uppercase" data-i18n-key="RESULT_DECK_MAIN" data-i18n-type="local">Main Deck (2/2)</span>
+                                <div class="flex space-x-[-15px]">
+                                    <div class="w-16 h-24 border border-gray-500 bg-[#111] flex items-start justify-start p-2 shadow-lg brightness-75">
+                                        <span class="text-xs text-gray-400 font-bold">♥ 7</span>
+                                    </div>
+                                    <div class="w-16 h-24 border border-white bg-[#1a1a1a] flex items-start justify-start p-2 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                                        <span class="text-xs text-white font-bold">♠ K</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Side Deck -->
-                        <div class="flex flex-col items-start">
-                            <span class="text-[10px] text-gray-400 tracking-widest mb-2 uppercase" data-i18n-key="RESULT_DECK_SIDE" data-i18n-type="local">Side Deck (3/5)</span>
-                            <div class="flex space-x-2">
-                                <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                                    <span class="text-[10px] text-white font-bold">♠ 3</span>
-                                </div>
-                                <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                                    <span class="text-[10px] text-white font-bold">♥ 3</span>
-                                </div>
-                                <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                                    <span class="text-[10px] text-white font-bold">♦ 4</span>
-                                </div>
-                                <div class="w-12 h-16 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50">
-                                    <span class="text-lg text-gray-600">+</span>
-                                </div>
-                                <div class="w-12 h-16 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50">
-                                    <span class="text-lg text-gray-600">+</span>
+                            <!-- Side Deck -->
+                            <div class="flex flex-col items-start">
+                                <span class="text-[10px] text-gray-400 tracking-widest mb-3 uppercase" data-i18n-key="RESULT_DECK_SIDE" data-i18n-type="local">Side Deck (3/5)</span>
+                                <div class="flex space-x-3">
+                                    <div class="w-16 h-24 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                        <span class="text-xs text-white font-bold">♠ 3</span>
+                                    </div>
+                                    <div class="w-16 h-24 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                        <span class="text-xs text-white font-bold">♥ 3</span>
+                                    </div>
+                                    <div class="w-16 h-24 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                        <span class="text-xs text-white font-bold">♦ 4</span>
+                                    </div>
+                                    <div class="w-16 h-24 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50">
+                                        <span class="text-2xl text-gray-600">+</span>
+                                    </div>
+                                    <div class="w-16 h-24 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50">
+                                        <span class="text-2xl text-gray-600">+</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -375,7 +384,6 @@
             const title = document.getElementById('result-title');
             const subtitle = document.getElementById('result-subtitle');
             const bgOverlay = document.getElementById('bg-overlay');
-            // opacity 변경 삭제 (항상 1 유지)
 
             if (!isStringKeyMode) {
                 if (isSuccess) {
