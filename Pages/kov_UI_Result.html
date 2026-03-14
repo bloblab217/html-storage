@@ -139,25 +139,25 @@
 
                         <div class="flex justify-between items-center text-sm border-b border-white/5 pb-2">
                             <span class="text-gray-400" data-i18n-key="STAT_ACE_CARD" data-i18n-type="local">가장 에이스 카드 (최고 피해)</span>
-                            <span class="text-yellow-400 font-bold">♠ K (킹 스매시)</span>
+                            <span class="text-yellow-400 font-bold">♠ K</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- 우측: 이번 게임에서 완성한 전체 족보 리스트 -->
                 <div class="w-7/12 h-full p-8 flex flex-col relative">
-                    <span class="logic-badge hidden-badge absolute top-8 right-8 z-20" onmouseenter="showTooltip(event, '[③ 달성 족보 기록]', '- 이번 게임 플레이 도중 유저가 완성했던 모든 족보의 종류와 횟수를 노출<br>- 생존/사망 여부와 무관하게 플레이어의 성취 기록으로 남음')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
+                    <span class="logic-badge hidden-badge absolute top-8 right-8 z-20" onmouseenter="showTooltip(event, '[③ 달성 족보 기록]', '- 이번 게임 플레이 도중 유저가 완성했던 모든 족보의 종류를 노출<br>- 스크롤을 통해 전체 족보 확인 가능<br>- 생존/사망 여부와 무관하게 표시')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
                     
                     <div class="flex justify-between items-end mb-6 border-b border-gray-800 pb-2">
                         <div class="text-xl font-light tracking-widest text-white uppercase" data-i18n-key="RESULT_LBL_HANDS" data-i18n-type="local">Completed Poker Hands</div>
-                        <div class="text-xs text-purple-400 tracking-widest" data-i18n-key="RESULT_HANDS_SUB" data-i18n-type="local">총 8번의 족보를 완성했습니다.</div>
+                        <div class="text-xs text-purple-400 tracking-widest" data-i18n-key="RESULT_HANDS_SUB" data-i18n-type="local">총 8개의 족보 활성화</div>
                     </div>
 
-                    <!-- Hands List -->
+                    <!-- Hands List (Scrollable) -->
                     <div class="flex-1 overflow-y-auto pr-4 space-y-3" id="result-hands-list">
                         
                         <!-- Item 1 -->
-                        <div class="wf-box p-4 justify-between border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden transition-opacity duration-300">
+                        <div class="wf-box p-4 justify-start border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden">
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-purple-500"></div>
                             <div class="flex items-center space-x-4">
                                 <div class="w-12 h-12 flex items-center justify-center border border-purple-500/50 bg-purple-900/20 text-2xl text-purple-300">🃏</div>
@@ -166,13 +166,10 @@
                                     <div class="text-xs text-gray-400 mt-1" data-i18n-key="DESC_REC_FLUSH" data-i18n-type="local">♠A ♠K ♠Q ♠J ♠10 등 조합</div>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <div class="text-2xl font-bold text-purple-400">1<span class="text-sm text-gray-500 ml-1 font-normal" data-i18n-key="LBL_COUNT" data-i18n-type="local">회</span></div>
-                            </div>
                         </div>
 
                         <!-- Item 2 -->
-                        <div class="wf-box p-4 justify-between border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden transition-opacity duration-300">
+                        <div class="wf-box p-4 justify-start border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden">
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-yellow-500"></div>
                             <div class="flex items-center space-x-4">
                                 <div class="w-12 h-12 flex items-center justify-center border border-yellow-500/50 bg-yellow-900/20 text-2xl text-yellow-300">🎴</div>
@@ -181,13 +178,10 @@
                                     <div class="text-xs text-gray-400 mt-1" data-i18n-key="DESC_REC_FULLHOUSE" data-i18n-type="local">주요 활용: 강력한 스탯 부스팅</div>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <div class="text-2xl font-bold text-yellow-400">2<span class="text-sm text-gray-500 ml-1 font-normal" data-i18n-key="LBL_COUNT" data-i18n-type="local">회</span></div>
-                            </div>
                         </div>
 
                         <!-- Item 3 -->
-                        <div class="wf-box p-4 justify-between border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden transition-opacity duration-300">
+                        <div class="wf-box p-4 justify-start border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden">
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-500"></div>
                             <div class="flex items-center space-x-4">
                                 <div class="w-12 h-12 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-2xl text-gray-300">🎴</div>
@@ -196,22 +190,85 @@
                                     <div class="text-xs text-gray-400 mt-1" data-i18n-key="DESC_REC_ONEPAIR" data-i18n-type="local">기본 스탯 지속 회복 및 향상</div>
                                 </div>
                             </div>
-                            <div class="text-right">
-                                <div class="text-2xl font-bold text-gray-300">5<span class="text-sm text-gray-500 ml-1 font-normal" data-i18n-key="LBL_COUNT" data-i18n-type="local">회</span></div>
-                            </div>
                         </div>
 
+                        <!-- Item 4 (for Scroll) -->
+                        <div class="wf-box p-4 justify-start border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-500"></div>
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-2xl text-gray-300">🎴</div>
+                                <div class="text-left">
+                                    <div class="text-lg font-bold text-white tracking-widest" data-i18n-key="HAND_TWOPAIR" data-i18n-type="ref">TWO PAIR (투페어)</div>
+                                    <div class="text-xs text-gray-400 mt-1" data-i18n-key="DESC_REC_TWOPAIR" data-i18n-type="local">방어력 소폭 증가</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Item 5 (for Scroll) -->
+                        <div class="wf-box p-4 justify-start border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 flex items-center justify-center border border-red-500/50 bg-red-900/20 text-2xl text-red-300">🃏</div>
+                                <div class="text-left">
+                                    <div class="text-lg font-bold text-white tracking-widest" data-i18n-key="HAND_STRAIGHT" data-i18n-type="ref">STRAIGHT (스트레이트)</div>
+                                    <div class="text-xs text-gray-400 mt-1" data-i18n-key="DESC_REC_STRAIGHT" data-i18n-type="local">이동속도 증가 및 회피율 상승</div>
+                                </div>
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
 
             </div>
 
-            <!-- 하단: 네비게이션 버튼 -->
-            <div class="w-full h-24 bg-[#0a0a0a] border-t border-white/10 flex items-center justify-end px-12 relative z-10">
-                <span class="logic-badge hidden-badge absolute top-8 right-80 z-20" onmouseenter="showTooltip(event, '[④ 귀환 버튼]', '- 클릭 시 [2-1 로비] 화면으로 돌아갑니다.<br>- 로딩 스크린 연출 후 씬 전환')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
-                <button class="wf-box w-64 h-14 bg-white text-black text-lg font-bold tracking-[0.2em] hover:bg-gray-300 transition-colors uppercase border-none" data-i18n-key="BTN_RETURN_LOBBY" data-i18n-type="local">
-                    Return to Lobby
-                </button>
+            <!-- 하단: 탈출 시점 덱 구성 & 네비게이션 버튼 -->
+            <div class="w-full h-32 bg-[#0a0a0a] border-t border-white/10 flex items-center justify-between px-12 relative z-10">
+                <span class="logic-badge hidden-badge absolute top-4 left-4 z-20" onmouseenter="showTooltip(event, '[④ 덱 상태 확인]', '- 게임 종료(탈출/사망) 시점의 메인 덱과 사이드 덱 상태를 표시<br>- 다음 게임을 위한 피드백 용도')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
+                
+                <!-- 탈출 시점 Deck UI -->
+                <div class="flex items-end space-x-8">
+                    <!-- Main Deck -->
+                    <div class="flex flex-col items-start">
+                        <span class="text-[10px] text-gray-400 tracking-widest mb-2 uppercase" data-i18n-key="RESULT_DECK_MAIN" data-i18n-type="local">Main Deck (2/2)</span>
+                        <div class="flex space-x-[-15px]">
+                            <div class="w-12 h-16 border border-gray-500 bg-[#111] flex items-start justify-start p-1.5 shadow-lg brightness-75">
+                                <span class="text-[10px] text-gray-400 font-bold">♥ 7</span>
+                            </div>
+                            <div class="w-12 h-16 border border-white bg-[#1a1a1a] flex items-start justify-start p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+                                <span class="text-[10px] text-white font-bold">♠ K</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side Deck -->
+                    <div class="flex flex-col items-start">
+                        <span class="text-[10px] text-gray-400 tracking-widest mb-2 uppercase" data-i18n-key="RESULT_DECK_SIDE" data-i18n-type="local">Side Deck (3/5)</span>
+                        <div class="flex space-x-2">
+                            <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                <span class="text-[10px] text-white font-bold">♠ 3</span>
+                            </div>
+                            <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                <span class="text-[10px] text-white font-bold">♥ 3</span>
+                            </div>
+                            <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                <span class="text-[10px] text-white font-bold">♦ 4</span>
+                            </div>
+                            <div class="w-12 h-16 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50">
+                                <span class="text-lg text-gray-600">+</span>
+                            </div>
+                            <div class="w-12 h-16 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50">
+                                <span class="text-lg text-gray-600">+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <span class="logic-badge hidden-badge absolute -top-4 right-1/2 translate-x-1/2 w-max z-20" onmouseenter="showTooltip(event, '[⑤ 귀환 버튼]', '- 클릭 시 [2-1 로비] 화면으로 돌아갑니다.<br>- 로딩 스크린 연출 후 씬 전환')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
+                    <button class="wf-box w-64 h-14 bg-white text-black text-lg font-bold tracking-[0.2em] hover:bg-gray-300 transition-colors uppercase border-none" data-i18n-key="BTN_RETURN_LOBBY" data-i18n-type="local">
+                        Return to Lobby
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -317,7 +374,7 @@
             const title = document.getElementById('result-title');
             const subtitle = document.getElementById('result-subtitle');
             const bgOverlay = document.getElementById('bg-overlay');
-            const handsList = document.getElementById('result-hands-list');
+            // opacity 변경 삭제 (항상 1 유지)
 
             if (!isStringKeyMode) {
                 if (isSuccess) {
@@ -330,21 +387,17 @@
                     subtitle.setAttribute('data-i18n-key', 'RESULT_SUB_SUCCESS');
                     
                     bgOverlay.className = "absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none transition-colors duration-500";
-                    
-                    if(handsList) handsList.style.opacity = '1';
 
                 } else {
                     title.innerText = "MISSING IN ACTION";
                     title.className = "text-6xl font-extrabold tracking-[0.2em] text-red-500 drop-shadow-[0_0_20px_rgba(239,68,68,0.4)] mb-2";
                     title.setAttribute('data-i18n-key', 'RESULT_TITLE_FAIL');
                     
-                    subtitle.innerText = "섹터 내에서 사망하여 소지품의 대부분을 잃었습니다.";
+                    subtitle.innerText = "섹터 내에서 사망하여 탈출에 실패했습니다."; // 텍스트도 족보 위주로 맞게 수정
                     subtitle.className = "text-sm tracking-widest text-red-500/70";
                     subtitle.setAttribute('data-i18n-key', 'RESULT_SUB_FAIL');
                     
                     bgOverlay.className = "absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none transition-colors duration-500";
-                    
-                    if(handsList) handsList.style.opacity = '0.7'; // 사망 시 족보 기록이 살짝 어두워지는 연출
                 }
             } else {
                 // 키 모드 켜져있을 땐 데이터 키만 업데이트하고 리프레쉬
@@ -352,12 +405,10 @@
                     title.setAttribute('data-i18n-key', 'RESULT_TITLE_SUCCESS');
                     subtitle.setAttribute('data-i18n-key', 'RESULT_SUB_SUCCESS');
                     bgOverlay.className = "absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none transition-colors duration-500";
-                    if(handsList) handsList.style.opacity = '1';
                 } else {
                     title.setAttribute('data-i18n-key', 'RESULT_TITLE_FAIL');
                     subtitle.setAttribute('data-i18n-key', 'RESULT_SUB_FAIL');
                     bgOverlay.className = "absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none transition-colors duration-500";
-                    if(handsList) handsList.style.opacity = '0.7';
                 }
                 applyStringKeyModeToContainer(document.body);
             }
