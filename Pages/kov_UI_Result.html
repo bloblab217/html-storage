@@ -32,9 +32,11 @@
         .logic-badge:hover { background-color: rgba(2, 132, 199, 1); z-index: 50; }
         .hidden-badge { display: none !important; }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body class="h-screen flex flex-col font-sans overflow-hidden">
@@ -71,7 +73,7 @@
             <div id="bg-overlay" class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none transition-colors duration-500"></div>
 
             <!-- 상단: 결과 타이틀 -->
-            <div class="w-full pt-12 pb-8 flex flex-col items-center justify-center relative z-10 border-b border-white/5">
+            <div class="w-full pt-12 pb-8 flex flex-col items-center justify-center relative z-10 border-b border-white/5 shrink-0">
                 <span class="logic-badge hidden-badge absolute top-4 left-4" onmouseenter="showTooltip(event, '[① 결과 타이틀]', '- 생존(탈출) 시: EXTRACTION SUCCESS (Green 톤)<br>- 사망/시간초과 시: K.I.A / MISSING IN ACTION (Red 톤)')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
                 
                 <h1 id="result-title" class="text-6xl font-extrabold tracking-[0.2em] text-green-400 drop-shadow-[0_0_20px_rgba(74,222,128,0.3)] mb-2" data-i18n-key="RESULT_TITLE_SUCCESS" data-i18n-type="local">EXTRACTION SUCCESS</h1>
@@ -109,7 +111,7 @@
                                 <span class="text-gray-400" data-i18n-key="STAT_ZONES_CLEARED" data-i18n-type="local">돌파한 구역</span>
                                 <span class="text-white font-bold block">3 구역</span>
                             </div>
-                            <div class="flex justify-between text-[11px] text-gray-500 bg-black/30 p-2 rounded">
+                            <div class="flex justify-between text-xs text-gray-500">
                                 <span data-i18n-key="STAT_ZONE_SEWER" data-i18n-type="local">지하도 : <span class="text-white font-bold">1개 구역</span></span>
                                 <span data-i18n-key="STAT_ZONE_ALLEY" data-i18n-type="local">뒷골목 : <span class="text-white font-bold">1개 구역</span></span>
                                 <span data-i18n-key="STAT_ZONE_FACTORY" data-i18n-type="local">공장 : <span class="text-white font-bold">1개 구역</span></span>
@@ -143,118 +145,131 @@
 
                         <div class="flex justify-between items-center text-sm border-b border-white/5 pb-2">
                             <span class="text-gray-400" data-i18n-key="STAT_ACE_CARD" data-i18n-type="local">가장 에이스 카드 (최고 피해)</span>
-                            <span class="text-yellow-400 font-bold">♠ K</span>
+                            <span class="text-yellow-400 font-bold text-lg">♠ K</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 우측: 이번 게임에서 완성한 전체 족보 리스트 -->
-                <div class="w-7/12 h-full p-8 flex flex-col relative">
+                <!-- 우측: 이번 게임에서 완성한 전체 족보 리스트 & 덱 상태 -->
+                <div class="w-7/12 h-full p-8 flex flex-col relative overflow-hidden">
                     <span class="logic-badge hidden-badge absolute top-8 right-8 z-20" onmouseenter="showTooltip(event, '[③ 달성 족보 기록]', '- 이번 게임 플레이 도중 유저가 완성했던 모든 족보의 종류를 노출<br>- 스크롤을 통해 전체 족보 확인 가능<br>- 생존/사망 여부와 무관하게 표시')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
                     
+                    <!-- 헤더 -->
                     <div class="flex justify-between items-end mb-6 border-b border-gray-800 pb-2 shrink-0">
                         <div class="text-xl font-light tracking-widest text-white uppercase" data-i18n-key="RESULT_LBL_HANDS" data-i18n-type="local">Completed Poker Hands</div>
                         <div class="text-xs text-purple-400 tracking-widest" data-i18n-key="RESULT_HANDS_SUB" data-i18n-type="local">총 8개의 족보 활성화</div>
                     </div>
 
-                    <!-- Hands List (Scrollable Grid) -->
-                    <div class="flex-1 overflow-y-auto pr-4 grid grid-cols-3 gap-4 content-start" id="result-hands-list">
+                    <!-- Hands List (Scrollable Grid) - 3 Columns -->
+                    <div class="flex-1 overflow-y-auto pr-4 grid grid-cols-3 gap-4 content-start mb-6" id="result-hands-list">
                         
                         <!-- Item 1 -->
-                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
                             <div class="absolute top-0 left-0 right-0 h-1 bg-purple-500"></div>
-                            <div class="w-12 h-12 flex items-center justify-center border border-purple-500/50 bg-purple-900/20 text-2xl text-purple-300 mb-2 mt-1">🃏</div>
+                            <div class="w-14 h-14 flex items-center justify-center border border-purple-500/50 bg-purple-900/20 text-3xl text-purple-300 mb-3 mt-2 shadow-[0_0_10px_rgba(168,85,247,0.2)]">🃏</div>
                             <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FLUSH" data-i18n-type="ref">FLUSH</div>
                         </div>
 
                         <!-- Item 2 -->
-                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
                             <div class="absolute top-0 left-0 right-0 h-1 bg-yellow-500"></div>
-                            <div class="w-12 h-12 flex items-center justify-center border border-yellow-500/50 bg-yellow-900/20 text-2xl text-yellow-300 mb-2 mt-1">🎴</div>
+                            <div class="w-14 h-14 flex items-center justify-center border border-yellow-500/50 bg-yellow-900/20 text-3xl text-yellow-300 mb-3 mt-2 shadow-[0_0_10px_rgba(234,179,8,0.2)]">🎴</div>
                             <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FULLHOUSE" data-i18n-type="ref">FULL HOUSE</div>
                         </div>
 
                         <!-- Item 3 -->
-                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
                             <div class="absolute top-0 left-0 right-0 h-1 bg-gray-500"></div>
-                            <div class="w-12 h-12 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-2xl text-gray-300 mb-2 mt-1">🎴</div>
+                            <div class="w-14 h-14 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-3xl text-gray-300 mb-3 mt-2">🎴</div>
                             <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_ONEPAIR" data-i18n-type="ref">ONE PAIR</div>
                         </div>
 
-                        <!-- Item 4 (for Scroll) -->
-                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                        <!-- Item 4 -->
+                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
                             <div class="absolute top-0 left-0 right-0 h-1 bg-gray-500"></div>
-                            <div class="w-12 h-12 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-2xl text-gray-300 mb-2 mt-1">🎴</div>
+                            <div class="w-14 h-14 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-3xl text-gray-300 mb-3 mt-2">🎴</div>
                             <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_TWOPAIR" data-i18n-type="ref">TWO PAIR</div>
                         </div>
                         
-                        <!-- Item 5 (for Scroll) -->
-                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                        <!-- Item 5 -->
+                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
                             <div class="absolute top-0 left-0 right-0 h-1 bg-red-500"></div>
-                            <div class="w-12 h-12 flex items-center justify-center border border-red-500/50 bg-red-900/20 text-2xl text-red-300 mb-2 mt-1">🃏</div>
+                            <div class="w-14 h-14 flex items-center justify-center border border-red-500/50 bg-red-900/20 text-3xl text-red-300 mb-3 mt-2 shadow-[0_0_10px_rgba(239,68,68,0.2)]">🃏</div>
                             <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_STRAIGHT" data-i18n-type="ref">STRAIGHT</div>
                         </div>
 
-                        <!-- Additional Item -->
-                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                        <!-- Item 6 -->
+                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
                             <div class="absolute top-0 left-0 right-0 h-1 bg-orange-500"></div>
-                            <div class="w-12 h-12 flex items-center justify-center border border-orange-500/50 bg-orange-900/20 text-2xl text-orange-300 mb-2 mt-1">🃏</div>
+                            <div class="w-14 h-14 flex items-center justify-center border border-orange-500/50 bg-orange-900/20 text-3xl text-orange-300 mb-3 mt-2 shadow-[0_0_10px_rgba(249,115,22,0.2)]">🃏</div>
                             <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_ROYALFLUSH" data-i18n-type="ref">ROYAL FLUSH</div>
                         </div>
+
+                        <!-- Item 7 -->
+                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-blue-500"></div>
+                            <div class="w-14 h-14 flex items-center justify-center border border-blue-500/50 bg-blue-900/20 text-3xl text-blue-300 mb-3 mt-2 shadow-[0_0_10px_rgba(59,130,246,0.2)]">🎴</div>
+                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_TRIPLE" data-i18n-type="ref">TRIPLE</div>
+                        </div>
+
+                        <!-- Item 8 -->
+                        <div class="wf-box p-5 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative flex-col items-center shadow-md">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-green-500"></div>
+                            <div class="w-14 h-14 flex items-center justify-center border border-green-500/50 bg-green-900/20 text-3xl text-green-300 mb-3 mt-2 shadow-[0_0_10px_rgba(34,197,94,0.2)]">🃏</div>
+                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FOURCARD" data-i18n-type="ref">FOUR CARD</div>
+                        </div>
                         
+                    </div>
+
+                    <!-- 하단: 탈출 시점 덱 구성 (내부로 편입) -->
+                    <div class="shrink-0 border-t border-gray-800 pt-6 flex items-end space-x-8 relative">
+                        <span class="logic-badge hidden-badge absolute -top-3 left-0 z-20" onmouseenter="showTooltip(event, '[④ 덱 상태 확인]', '- 게임 종료(탈출/사망) 시점의 메인 덱과 사이드 덱 상태를 표시<br>- 다음 게임을 위한 피드백 용도')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
+                        
+                        <!-- Main Deck -->
+                        <div class="flex flex-col items-start">
+                            <span class="text-[10px] text-gray-400 tracking-widest mb-2 uppercase" data-i18n-key="RESULT_DECK_MAIN" data-i18n-type="local">Main Deck (2/2)</span>
+                            <div class="flex space-x-[-15px]">
+                                <div class="w-12 h-16 border border-gray-500 bg-[#111] flex items-start justify-start p-1.5 shadow-lg brightness-75">
+                                    <span class="text-[10px] text-gray-400 font-bold">♥ 7</span>
+                                </div>
+                                <div class="w-12 h-16 border border-white bg-[#1a1a1a] flex items-start justify-start p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+                                    <span class="text-[10px] text-white font-bold">♠ K</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Side Deck -->
+                        <div class="flex flex-col items-start">
+                            <span class="text-[10px] text-gray-400 tracking-widest mb-2 uppercase" data-i18n-key="RESULT_DECK_SIDE" data-i18n-type="local">Side Deck (3/5)</span>
+                            <div class="flex space-x-2">
+                                <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                    <span class="text-[10px] text-white font-bold">♠ 3</span>
+                                </div>
+                                <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                    <span class="text-[10px] text-white font-bold">♥ 3</span>
+                                </div>
+                                <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
+                                    <span class="text-[10px] text-white font-bold">♦ 4</span>
+                                </div>
+                                <div class="w-12 h-16 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50">
+                                    <span class="text-lg text-gray-600">+</span>
+                                </div>
+                                <div class="w-12 h-16 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50">
+                                    <span class="text-lg text-gray-600">+</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- 하단: 탈출 시점 덱 구성 & 네비게이션 버튼 -->
-            <div class="w-full h-32 bg-[#0a0a0a] border-t border-white/10 flex items-center justify-end px-12 space-x-12 relative z-10">
-                <span class="logic-badge hidden-badge absolute top-4 right-[450px] z-20" onmouseenter="showTooltip(event, '[④ 덱 상태 확인]', '- 게임 종료(탈출/사망) 시점의 메인 덱과 사이드 덱 상태를 표시<br>- 다음 게임을 위한 피드백 용도')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
-                
-                <!-- 탈출 시점 Deck UI -->
-                <div class="flex items-end space-x-8">
-                    <!-- Main Deck -->
-                    <div class="flex flex-col items-start">
-                        <span class="text-[10px] text-gray-400 tracking-widest mb-2 uppercase" data-i18n-key="RESULT_DECK_MAIN" data-i18n-type="local">Main Deck (2/2)</span>
-                        <div class="flex space-x-[-15px]">
-                            <div class="w-12 h-16 border border-gray-500 bg-[#111] flex items-start justify-start p-1.5 shadow-lg brightness-75">
-                                <span class="text-[10px] text-gray-400 font-bold">♥ 7</span>
-                            </div>
-                            <div class="w-12 h-16 border border-white bg-[#1a1a1a] flex items-start justify-start p-1.5 shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                                <span class="text-[10px] text-white font-bold">♠ K</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Side Deck -->
-                    <div class="flex flex-col items-start">
-                        <span class="text-[10px] text-gray-400 tracking-widest mb-2 uppercase" data-i18n-key="RESULT_DECK_SIDE" data-i18n-type="local">Side Deck (3/5)</span>
-                        <div class="flex space-x-2">
-                            <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                                <span class="text-[10px] text-white font-bold">♠ 3</span>
-                            </div>
-                            <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                                <span class="text-[10px] text-white font-bold">♥ 3</span>
-                            </div>
-                            <div class="w-12 h-16 border border-white/80 bg-[#1a1a1a] flex items-center justify-center shadow-[0_0_10px_rgba(255,255,255,0.1)]">
-                                <span class="text-[10px] text-white font-bold">♦ 4</span>
-                            </div>
-                            <div class="w-12 h-16 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50">
-                                <span class="text-lg text-gray-600">+</span>
-                            </div>
-                            <div class="w-12 h-16 border border-dashed border-gray-600 bg-transparent flex justify-center items-center opacity-50">
-                                <span class="text-lg text-gray-600">+</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="relative">
-                    <span class="logic-badge hidden-badge absolute -top-4 right-1/2 translate-x-1/2 w-max z-20" onmouseenter="showTooltip(event, '[⑤ 귀환 버튼]', '- 클릭 시 [2-1 로비] 화면으로 돌아갑니다.<br>- 로딩 스크린 연출 후 씬 전환')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
-                    <button class="wf-box w-64 h-14 bg-white text-black text-lg font-bold tracking-[0.2em] hover:bg-gray-300 transition-colors uppercase border-none" data-i18n-key="BTN_RETURN_LOBBY" data-i18n-type="local">
-                        Return to Lobby
-                    </button>
-                </div>
+            <!-- 하단: 네비게이션 버튼 -->
+            <div class="w-full h-24 bg-[#0a0a0a] border-t border-white/10 flex items-center justify-end px-12 relative z-10 shrink-0">
+                <span class="logic-badge hidden-badge absolute top-1/2 -translate-y-1/2 right-[320px] z-20" onmouseenter="showTooltip(event, '[⑤ 귀환 버튼]', '- 클릭 시 [2-1 로비] 화면으로 돌아갑니다.<br>- 로딩 스크린 연출 후 씬 전환')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
+                <button class="wf-box w-64 h-14 bg-white text-black text-lg font-bold tracking-[0.2em] hover:bg-gray-300 transition-colors uppercase border-none" data-i18n-key="BTN_RETURN_LOBBY" data-i18n-type="local">
+                    Return to Lobby
+                </button>
             </div>
 
         </div>
@@ -360,7 +375,7 @@
             const title = document.getElementById('result-title');
             const subtitle = document.getElementById('result-subtitle');
             const bgOverlay = document.getElementById('bg-overlay');
-            const handsList = document.getElementById('result-hands-list');
+            // opacity 변경 삭제 (항상 1 유지)
 
             if (!isStringKeyMode) {
                 if (isSuccess) {
@@ -379,7 +394,7 @@
                     title.className = "text-6xl font-extrabold tracking-[0.2em] text-red-500 drop-shadow-[0_0_20px_rgba(239,68,68,0.4)] mb-2";
                     title.setAttribute('data-i18n-key', 'RESULT_TITLE_FAIL');
                     
-                    subtitle.innerText = "섹터 내에서 사망하여 탈출에 실패했습니다.";
+                    subtitle.innerText = "섹터 내에서 사망하여 탈출에 실패했습니다."; 
                     subtitle.className = "text-sm tracking-widest text-red-500/70";
                     subtitle.setAttribute('data-i18n-key', 'RESULT_SUB_FAIL');
                     
