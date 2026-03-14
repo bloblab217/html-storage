@@ -104,11 +104,15 @@
                     <div class="flex-1 flex flex-col space-y-5">
                         <div class="text-xs tracking-widest text-gray-400 uppercase border-b border-gray-800 pb-2" data-i18n-key="RESULT_LBL_STATS" data-i18n-type="local">Session Statistics</div>
                         
-                        <div class="flex justify-between items-center text-sm border-b border-white/5 pb-3">
-                            <span class="text-gray-400" data-i18n-key="STAT_ZONES_CLEARED" data-i18n-type="local">돌파한 구역</span>
-                            <div class="text-right">
-                                <span class="text-white font-bold block mb-1">3 구역</span>
-                                <span class="text-[10px] text-sky-400 font-bold px-2 py-0.5 border border-sky-500/50 bg-sky-900/20">지하도 ➔ 뒷골목 ➔ 공장</span>
+                        <div class="flex flex-col border-b border-white/5 pb-3">
+                            <div class="flex justify-between items-center text-sm mb-2">
+                                <span class="text-gray-400" data-i18n-key="STAT_ZONES_CLEARED" data-i18n-type="local">돌파한 구역</span>
+                                <span class="text-white font-bold block">3 구역</span>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-gray-500 bg-black/30 p-2 rounded">
+                                <span data-i18n-key="STAT_ZONE_SEWER" data-i18n-type="local">지하도 : <span class="text-white font-bold">1개 구역</span></span>
+                                <span data-i18n-key="STAT_ZONE_ALLEY" data-i18n-type="local">뒷골목 : <span class="text-white font-bold">1개 구역</span></span>
+                                <span data-i18n-key="STAT_ZONE_FACTORY" data-i18n-type="local">공장 : <span class="text-white font-bold">1개 구역</span></span>
                             </div>
                         </div>
 
@@ -148,72 +152,54 @@
                 <div class="w-7/12 h-full p-8 flex flex-col relative">
                     <span class="logic-badge hidden-badge absolute top-8 right-8 z-20" onmouseenter="showTooltip(event, '[③ 달성 족보 기록]', '- 이번 게임 플레이 도중 유저가 완성했던 모든 족보의 종류를 노출<br>- 스크롤을 통해 전체 족보 확인 가능<br>- 생존/사망 여부와 무관하게 표시')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
                     
-                    <div class="flex justify-between items-end mb-6 border-b border-gray-800 pb-2">
+                    <div class="flex justify-between items-end mb-6 border-b border-gray-800 pb-2 shrink-0">
                         <div class="text-xl font-light tracking-widest text-white uppercase" data-i18n-key="RESULT_LBL_HANDS" data-i18n-type="local">Completed Poker Hands</div>
                         <div class="text-xs text-purple-400 tracking-widest" data-i18n-key="RESULT_HANDS_SUB" data-i18n-type="local">총 8개의 족보 활성화</div>
                     </div>
 
-                    <!-- Hands List (Scrollable) -->
-                    <div class="flex-1 overflow-y-auto pr-4 space-y-3" id="result-hands-list">
+                    <!-- Hands List (Scrollable Grid) -->
+                    <div class="flex-1 overflow-y-auto pr-4 grid grid-cols-3 gap-4 content-start" id="result-hands-list">
                         
                         <!-- Item 1 -->
-                        <div class="wf-box p-4 justify-start border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden">
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-purple-500"></div>
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 flex items-center justify-center border border-purple-500/50 bg-purple-900/20 text-2xl text-purple-300">🃏</div>
-                                <div class="text-left">
-                                    <div class="text-lg font-bold text-white tracking-widest" data-i18n-key="HAND_FLUSH" data-i18n-type="ref">FLUSH (플러쉬)</div>
-                                    <div class="text-xs text-gray-400 mt-1" data-i18n-key="DESC_REC_FLUSH" data-i18n-type="local">♠A ♠K ♠Q ♠J ♠10 등 조합</div>
-                                </div>
-                            </div>
+                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-purple-500"></div>
+                            <div class="w-12 h-12 flex items-center justify-center border border-purple-500/50 bg-purple-900/20 text-2xl text-purple-300 mb-2 mt-1">🃏</div>
+                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FLUSH" data-i18n-type="ref">FLUSH</div>
                         </div>
 
                         <!-- Item 2 -->
-                        <div class="wf-box p-4 justify-start border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden">
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-yellow-500"></div>
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 flex items-center justify-center border border-yellow-500/50 bg-yellow-900/20 text-2xl text-yellow-300">🎴</div>
-                                <div class="text-left">
-                                    <div class="text-lg font-bold text-white tracking-widest" data-i18n-key="HAND_FULLHOUSE" data-i18n-type="ref">FULL HOUSE (풀하우스)</div>
-                                    <div class="text-xs text-gray-400 mt-1" data-i18n-key="DESC_REC_FULLHOUSE" data-i18n-type="local">주요 활용: 강력한 스탯 부스팅</div>
-                                </div>
-                            </div>
+                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-yellow-500"></div>
+                            <div class="w-12 h-12 flex items-center justify-center border border-yellow-500/50 bg-yellow-900/20 text-2xl text-yellow-300 mb-2 mt-1">🎴</div>
+                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_FULLHOUSE" data-i18n-type="ref">FULL HOUSE</div>
                         </div>
 
                         <!-- Item 3 -->
-                        <div class="wf-box p-4 justify-start border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden">
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-500"></div>
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-2xl text-gray-300">🎴</div>
-                                <div class="text-left">
-                                    <div class="text-lg font-bold text-white tracking-widest" data-i18n-key="HAND_ONEPAIR" data-i18n-type="ref">ONE PAIR (원페어)</div>
-                                    <div class="text-xs text-gray-400 mt-1" data-i18n-key="DESC_REC_ONEPAIR" data-i18n-type="local">기본 스탯 지속 회복 및 향상</div>
-                                </div>
-                            </div>
+                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-gray-500"></div>
+                            <div class="w-12 h-12 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-2xl text-gray-300 mb-2 mt-1">🎴</div>
+                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_ONEPAIR" data-i18n-type="ref">ONE PAIR</div>
                         </div>
 
                         <!-- Item 4 (for Scroll) -->
-                        <div class="wf-box p-4 justify-start border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden">
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-500"></div>
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-2xl text-gray-300">🎴</div>
-                                <div class="text-left">
-                                    <div class="text-lg font-bold text-white tracking-widest" data-i18n-key="HAND_TWOPAIR" data-i18n-type="ref">TWO PAIR (투페어)</div>
-                                    <div class="text-xs text-gray-400 mt-1" data-i18n-key="DESC_REC_TWOPAIR" data-i18n-type="local">방어력 소폭 증가</div>
-                                </div>
-                            </div>
+                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-gray-500"></div>
+                            <div class="w-12 h-12 flex items-center justify-center border border-gray-500/50 bg-gray-800/50 text-2xl text-gray-300 mb-2 mt-1">🎴</div>
+                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_TWOPAIR" data-i18n-type="ref">TWO PAIR</div>
                         </div>
                         
                         <!-- Item 5 (for Scroll) -->
-                        <div class="wf-box p-4 justify-start border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden">
-                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>
-                            <div class="flex items-center space-x-4">
-                                <div class="w-12 h-12 flex items-center justify-center border border-red-500/50 bg-red-900/20 text-2xl text-red-300">🃏</div>
-                                <div class="text-left">
-                                    <div class="text-lg font-bold text-white tracking-widest" data-i18n-key="HAND_STRAIGHT" data-i18n-type="ref">STRAIGHT (스트레이트)</div>
-                                    <div class="text-xs text-gray-400 mt-1" data-i18n-key="DESC_REC_STRAIGHT" data-i18n-type="local">이동속도 증가 및 회피율 상승</div>
-                                </div>
-                            </div>
+                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-red-500"></div>
+                            <div class="w-12 h-12 flex items-center justify-center border border-red-500/50 bg-red-900/20 text-2xl text-red-300 mb-2 mt-1">🃏</div>
+                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_STRAIGHT" data-i18n-type="ref">STRAIGHT</div>
+                        </div>
+
+                        <!-- Additional Item -->
+                        <div class="wf-box p-4 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] relative overflow-hidden flex-col items-center">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-orange-500"></div>
+                            <div class="w-12 h-12 flex items-center justify-center border border-orange-500/50 bg-orange-900/20 text-2xl text-orange-300 mb-2 mt-1">🃏</div>
+                            <div class="text-sm font-bold text-white tracking-widest text-center" data-i18n-key="HAND_ROYALFLUSH" data-i18n-type="ref">ROYAL FLUSH</div>
                         </div>
                         
                     </div>
@@ -222,8 +208,8 @@
             </div>
 
             <!-- 하단: 탈출 시점 덱 구성 & 네비게이션 버튼 -->
-            <div class="w-full h-32 bg-[#0a0a0a] border-t border-white/10 flex items-center justify-between px-12 relative z-10">
-                <span class="logic-badge hidden-badge absolute top-4 left-4 z-20" onmouseenter="showTooltip(event, '[④ 덱 상태 확인]', '- 게임 종료(탈출/사망) 시점의 메인 덱과 사이드 덱 상태를 표시<br>- 다음 게임을 위한 피드백 용도')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
+            <div class="w-full h-32 bg-[#0a0a0a] border-t border-white/10 flex items-center justify-end px-12 space-x-12 relative z-10">
+                <span class="logic-badge hidden-badge absolute top-4 right-[450px] z-20" onmouseenter="showTooltip(event, '[④ 덱 상태 확인]', '- 게임 종료(탈출/사망) 시점의 메인 덱과 사이드 덱 상태를 표시<br>- 다음 게임을 위한 피드백 용도')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()">ℹ️(info)</span>
                 
                 <!-- 탈출 시점 Deck UI -->
                 <div class="flex items-end space-x-8">
@@ -374,7 +360,7 @@
             const title = document.getElementById('result-title');
             const subtitle = document.getElementById('result-subtitle');
             const bgOverlay = document.getElementById('bg-overlay');
-            // opacity 변경 삭제 (항상 1 유지)
+            const handsList = document.getElementById('result-hands-list');
 
             if (!isStringKeyMode) {
                 if (isSuccess) {
@@ -393,7 +379,7 @@
                     title.className = "text-6xl font-extrabold tracking-[0.2em] text-red-500 drop-shadow-[0_0_20px_rgba(239,68,68,0.4)] mb-2";
                     title.setAttribute('data-i18n-key', 'RESULT_TITLE_FAIL');
                     
-                    subtitle.innerText = "섹터 내에서 사망하여 탈출에 실패했습니다."; // 텍스트도 족보 위주로 맞게 수정
+                    subtitle.innerText = "섹터 내에서 사망하여 탈출에 실패했습니다.";
                     subtitle.className = "text-sm tracking-widest text-red-500/70";
                     subtitle.setAttribute('data-i18n-key', 'RESULT_SUB_FAIL');
                     
