@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>화려한 반짝이 페이지</title>
+    <style>
+        /* 1. 무지개 배경 반짝임 효과 */
+        @keyframes rainbowBackground {
+            0%   { background-color: #ff0000; }
+            14%  { background-color: #ff7f00; }
+            28%  { background-color: #ffff00; }
+            42%  { background-color: #00ff00; }
+            56%  { background-color: #0000ff; }
+            70%  { background-color: #4b0082; }
+            84%  { background-color: #9400d3; }
+            100% { background-color: #ff0000; }
+        }
+
+        /* 2. 글씨 반짝임 효과 */
+        @keyframes flashingText {
+            0%, 49% { 
+                color: #ff00ff; 
+                text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 0 0 10px #ff00ff; 
+            }
+            50%, 100% { 
+                color: #00ff00; 
+                text-shadow: 3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 0 0 15px yellow; 
+            }
+        }
+
+        body {
+            animation: rainbowBackground 1.5s infinite;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Comic Sans MS', '궁서', sans-serif;
+            text-align: center;
+            padding: 20px; /* 모바일에서 상하좌우 여유 공간 확보 */
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.85);
+            /* 모바일 화면에 맞춰 크기 유연하게 조정 */
+            width: 100%;
+            max-width: 450px; /* PC에서는 너무 넙적해지지 않게 최대 크기 제한 */
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            border: 5px dashed #ff00ff;
+        }
+
+        img {
+            width: 100%; /* 이미지가 컨테이너 밖으로 나가지 않게 */
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 3px solid black;
+            box-sizing: border-box;
+        }
+
+        .flashing-text {
+            animation: flashingText 0.3s infinite alternate;
+            /* 화면 크기에 맞춰 폰트 크기 자동 조절 (최소 2rem ~ 최대 3.5rem) */
+            font-size: clamp(2rem, 9vw, 3.5rem); 
+            font-weight: 900;
+            margin: 0;
+            /* 모바일에서 글자가 길면 자연스럽게 단어 단위로 줄바꿈 허용 */
+            white-space: normal; 
+            word-break: keep-all; 
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="ace_card_coffee.png" alt="커피와 카드">
+
+        <p class="flashing-text">커피마시면서해요</p>
+    </div>
+</body>
+</html>
