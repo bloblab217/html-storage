@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game UI Wireframe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 픽셀 느낌을 주기 위한 웹 폰트 적용 */
+        @import url('https://fonts.googleapis.com/css2?family=DungGeunMo&display=swap');
+        
+        body {
+            font-family: 'DungGeunMo', 'Courier New', Courier, monospace;
+            background-color: #1a1a1c;
+        }
+        
+        * {
+            -webkit-font-smoothing: none;
+        }
+
+        /* 카드 배열 및 호버 효과를 위한 CSS */
+        .card-base {
+            position: absolute;
+            width: 65px;
+            height: 95px;
+            background-color: #ededed;
+            border: 2px solid #222;
+            border-radius: 4px;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', Courier, serif;
+            transform-origin: bottom center;
+            transform: translateX(var(--def-x)) translateY(0px) rotate(0deg);
+            transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s;
+        }
+
+        .group-cards:hover .card-base {
+            transform: translateX(var(--hov-x)) translateY(var(--hov-y)) rotate(var(--hov-rot));
+            box-shadow: 4px 6px 0px rgba(0,0,0,0.3);
+        }
+
+        .card-1 { --def-x: -60px; --hov-x: -110px; --hov-y: -10px; --hov-rot: -20deg; z-index: 10; }
+        .card-2 { --def-x: -36px; --hov-x: -65px;  --hov-y: -25px; --hov-rot: -10deg; z-index: 20; }
+        .card-3 { --def-x: -12px; --hov-x: -20px;  --hov-y: -35px; --hov-rot: -2deg;  z-index: 30; }
+        .card-4 { --def-x: 12px;  --hov-x: 20px;   --hov-y: -35px; --hov-rot: 2deg;   z-index: 40; }
+        .card-5 { --def-x: 36px;  --hov-x: 65px;   --hov-y: -25px; --hov-rot: 10deg;  z-index: 50; }
+        .card-6 { --def-x: 60px;  --hov-x: 110px;  --hov-y: -10px; --hov-rot: 20deg;  z-index: 60; }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden relative text-white select-none bg-[#1a1a1c]">
+
+    <!-- 최상단 우측 언어 설정 -->
+    <div class="absolute top-0 right-0 bg-gray-600/80 px-2 py-0.5 text-xs text-gray-300 z-50">
+        Korean
+    </div>
+
+    <!-- 중앙 상단 타이머 추가 -->
+    <div class="absolute top-6 left-1/2 transform -translate-x-1/2 z-50 flex items-center justify-center">
+        <span class="text-3xl font-bold tracking-widest text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">00:00</span>
+    </div>
+
+    <!-- 좌측 상단 아이콘 영역 (조커 & 증강) -->
+    <div class="absolute top-8 left-6 flex flex-col gap-3 z-50">
+        <!-- 조커 아이콘 (가로 1행) -->
+        <div class="flex items-center gap-3">
+            <!-- 아이콘 1 -->
+            <div class="w-11 h-11 bg-[#1a1c23] border-2 border-[#3b4566] rounded flex items-center justify-center shadow-md tooltip-trigger cursor-help">
+                <svg width="28" height="28" viewBox="0 0 32 32" class="opacity-90">
+                    <path d="M12 4h8v6h-8z" fill="#991b1b"/><path d="M6 10h6v6H6z" fill="#111827"/><path d="M20 10h6v6h-6z" fill="#111827"/><rect x="4" y="14" width="4" height="4" fill="#9ca3af"/><rect x="24" y="14" width="4" height="4" fill="#9ca3af"/><path d="M8 16h16v10H8z" fill="#030712"/><path d="M11 19h3v4h-3z" fill="#fef08a"/><path d="M18 19h3v4h-3z" fill="#fef08a"/><rect x="12" y="20" width="1" height="2" fill="#030712"/><rect x="19" y="20" width="1" height="2" fill="#030712"/><path d="M12 26h8v4h-8z" fill="#991b1b"/><path d="M10 28h12v2H10z" fill="#991b1b"/>
+                </svg>
+                <!-- 호버 버블 팝업 (포인터 추적용 fixed) -->
+                <div class="tooltip-content fixed hidden w-[280px] bg-[#111726]/95 border border-[#3b4566] rounded p-3 shadow-xl backdrop-blur-sm pointer-events-none z-[100]">
+                    <div class="text-[#e29352] text-xs font-bold mb-1.5">[조커/이름] <span class="text-white">Basic Joker</span></div>
+                    <div class="text-gray-400 text-xs leading-relaxed">[조커/설명] 5 이하의 카드를 모두 5로 바꾸어 계산합니다.</div>
+                </div>
+            </div>
+            
+            <!-- 아이콘 2 -->
+            <div class="w-11 h-11 bg-[#1a1c23] border-2 border-[#3b4566] rounded flex items-center justify-center shadow-md tooltip-trigger cursor-help">
+                 <svg width="28" height="28" viewBox="0 0 32 32" class="opacity-90">
+                    <path d="M12 4h8v6h-8z" fill="#991b1b"/><path d="M6 10h6v6H6z" fill="#111827"/><path d="M20 10h6v6h-6z" fill="#111827"/><rect x="4" y="14" width="4" height="4" fill="#9ca3af"/><rect x="24" y="14" width="4" height="4" fill="#9ca3af"/><path d="M8 16h16v10H8z" fill="#030712"/><path d="M11 19h3v4h-3z" fill="#fef08a"/><path d="M18 19h3v4h-3z" fill="#fef08a"/><rect x="12" y="20" width="1" height="2" fill="#030712"/><rect x="19" y="20" width="1" height="2" fill="#030712"/><path d="M12 26h8v4h-8z" fill="#991b1b"/><path d="M10 28h12v2H10z" fill="#991b1b"/>
+                </svg>
+                <div class="tooltip-content fixed hidden w-[280px] bg-[#111726]/95 border border-[#3b4566] rounded p-3 shadow-xl backdrop-blur-sm pointer-events-none z-[100]">
+                    <div class="text-[#e29352] text-xs font-bold mb-1.5">[조커/이름] <span class="text-white">Basic Joker</span></div>
+                    <div class="text-gray-400 text-xs leading-relaxed">[조커/설명] 5 이하의 카드를 모두 5로 바꾸어 계산합니다.</div>
+                </div>
+            </div>
+
+            <!-- 아이콘 3 -->
+            <div class="w-11 h-11 bg-[#1a1c23] border-2 border-[#3b4566] rounded flex items-center justify-center shadow-md tooltip-trigger cursor-help">
+                 <svg width="28" height="28" viewBox="0 0 32 32" class="opacity-90">
+                    <path d="M12 4h8v6h-8z" fill="#991b1b"/><path d="M6 10h6v6H6z" fill="#111827"/><path d="M20 10h6v6h-6z" fill="#111827"/><rect x="4" y="14" width="4" height="4" fill="#9ca3af"/><rect x="24" y="14" width="4" height="4" fill="#9ca3af"/><path d="M8 16h16v10H8z" fill="#030712"/><path d="M11 19h3v4h-3z" fill="#fef08a"/><path d="M18 19h3v4h-3z" fill="#fef08a"/><rect x="12" y="20" width="1" height="2" fill="#030712"/><rect x="19" y="20" width="1" height="2" fill="#030712"/><path d="M12 26h8v4h-8z" fill="#991b1b"/><path d="M10 28h12v2H10z" fill="#991b1b"/>
+                </svg>
+                <div class="tooltip-content fixed hidden w-[280px] bg-[#111726]/95 border border-[#3b4566] rounded p-3 shadow-xl backdrop-blur-sm pointer-events-none z-[100]">
+                    <div class="text-[#e29352] text-xs font-bold mb-1.5">[조커/이름] <span class="text-white">Basic Joker</span></div>
+                    <div class="text-gray-400 text-xs leading-relaxed">[조커/설명] 5 이하의 카드를 모두 5로 바꾸어 계산합니다.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 증강 아이콘 (가로 1행) -->
+        <div class="flex items-center gap-3 ml-0.5 mt-1">
+            <!-- 원형 아이콘 1 -->
+            <div class="w-10 h-10 bg-[#2a303c] border-2 border-[#4b5563] rounded-full flex items-center justify-center shadow-md tooltip-trigger cursor-help">
+                <span class="text-gray-400 text-xs font-bold">+</span>
+                <div class="tooltip-content fixed hidden w-[300px] bg-[#111726]/95 border border-[#4b5563] rounded p-3 shadow-xl backdrop-blur-sm pointer-events-none z-[100]">
+                    <div class="text-[#a855f7] text-xs font-bold mb-1.5">[증강/이름] <span class="text-white">한방에 두놈</span></div>
+                    <div class="text-gray-400 text-xs leading-relaxed">[증강/설명] 모든 탄환형 발사체가 두개로 나뉘어 발사되는 대신, 대미지가 75%가 됩니다.</div>
+                </div>
+            </div>
+            
+            <!-- 원형 아이콘 2 -->
+            <div class="w-10 h-10 bg-[#2a303c] border-2 border-[#4b5563] rounded-full flex items-center justify-center shadow-md tooltip-trigger cursor-help">
+                <span class="text-gray-400 text-xs font-bold">+</span>
+                <div class="tooltip-content fixed hidden w-[300px] bg-[#111726]/95 border border-[#4b5563] rounded p-3 shadow-xl backdrop-blur-sm pointer-events-none z-[100]">
+                    <div class="text-[#a855f7] text-xs font-bold mb-1.5">[증강/이름] <span class="text-white">한방에 두놈</span></div>
+                    <div class="text-gray-400 text-xs leading-relaxed">[증강/설명] 모든 탄환형 발사체가 두개로 나뉘어 발사되는 대신, 대미지가 75%가 됩니다.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 좌측 중앙 영역 (호버 시: 족보 리스트 표시) -->
+    <div class="absolute top-1/2 -translate-y-1/2 left-6 flex items-start z-50 group">
+        <!-- 흰색 정사각형 아이콘 (트리거) -->
+        <div class="w-12 h-12 bg-[#ededed] border-2 border-[#222] rounded shadow-[2px_2px_0px_rgba(0,0,0,0.5)] cursor-default flex items-center justify-center relative">
+        </div>
+        
+        <!-- 마우스 호버 시 나오는 족보 플레이 횟수 리스트 -->
+        <div class="absolute left-16 top-1/2 -translate-y-1/2 hidden group-hover:block bg-[#111726]/95 border border-[#3b4566] rounded-xl w-[220px] p-4 shadow-xl backdrop-blur-sm animate-fade-in pointer-events-auto">
+            <h2 class="text-[#e29352] text-[15px] text-center mb-3 tracking-wider">족보 플레이 횟수</h2>
+            
+            <div class="flex flex-col text-[13px] text-[#6b7280]">
+                
+                <!-- 각 족보 항목 (호버 시 서브 팝업 등장) -->
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">펜타</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <!-- 무기 팝업 -->
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#e29352] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">☠️</div>
+                        <div class="text-[#e29352] text-[13px] font-bold tracking-wider">데스 브링어</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">존재하는 모든 것을 파괴하는 궁극의 레이저 캐논.</div>
+                    </div>
+                </div>
+
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">로열 플러시</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#fbbf24] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">👑</div>
+                        <div class="text-[#fbbf24] text-[13px] font-bold tracking-wider">엑스칼리버</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">왕의 자격을 증명하는 황금빛 전설 총기.</div>
+                    </div>
+                </div>
+
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">로열 스트레이트</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#a78bfa] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">🌟</div>
+                        <div class="text-[#a78bfa] text-[13px] font-bold tracking-wider">스타폴 블래스터</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">별빛을 모아 폭발적인 에너지를 발사하는 라이플.</div>
+                    </div>
+                </div>
+
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">스트레이트 플러시</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#38bdf8] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">☄️</div>
+                        <div class="text-[#38bdf8] text-[13px] font-bold tracking-wider">플라즈마 캐논</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">일직선으로 뻗어나가는 고온의 플라즈마포.</div>
+                    </div>
+                </div>
+
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">포 카드</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#f87171] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">🚀</div>
+                        <div class="text-[#f87171] text-[13px] font-bold tracking-wider">쿼드 런처</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">4발의 유도 로켓을 동시에 쏘아내는 화기.</div>
+                    </div>
+                </div>
+
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">풀 하우스</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#fb923c] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">🌋</div>
+                        <div class="text-[#fb923c] text-[13px] font-bold tracking-wider">발칸 미니건</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">압도적인 연사력으로 적을 휩쓰는 중화기.</div>
+                    </div>
+                </div>
+
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">플러시</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#60a5fa] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">🌊</div>
+                        <div class="text-[#60a5fa] text-[13px] font-bold tracking-wider">립타이드 샷건</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">넓은 범위로 파도처럼 퍼지는 산탄총.</div>
+                    </div>
+                </div>
+
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">스트레이트</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#facc15] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">⚡</div>
+                        <div class="text-[#facc15] text-[13px] font-bold tracking-wider">피어싱 스나이퍼</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">모든 적을 관통하는 고압의 번개 탄환.</div>
+                    </div>
+                </div>
+
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">트리플</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#4ade80] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">🔱</div>
+                        <div class="text-[#4ade80] text-[13px] font-bold tracking-wider">트라이 어썰트</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">안정적인 3점사를 지원하는 전술 소총.</div>
+                    </div>
+                </div>
+
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">투 페어</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#9ca3af] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">🔫</div>
+                        <div class="text-[#9ca3af] text-[13px] font-bold tracking-wider">듀얼 우지</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">양손에 들고 사방에 난사하는 기관단총.</div>
+                    </div>
+                </div>
+                
+                <!-- 활성화된 항목 (페어) -->
+                <div class="group/hand relative flex justify-between py-1 my-0.5 bg-[#25324b] -mx-2 px-2 rounded transition-colors cursor-help text-[#d1d5db]">
+                    <span class="tracking-wide">페어</span> 
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#f97316] text-black w-5 h-5 flex items-center justify-center rounded-full text-[11px] font-bold">1</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#f97316] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">🧨</div>
+                        <div class="text-[#f97316] text-[13px] font-bold tracking-wider">트윈 피스톨</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">준수한 밸런스를 가진 기본 보조 무기.</div>
+                    </div>
+                </div>
+                
+                <div class="group/hand relative flex justify-between py-1 -mx-2 px-2 hover:bg-[#2c3342] rounded transition-colors cursor-help">
+                    <span class="tracking-wide">하이 카드</span>
+                    <span class="flex items-center gap-1 text-[#4b5563]"># <span class="bg-[#1e222a] text-gray-400 w-5 h-5 flex items-center justify-center rounded-full text-[11px]">0</span></span>
+                    <div class="hidden group-hover/hand:flex absolute left-full ml-3 top-0 w-[220px] bg-[#111726]/95 border-2 border-[#6b7280] rounded-lg p-3 shadow-xl flex-col gap-2 z-[80] pointer-events-none">
+                        <div class="h-[60px] bg-[#1a1c23] border border-[#3b4566] rounded flex items-center justify-center text-3xl">🪄</div>
+                        <div class="text-[#9ca3af] text-[13px] font-bold tracking-wider">베이직 스태프</div>
+                        <div class="text-gray-400 text-[11px] leading-relaxed break-keep">가장 기초적이고 약한 마력 발사기.</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 우측 상단 미니맵 -->
+    <div class="absolute top-8 right-8 z-50 flex flex-col items-end">
+        <div class="bg-[#1a1c23]/90 border-2 border-[#3b4566] rounded-md shadow-lg backdrop-blur-sm w-[160px] h-[140px] relative overflow-hidden">
+            <!-- 미니맵 지형 (Mock) -->
+            <div class="absolute top-[20px] left-[20px] w-[50px] h-[40px] border border-[#4b5563] bg-[#2a303c]"></div>
+            <div class="absolute top-[20px] left-[70px] w-[60px] h-[40px] border border-[#4b5563] bg-[#2a303c]"></div>
+            <div class="absolute top-[60px] left-[70px] w-[40px] h-[50px] border border-[#4b5563] bg-[#2a303c]"></div>
+            <!-- 플레이어 위치 -->
+            <div class="absolute top-[80px] left-[85px] w-2 h-2 bg-red-500 rounded-full shadow-[0_0_5px_red]"></div>
+            <div class="absolute top-[80px] left-[85px] w-2 h-2 bg-red-500 rounded-full animate-ping opacity-75"></div>
+        </div>
+        <span class="text-[11px] text-gray-400 mt-1.5 tracking-widest font-bold">MINIMAP</span>
+    </div>
+
+    <!-- 좌측 하단: 무기 정보 및 체력바 -->
+    <div class="absolute bottom-6 left-6 flex flex-col items-start z-50 gap-4">
+        <!-- 무기 정보 UI -->
+        <div class="flex items-end gap-3">
+            <!-- 총기 이미지 (도트 아트 스타일) -->
+            <div class="w-[70px] h-[70px] bg-[#2a303c] border-2 border-[#4b5563] rounded-md flex items-center justify-center relative overflow-hidden shadow-[inset_0_2px_8px_rgba(0,0,0,0.5)]">
+                <svg width="48" height="32" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="opacity-80">
+                    <!-- 총신 (Barrel) -->
+                    <rect x="4" y="6" width="32" height="8" fill="#d1d5db"/>
+                    <rect x="4" y="6" width="6" height="4" fill="#9ca3af"/>
+                    <!-- 하단 프레임 -->
+                    <rect x="14" y="14" width="22" height="4" fill="#6b7280"/>
+                    <!-- 손잡이 (Grip) -->
+                    <rect x="14" y="18" width="10" height="12" fill="#4b5563"/>
+                    <rect x="14" y="18" width="4" height="12" fill="#1f2937"/>
+                    <!-- 방아쇠 울 -->
+                    <rect x="24" y="18" width="4" height="4" fill="#374151"/>
+                </svg>
+            </div>
+            
+            <!-- 탄약 및 총기 이름 정보 -->
+            <div class="flex flex-col">
+                <!-- 장탄 수 -->
+                <div class="flex items-center gap-1 text-2xl font-bold text-white tracking-wider leading-none">
+                    <span class="text-gray-400">◆</span>
+                    <span>25</span>
+                    <span class="text-gray-500 text-lg">/25</span>
+                </div>
+                <!-- 총기 이름 -->
+                <span class="text-[#a0a0a0] text-[11px] tracking-wide mt-1">기본 권총</span>
+            </div>
+        </div>
+
+        <!-- 체력바 -->
+        <div class="relative w-[250px] h-[12px] bg-[#222] rounded-sm border-2 border-gray-900 shadow-md overflow-hidden">
+            <div class="h-full w-full bg-[#42df8e]"></div>
+        </div>
+    </div>
+
+    <!-- 중앙 하단: 카드 덱 6장 -->
+    <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex flex-col items-center z-40 group-cards cursor-pointer w-[400px] h-[160px] justify-end pb-8">
+        <div class="relative w-full h-full flex justify-center items-end">
+            <!-- Card 1: J ♠ -->
+            <div class="card-base card-1">
+                <div class="absolute top-1 left-1.5 flex flex-col items-center text-[#111]"><span class="text-[13px] font-bold leading-none">J</span><span class="text-[10px]">♠</span></div>
+                <div class="flex flex-col items-center mt-2 text-[#111]"><span class="text-[12px] mb-[-4px]">👑</span><span class="text-[32px] font-black font-sans tracking-tighter">J</span></div>
+            </div>
+            <!-- Card 2: A ♥ -->
+            <div class="card-base card-2">
+                <div class="absolute top-1 left-1.5 flex flex-col items-center text-[#aa2222]"><span class="text-[13px] font-bold leading-none">A</span><span class="text-[10px]">♥</span></div>
+                <div class="flex flex-col items-center mt-2 text-[#aa2222]"><span class="text-[12px] mb-[-4px]">👑</span><span class="text-[32px] font-black font-sans tracking-tighter">A</span></div>
+            </div>
+            <!-- Card 3: 8 ♠ -->
+            <div class="card-base card-3">
+                <div class="absolute top-1 left-1.5 flex flex-col items-center text-[#111]"><span class="text-[13px] font-bold leading-none">8</span><span class="text-[10px]">♠</span></div>
+                <div class="text-[32px] text-center mt-1 text-[#111]">♠</div>
+                <div class="absolute bottom-1 right-1.5 flex flex-col items-center rotate-180 text-[#111]"><span class="text-[13px] font-bold leading-none">8</span><span class="text-[10px]">♠</span></div>
+            </div>
+            <!-- Card 4: 10 ♣ -->
+            <div class="card-base card-4">
+                <div class="absolute top-1 left-1.5 flex flex-col items-center text-[#111]"><span class="text-[13px] font-bold leading-none">10</span><span class="text-[10px]">♣</span></div>
+                <div class="text-[32px] text-center mt-1 text-[#111]">♣</div>
+                <div class="absolute bottom-1 right-1.5 flex flex-col items-center rotate-180 text-[#111]"><span class="text-[13px] font-bold leading-none">10</span><span class="text-[10px]">♣</span></div>
+            </div>
+            <!-- Card 5: A ♥ -->
+            <div class="card-base card-5">
+                <div class="absolute top-1 left-1.5 flex flex-col items-center text-[#aa2222]"><span class="text-[13px] font-bold leading-none">A</span><span class="text-[10px]">♥</span></div>
+                <div class="flex flex-col items-center mt-2 text-[#aa2222]"><span class="text-[12px] mb-[-4px]">👑</span><span class="text-[32px] font-black font-sans tracking-tighter">A</span></div>
+            </div>
+            <!-- Card 6: Q ♥ -->
+            <div class="card-base card-6">
+                <div class="absolute top-1 left-1.5 flex flex-col items-center text-[#aa2222]"><span class="text-[13px] font-bold leading-none">Q</span><span class="text-[10px]">♥</span></div>
+                <div class="flex flex-col items-center mt-2 text-[#aa2222]"><span class="text-[12px] mb-[-4px]">👑</span><span class="text-[32px] font-black font-sans tracking-tighter">Q</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 우측 하단 컨트롤러 설명 -->
+    <div class="absolute bottom-6 right-8 flex flex-col gap-[7px] text-right z-50">
+        <div class="text-[#888] text-[13px] mb-2 flex items-center justify-end gap-1 font-sans tracking-wide">
+            Controls <span class="text-[10px]">▼</span>
+        </div>
+        <div class="flex justify-end items-center gap-4">
+            <span class="text-[#a0a0a0] text-[13px]">이동</span>
+            <div class="flex gap-1">
+                <span class="bg-[#f0f0f0] text-black px-1.5 py-[3px] min-w-[22px] text-center rounded shadow-sm text-[12px] font-sans font-bold leading-none">W</span>
+                <span class="bg-[#f0f0f0] text-black px-1.5 py-[3px] min-w-[22px] text-center rounded shadow-sm text-[12px] font-sans font-bold leading-none">A</span>
+                <span class="bg-[#f0f0f0] text-black px-1.5 py-[3px] min-w-[22px] text-center rounded shadow-sm text-[12px] font-sans font-bold leading-none">S</span>
+                <span class="bg-[#f0f0f0] text-black px-1.5 py-[3px] min-w-[22px] text-center rounded shadow-sm text-[12px] font-sans font-bold leading-none">D</span>
+            </div>
+        </div>
+        <div class="flex justify-end items-center gap-4">
+            <span class="text-[#a0a0a0] text-[13px]">기본 공격</span>
+            <span class="bg-[#f0f0f0] text-black px-2 py-[3px] min-w-[65px] text-center rounded shadow-sm text-[12px] font-sans font-bold leading-none">L-Click</span>
+        </div>
+        <div class="flex justify-end items-center gap-4">
+            <span class="text-[#a0a0a0] text-[13px]">달리기</span>
+            <span class="bg-[#f0f0f0] text-black px-2 py-[3px] min-w-[65px] text-center rounded shadow-sm text-[12px] font-sans font-bold leading-none">L-Shift</span>
+        </div>
+        <div class="flex justify-end items-center gap-4">
+            <span class="text-[#a0a0a0] text-[13px]">인벤토리</span>
+            <span class="bg-[#f0f0f0] text-black px-2 py-[3px] min-w-[65px] text-center rounded shadow-sm text-[12px] font-sans font-bold leading-none">Q</span>
+        </div>
+        <div class="flex justify-end items-center gap-4">
+            <span class="text-[#a0a0a0] text-[13px]">스와핑</span>
+            <span class="bg-[#f0f0f0] text-black px-2 py-[3px] min-w-[65px] text-center rounded shadow-sm text-[12px] font-sans font-bold leading-none">Tap</span>
+        </div>
+    </div>
+
+    <!-- 좌상단 툴팁 마우스 포인터 위치 추적용 스크립트 -->
+    <script>
+        document.querySelectorAll('.tooltip-trigger').forEach(trigger => {
+            const tooltip = trigger.querySelector('.tooltip-content');
+            
+            trigger.addEventListener('mouseenter', (e) => {
+                if(tooltip) {
+                    tooltip.classList.remove('hidden');
+                    // 좌상단이 마우스 포인터에 정확히 위치하도록 설정
+                    tooltip.style.left = e.clientX + 'px';
+                    tooltip.style.top = e.clientY + 'px';
+                }
+            });
+
+            trigger.addEventListener('mousemove', (e) => {
+                if(tooltip) {
+                    tooltip.style.left = e.clientX + 'px';
+                    tooltip.style.top = e.clientY + 'px';
+                }
+            });
+
+            trigger.addEventListener('mouseleave', () => {
+                if(tooltip) {
+                    tooltip.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
