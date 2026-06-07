@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project kov - Result Screen V2.3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #050505; color: #ffffff; }
+        
+        .wf-box {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(15, 15, 15, 0.8); 
+            backdrop-filter: blur(8px);
+        }
+
+        /* 기획 로직 배지 스타일 */
+        .logic-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            background-color: rgba(14, 165, 233, 0.9); border: 1px solid #7dd3fc; color: white;
+            font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 3px;
+            cursor: help; white-space: nowrap; pointer-events: auto;
+            box-shadow: 0 0 8px rgba(14, 165, 233, 0.5); transition: background-color 0.2s;
+        }
+        .logic-badge:hover { background-color: rgba(2, 132, 199, 1); z-index: 50; }
+        .hidden-badge { display: none !important; }
+
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+        /* 발라트로 스타일 리스트 폰트 */
+        .hand-list-text {
+            font-family: 'Malgun Gothic', sans-serif;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col font-sans overflow-hidden">
+
+    <div id="global-tooltip" class="hidden fixed z-[9999] pointer-events-none wf-box flex-col bg-black/95 border border-gray-500 p-3 shadow-2xl items-start text-left w-80 transition-none" style="transform: translate(15px, 15px);">
+        <div id="tooltip-title" class="text-white font-bold text-xs mb-1 tracking-widest border-b border-gray-600 pb-1 w-full">Title</div>
+        <div id="tooltip-desc" class="text-gray-300 text-[10px] leading-relaxed mt-1 break-words w-full">Description</div>
+    </div>
+
+    <header class="bg-[#0f0f0f] border-b border-[#222] p-4 flex justify-between items-center z-10 shrink-0">
+        <h1 class="text-xl font-bold tracking-[0.2em] text-white">PROJECT <span class="text-gray-500">kov</span> <span class="text-xs font-normal text-purple-400 border border-purple-400 px-2 py-1 rounded ml-2">Result Screen V2.3 (Grid Icons)</span></h1>
+        
+        <div class="flex items-center space-x-4">
+            <button onclick="toggleResultState()" class="px-3 py-2 text-xs border border-red-500 text-red-400 bg-black/50 hover:bg-red-500 hover:text-black font-bold tracking-widest transition-colors rounded">
+                TEST: 생존/사망 토글
+            </button>
+            <div class="w-px h-6 bg-gray-700 mx-2"></div>
+            <button onclick="toggleLogicInfoMode()" id="logic-info-toggle-btn" class="px-3 py-2 text-xs border border-sky-500 text-sky-400 bg-black/50 hover:bg-sky-500 hover:text-black font-bold tracking-widest transition-colors rounded">
+                [i] 기획 로직 확인
+            </button>
+            <button onclick="toggleStringKeyMode()" id="string-key-toggle-btn" class="px-3 py-2 text-xs border border-yellow-500 text-yellow-400 bg-black/50 hover:bg-yellow-500 hover:text-black font-bold tracking-widest transition-colors rounded">
+                [?] 텍스트 키 확인
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center p-6 relative bg-[#050505]">
+        <div class="w-full max-w-[1360px] h-full relative overflow-hidden bg-[#0a0a0a] border border-[#222] shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col rounded-xl">
+            
+            <div id="bg-overlay" class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none transition-colors duration-500"></div>
+
+            <div class="w-full pt-8 pb-6 flex flex-col items-center justify-center relative z-10 border-b border-white/5 shrink-0">
+                <span class="logic-badge hidden-badge absolute top-4 left-4" onmouseenter="showTooltip(event, '[① 결과 타이틀]', '생존/사망에 따른 타이틀 및 배경색 전환')" onmouseleave="hideTooltip()">ℹ️(info)</span>
+                <h1 id="result-title" class="text-5xl font-extrabold tracking-[0.2em] text-green-400 drop-shadow-[0_0_20px_rgba(74,222,128,0.3)] mb-2" data-i18n-key="RESULT_TITLE_SUCCESS" data-i18n-type="local">EXTRACTION SUCCESS</h1>
+            </div>
+
+            <div class="flex-1 flex w-full h-0 relative z-10">
+                
+                <div class="w-3/4 h-full border-r border-white/5 p-8 flex flex-col overflow-y-auto custom-scrollbar">
+                    
+                    <span class="logic-badge hidden-badge mb-2 w-max" onmouseenter="showTooltip(event, '[② 세션 통계]', '비중이 낮은 정보이므로 텍스트 크기와 영역을 대폭 축소하여 상단에 배치')" onmouseleave="hideTooltip()">ℹ️(info)</span>
+                    
+                    <div class="grid grid-cols-5 gap-3 mb-8">
+                        <div class="wf-box py-2 px-3 rounded flex flex-col justify-center bg-white/5 border-none">
+                            <span class="text-gray-500 text-[10px] mb-1 tracking-widest" data-i18n-key="STAT_PLAYTIME" data-i18n-type="local">플레이 타임</span>
+                            <span class="text-gray-300 text-sm font-mono font-bold">28:45</span>
+                        </div>
+                        <div class="wf-box py-2 px-3 rounded flex flex-col justify-center bg-white/5 border-none">
+                            <span class="text-gray-500 text-[10px] mb-1 tracking-widest" data-i18n-key="STAT_MONSTER_KILL" data-i18n-type="local">처치한 몬스터</span>
+                            <span class="text-gray-300 text-sm font-mono font-bold">142 <span class="text-[10px] text-gray-600 font-sans font-normal">마리</span></span>
+                        </div>
+                        <div class="wf-box py-2 px-3 rounded flex flex-col justify-center bg-white/5 border-none">
+                            <span class="text-gray-500 text-[10px] mb-1 tracking-widest" data-i18n-key="STAT_PLAYER_KILL" data-i18n-type="local">처치한 플레이어</span>
+                            <span class="text-red-400/80 text-sm font-mono font-bold">3 <span class="text-[10px] text-red-500/40 font-sans font-normal">명</span></span>
+                        </div>
+                        <div class="wf-box py-2 px-3 rounded flex flex-col justify-center bg-white/5 border-none">
+                            <span class="text-gray-500 text-[10px] mb-1 tracking-widest" data-i18n-key="STAT_DMG_DEALT" data-i18n-type="local">누적 가한 피해</span>
+                            <span class="text-sky-400/80 text-sm font-mono font-bold">45,210</span>
+                        </div>
+                        <div class="wf-box py-2 px-3 rounded flex flex-col justify-center bg-white/5 border-none">
+                            <span class="text-gray-500 text-[10px] mb-1 tracking-widest" data-i18n-key="STAT_DMG_TAKEN" data-i18n-type="local">누적 받은 피해</span>
+                            <span class="text-orange-400/80 text-sm font-mono font-bold">3,850</span>
+                        </div>
+                    </div>
+
+                    <span class="logic-badge hidden-badge mb-2 w-max" onmouseenter="showTooltip(event, '[③ 트럼프 카드 패]', '게임의 핵심 보상이므로 시각적으로 크게 강조')" onmouseleave="hideTooltip()">ℹ️(info)</span>
+
+                    <div class="mb-8 p-6 bg-[#0c0c0e] border border-gray-800 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative shrink-0">
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-900/10 via-transparent to-yellow-900/10 rounded-xl pointer-events-none"></div>
+                        
+                        <h3 class="text-base font-bold text-white tracking-[0.1em] mb-5 flex items-center" data-i18n-key="RESULT_ACQUIRED_CARDS" data-i18n-type="local">
+                            <span class="text-yellow-500 mr-2 text-xl">✦</span> 이번 게임에서 획득한 트럼프 카드
+                        </h3>
+                        
+                        <div class="flex flex-wrap gap-4 relative z-10">
+                            <div class="w-20 h-28 bg-white border border-gray-300 rounded-md flex flex-col items-center justify-center shadow-lg transform hover:-translate-y-2 hover:shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-all cursor-default">
+                                <span class="text-black text-xl font-bold">♠ A</span>
+                            </div>
+                            <div class="w-20 h-28 bg-white border border-gray-300 rounded-md flex flex-col items-center justify-center shadow-lg transform hover:-translate-y-2 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all cursor-default">
+                                <span class="text-red-600 text-xl font-bold">♥ K</span>
+                            </div>
+                            <div class="w-20 h-28 bg-white border border-gray-300 rounded-md flex flex-col items-center justify-center shadow-lg transform hover:-translate-y-2 hover:shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-all cursor-default">
+                                <span class="text-black text-xl font-bold">♣ 7</span>
+                            </div>
+                            <div class="w-20 h-28 bg-white border border-gray-300 rounded-md flex flex-col items-center justify-center shadow-lg transform hover:-translate-y-2 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all cursor-default">
+                                <span class="text-red-600 text-xl font-bold">♦ 7</span>
+                            </div>
+                            <div class="w-20 h-28 bg-white border border-gray-300 rounded-md flex flex-col items-center justify-center shadow-lg transform hover:-translate-y-2 hover:shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-all cursor-default">
+                                <span class="text-black text-xl font-bold">♠ 3</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <span class="logic-badge hidden-badge mb-2 w-max" onmouseenter="showTooltip(event, '[④ 조커 및 증강 (그리드)]', '가로 10개 고정 그리드 배치. 조커 최대 3줄, 증강 최대 1줄')" onmouseleave="hideTooltip()">ℹ️(info)</span>
+
+                    <div class="flex flex-col gap-6 w-full mb-4">
+                        
+                        <div class="flex flex-col w-full">
+                            <h3 class="text-xs font-bold text-gray-400 tracking-widest mb-3 flex justify-between items-end" data-i18n-key="RESULT_JOKERS" data-i18n-type="local">
+                                <span>획득한 조커</span>
+                                <span class="text-[10px] text-gray-600 font-mono font-normal">14 / 30</span>
+                            </h3>
+                            
+                            <div class="grid grid-cols-10 gap-2 overflow-y-auto custom-scrollbar pr-2 max-h-[14rem] auto-rows-max">
+                                
+                                <div class="aspect-square border border-purple-500/50 bg-purple-900/20 rounded-md text-2xl flex justify-center items-center shadow-sm cursor-help hover:bg-purple-800/40 transition-colors"
+                                     onmouseenter="showTooltip(event, '[조커] 광대의 눈물', '배수 +4, 짝수 카드 사용 시 추가 칩 +10을 획득합니다.')" onmouseleave="hideTooltip()">🤡</div>
+                                
+                                <div class="aspect-square border border-yellow-500/50 bg-yellow-900/20 rounded-md text-2xl flex justify-center items-center shadow-sm cursor-help hover:bg-yellow-800/40 transition-colors"
+                                     onmouseenter="showTooltip(event, '[조커] 황금 카드', '상점 리롤 비용이 1 감소하며, 카드 판매 시 2배의 재화를 얻습니다.')" onmouseleave="hideTooltip()">🃏</div>
+                                
+                                <div class="aspect-square border border-blue-500/50 bg-blue-900/20 rounded-md text-2xl flex justify-center items-center shadow-sm cursor-help hover:bg-blue-800/40 transition-colors"
+                                     onmouseenter="showTooltip(event, '[조커] 푸른 달', '스페이드 무늬 카드 사용 시 피해량이 1.5배 증가합니다.')" onmouseleave="hideTooltip()">🌙</div>
+                                
+                                <div class="aspect-square border border-gray-400/50 bg-gray-600/20 rounded-md text-2xl flex justify-center items-center shadow-sm cursor-help hover:bg-gray-500/40 transition-colors"
+                                     onmouseenter="showTooltip(event, '[조커] 돌 조각상', '1 페어 달성 시 기본 칩이 20 증가합니다.')" onmouseleave="hideTooltip()">🗿</div>
+
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-md flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-md flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-md flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-md flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-md flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-md flex justify-center items-center opacity-30 border-dashed"></div>
+                                
+                                <div class="aspect-square border border-green-500/50 bg-green-900/20 rounded-md text-2xl flex justify-center items-center shadow-sm cursor-help hover:bg-green-800/40 transition-colors"
+                                     onmouseenter="showTooltip(event, '[조커] 독사', '공격 시 5% 확률로 맹독을 부여합니다.')" onmouseleave="hideTooltip()">🐍</div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-md flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-md flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-md flex justify-center items-center opacity-30 border-dashed"></div>
+
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col w-full">
+                            <h3 class="text-xs font-bold text-gray-400 tracking-widest mb-3 flex justify-between items-end" data-i18n-key="RESULT_AUGMENTS" data-i18n-type="local">
+                                <span>획득한 증강</span>
+                                <span class="text-[10px] text-gray-600 font-mono font-normal">2 / 10</span>
+                            </h3>
+                            
+                            <div class="grid grid-cols-10 gap-2 overflow-hidden pr-2">
+                                
+                                <div class="aspect-square border border-sky-500/50 bg-sky-900/20 rounded-full text-xl flex justify-center items-center shadow-sm cursor-help hover:bg-sky-800/40 transition-colors"
+                                     onmouseenter="showTooltip(event, '[증강] 아드레날린 주사', '최대 체력이 15% 증가하고, 이동 속도가 소폭 상승합니다.')" onmouseleave="hideTooltip()">💉</div>
+                                     
+                                <div class="aspect-square border border-red-500/50 bg-red-900/20 rounded-full text-xl flex justify-center items-center shadow-sm cursor-help hover:bg-red-800/40 transition-colors"
+                                     onmouseenter="showTooltip(event, '[증강] 발화성 탄약', '적중 시 30% 확률로 3초간 화상 피해를 입힙니다.')" onmouseleave="hideTooltip()">🔥</div>
+
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-full flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-full flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-full flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-full flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-full flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-full flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-full flex justify-center items-center opacity-30 border-dashed"></div>
+                                <div class="aspect-square border border-gray-700 bg-gray-800/50 rounded-full flex justify-center items-center opacity-30 border-dashed"></div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="w-1/4 h-full py-6 pr-6 pl-4 flex flex-col gap-4 relative bg-[#11131a] border-l border-white/5">
+                    
+                    <span class="logic-badge hidden-badge absolute top-4 right-4 z-20" onmouseenter="showTooltip(event, '[⑤ 족보 횟수 및 무기]', '우측 영역에 족보 통계와 가장 많이 쓴 무기 패널을 독립시켜 배치')" onmouseleave="hideTooltip()">ℹ️(info)</span>
+                    
+                    <div class="flex-1 border border-[#2a2d3d] bg-[#161925] rounded-xl flex flex-col shadow-2xl overflow-hidden min-h-0">
+                        
+                        <div class="text-center py-4 border-b border-[#2a2d3d] shrink-0">
+                            <h2 class="text-[#ff9d5c] text-sm font-bold tracking-[0.2em] hand-list-text" data-i18n-key="RESULT_HAND_COUNTS" data-i18n-type="local">족보 플레이 횟수</h2>
+                        </div>
+
+                        <div class="flex-1 overflow-y-auto px-2 py-2 space-y-0.5 custom-scrollbar">
+                            
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-400 text-xs tracking-wider hand-list-text" data-i18n-key="HAND_PENTA" data-i18n-type="ref">펜타</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-600 text-[10px]">≢</span>
+                                    <span class="bg-[#1f2233] text-gray-500 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-400 text-xs tracking-wider hand-list-text" data-i18n-key="HAND_ROYAL_FLUSH" data-i18n-type="ref">로열 플러시</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-600 text-[10px]">≢</span>
+                                    <span class="bg-[#1f2233] text-gray-500 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-400 text-xs tracking-wider hand-list-text whitespace-nowrap" data-i18n-key="HAND_ROYAL_STRAIGHT" data-i18n-type="ref">로열 스트레이트</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-600 text-[10px]">≢</span>
+                                    <span class="bg-[#1f2233] text-gray-500 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-400 text-xs tracking-wider hand-list-text whitespace-nowrap" data-i18n-key="HAND_STRAIGHT_FLUSH" data-i18n-type="ref">스플러시</span> 
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-600 text-[10px]">≢</span>
+                                    <span class="bg-[#1f2233] text-gray-500 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-400 text-xs tracking-wider hand-list-text" data-i18n-key="HAND_FOUR_CARD" data-i18n-type="ref">포 카드</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-600 text-[10px]">≢</span>
+                                    <span class="bg-[#1f2233] text-gray-500 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-200 text-xs tracking-wider hand-list-text drop-shadow-[0_0_3px_rgba(255,255,255,0.3)]" data-i18n-key="HAND_FULL_HOUSE" data-i18n-type="ref">풀 하우스</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-500 text-[10px]">≢</span>
+                                    <span class="bg-[#ff8522] text-black w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-[0_0_8px_rgba(255,133,34,0.5)]">2</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-400 text-xs tracking-wider hand-list-text" data-i18n-key="HAND_FLUSH" data-i18n-type="ref">플러시</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-600 text-[10px]">≢</span>
+                                    <span class="bg-[#1f2233] text-gray-500 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-400 text-xs tracking-wider hand-list-text" data-i18n-key="HAND_STRAIGHT" data-i18n-type="ref">스트레이트</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-600 text-[10px]">≢</span>
+                                    <span class="bg-[#1f2233] text-gray-500 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-400 text-xs tracking-wider hand-list-text" data-i18n-key="HAND_TRIPLE" data-i18n-type="ref">트리플</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-600 text-[10px]">≢</span>
+                                    <span class="bg-[#1f2233] text-gray-500 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-200 text-xs tracking-wider hand-list-text" data-i18n-key="HAND_TWO_PAIR" data-i18n-type="ref">투 페어</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-500 text-[10px]">≢</span>
+                                    <span class="bg-[#ff8522] text-black w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-[0_0_8px_rgba(255,133,34,0.5)]">1</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 bg-[#263152] border border-[#3b4c80] rounded transition-colors mt-1 mb-1 shadow-md">
+                                <span class="text-white text-xs tracking-wider font-bold hand-list-text" data-i18n-key="HAND_PAIR" data-i18n-type="ref">페어</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-400 text-[10px]">≢</span>
+                                    <span class="bg-[#ff8522] text-black w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-[0_0_8px_rgba(255,133,34,0.8)]">5</span>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center py-1.5 px-2 hover:bg-white/5 rounded transition-colors">
+                                <span class="text-gray-400 text-xs tracking-wider hand-list-text" data-i18n-key="HAND_HIGH_CARD" data-i18n-type="ref">하이 카드</span>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="text-gray-600 text-[10px]">≢</span>
+                                    <span class="bg-[#1f2233] text-gray-500 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">0</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="border border-[#2a2d3d] bg-[#161925] rounded-xl p-4 shadow-xl shrink-0 flex flex-col items-center">
+                        <h3 class="text-[#ff9d5c] text-[11px] font-bold tracking-[0.2em] mb-3 uppercase" data-i18n-key="RESULT_FAV_WEAPON" data-i18n-type="local">주 사용 무기</h3>
+                        <div class="flex items-center justify-center space-x-4 w-full">
+                            <div class="w-12 h-12 border border-gray-500 bg-gray-800 rounded flex justify-center items-center text-2xl shadow-inner shrink-0 cursor-help hover:bg-gray-700 transition-colors"
+                                 onmouseenter="showTooltip(event, 'Assault Rifle (Lv.3)', '이번 세션에서 가장 많은 피해를 입힌 주력 무기입니다.')" onmouseleave="hideTooltip()">
+                                🔫
+                            </div>
+                            <div class="flex flex-col items-start overflow-hidden">
+                                <span class="text-white font-bold text-sm truncate w-full">Assault Rifle</span>
+                                <span class="text-gray-500 text-[10px] mt-1 font-mono" data-i18n-key="STAT_WEAPON_USE" data-i18n-type="local">852회 사격</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center shrink-0">
+                        <button onclick="console.log('Return to Lobby')" class="wf-box w-full py-3 bg-white text-black text-xs font-bold tracking-[0.2em] hover:bg-gray-300 transition-colors uppercase border-none rounded-md shadow-lg" data-i18n-key="BTN_RETURN_LOBBY" data-i18n-type="local">
+                            Return Lobby
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let isStringKeyMode = false; 
+        let isLogicInfoMode = false;
+        let isSuccess = true;
+
+        function toggleStringKeyMode() {
+            isStringKeyMode = !isStringKeyMode;
+            const btn = document.getElementById('string-key-toggle-btn');
+            
+            if (isStringKeyMode) {
+                btn.classList.add('bg-yellow-500', 'text-black');
+                btn.classList.remove('text-yellow-400', 'bg-black/50');
+                btn.innerText = "[?] 복구";
+            } else {
+                btn.classList.remove('bg-yellow-500', 'text-black');
+                btn.classList.add('text-yellow-400', 'bg-black/50');
+                btn.innerText = "[?] 텍스트 키 확인";
+            }
+            applyStringKeyModeToContainer(document.body);
+        }
+
+        function toggleLogicInfoMode() {
+            isLogicInfoMode = !isLogicInfoMode;
+            const btn = document.getElementById('logic-info-toggle-btn');
+            if (isLogicInfoMode) {
+                btn.classList.add('bg-sky-500', 'text-black');
+                btn.classList.remove('text-sky-400', 'bg-black/50');
+                btn.innerText = "[i] 로직 숨기기";
+            } else {
+                btn.classList.remove('bg-sky-500', 'text-black');
+                btn.classList.add('text-sky-400', 'bg-black/50');
+                btn.innerText = "[i] 기획 로직 확인";
+            }
+            
+            document.querySelectorAll('.logic-badge').forEach(el => {
+                if (isLogicInfoMode) el.classList.remove('hidden-badge');
+                else el.classList.add('hidden-badge');
+            });
+        }
+
+        function applyStringKeyModeToContainer(container) {
+            if(!container) return;
+            const elements = container.querySelectorAll('[data-i18n-key]');
+            elements.forEach(el => {
+                if (isStringKeyMode) {
+                    if (!el.hasAttribute('data-original-html')) {
+                        el.setAttribute('data-original-html', el.innerHTML);
+                        const key = el.getAttribute('data-i18n-key');
+                        const type = el.getAttribute('data-i18n-type');
+                        
+                        let badgeClass = type === 'ref' 
+                            ? 'bg-green-500 border-green-700 text-black hover:bg-green-400' 
+                            : 'bg-yellow-400 border-yellow-600 text-black hover:bg-yellow-300';
+                        let tooltipTitle = type === 'ref' ? 'Reference Key (참조 키)' : 'Local Key (로컬 키)';
+                        
+                        el.innerHTML = `
+                            <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-sm border ${badgeClass} font-bold text-[9px] shadow-sm whitespace-nowrap cursor-help pointer-events-auto transition-colors align-middle"
+                                  onmouseenter="showTooltip(event, '${tooltipTitle}', '${key}'); event.stopPropagation();"
+                                  onmouseleave="hideTooltip(); event.stopPropagation();">
+                                <span class="mr-1 opacity-80 leading-none">🔑</span>(key)
+                            </span>
+                        `;
+                    }
+                } else {
+                    if (el.hasAttribute('data-original-html')) {
+                        el.innerHTML = el.getAttribute('data-original-html');
+                        el.removeAttribute('data-original-html');
+                    }
+                }
+            });
+        }
+
+        const globalTooltip = document.getElementById('global-tooltip');
+        document.addEventListener('mousemove', (e) => {
+            if(!globalTooltip.classList.contains('hidden')) {
+                globalTooltip.style.left = (e.clientX + 15) + 'px';
+                globalTooltip.style.top = (e.clientY + 15) + 'px';
+            }
+        });
+
+        function showTooltip(e, title, desc) {
+            document.getElementById('tooltip-title').innerText = title;
+            document.getElementById('tooltip-desc').innerHTML = desc; 
+            globalTooltip.classList.remove('hidden');
+            globalTooltip.classList.add('flex');
+        }
+        
+        function hideTooltip() {
+            globalTooltip.classList.add('hidden');
+            globalTooltip.classList.remove('flex');
+        }
+
+        function toggleResultState() {
+            isSuccess = !isSuccess;
+            
+            const title = document.getElementById('result-title');
+            const bgOverlay = document.getElementById('bg-overlay');
+
+            if (!isStringKeyMode) {
+                if (isSuccess) {
+                    title.innerText = "EXTRACTION SUCCESS";
+                    title.className = "text-5xl font-extrabold tracking-[0.2em] text-green-400 drop-shadow-[0_0_20px_rgba(74,222,128,0.3)] mb-2";
+                    title.setAttribute('data-i18n-key', 'RESULT_TITLE_SUCCESS');
+                    
+                    bgOverlay.className = "absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none transition-colors duration-500";
+
+                } else {
+                    title.innerText = "MISSING IN ACTION";
+                    title.className = "text-5xl font-extrabold tracking-[0.2em] text-red-500 drop-shadow-[0_0_20px_rgba(239,68,68,0.4)] mb-2";
+                    title.setAttribute('data-i18n-key', 'RESULT_TITLE_FAIL');
+                    
+                    bgOverlay.className = "absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none transition-colors duration-500";
+                }
+            } else {
+                if (isSuccess) {
+                    title.setAttribute('data-i18n-key', 'RESULT_TITLE_SUCCESS');
+                    bgOverlay.className = "absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green-900/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none transition-colors duration-500";
+                } else {
+                    title.setAttribute('data-i18n-key', 'RESULT_TITLE_FAIL');
+                    bgOverlay.className = "absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-900/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none transition-colors duration-500";
+                }
+                applyStringKeyModeToContainer(document.body);
+            }
+        }
+    </script>
+</body>
+</html>
