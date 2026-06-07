@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project kov - UI/UX Wireframes v5.1 (Polished Card System)</title>
+    <title>Project kov - UI/UX Wireframes v5.3 (Merged Version)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #050505; color: #ffffff; }
@@ -25,8 +25,9 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
 
-        .selected-item { border-color: white !important; box-shadow: 0 0 15px rgba(255,255,255,0.3) !important; transform: translateY(-2px); z-index: 10; }
+        .selected-item { border-color: white !important; box-shadow: 0 0 15px rgba(255,255,255,0.5) !important; transform: translateY(-2px); z-index: 10; }
 
+        /* V2 Tooltip & Logic Badge Styles */
         .logic-badge {
             display: inline-flex; align-items: center; justify-content: center;
             background-color: rgba(14, 165, 233, 0.9); border: 1px solid #7dd3fc; color: white;
@@ -37,50 +38,89 @@
         .logic-badge:hover { background-color: rgba(2, 132, 199, 1); z-index: 50; }
         .hidden-badge { display: none !important; }
 
-        /* 카드 공통 스타일 */
-        .playing-card {
-            background-color: #ffffff;
-            color: #000000;
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            transition: all 0.2s;
-            cursor: pointer;
-            border: 1px solid #ccc;
-        }
-        .playing-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255,255,255,0.3); }
-        .card-red { color: #dc2626; }
-        .card-black { color: #171717; }
-        .card-locked { background-color: #1a1a1a; color: #4a4a4a; border-color: #333; opacity: 0.6; }
-        .card-locked:hover { opacity: 0.9; }
-
         /* 리니지 컬렉션 리스트 스타일 */
         .collection-row { border-left: 3px solid transparent; transition: all 0.2s; }
         .collection-row:hover { background-color: rgba(255,255,255,0.05); border-left-color: rgba(255,255,255,0.3); }
         .collection-row.active-col { background-color: rgba(255,255,255,0.1); border-left-color: #38bdf8; }
         .col-completed { border-left-color: #4ade80 !important; opacity: 0.6; }
+
+        /* 카드 공통 스타일 */
+        .playing-card {
+            background-color: #ffffff;
+            color: #000000;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            user-select: none;
+        }
+        .playing-card:hover:not(.no-hover-effect) { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255,255,255,0.2); }
+        .card-red { color: #dc2626; }
+        .card-black { color: #171717; }
+        .card-locked { background-color: #1a1a1a; color: #4a4a4a; border-color: #333; opacity: 0.6; }
+        .card-locked:hover { opacity: 0.9; }
+
+        /* ====== 연구소 v2 티어별 프레임 스타일 ====== */
+        .tier-1 { background-color: #ffffff; border: 1px solid #d1d5db; }
+        .tier-2 { background-color: #f3f4f6; border: 2px solid #9ca3af; box-shadow: inset 0 0 15px rgba(255,255,255,0.8); }
+        .tier-3 { background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%); border: 2px solid #cbd5e1; box-shadow: 0 0 10px rgba(148, 163, 184, 0.4), inset 0 0 20px rgba(255,255,255,0.5); }
+        .tier-4 { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255,255,255,0.2); text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .tier-5 { background: linear-gradient(135deg, #fef08a 0%, #eab308 50%, #a16207 100%); border: 2px solid #fde047; box-shadow: 0 0 20px rgba(234, 179, 8, 0.5), inset 0 0 15px rgba(255,255,255,0.6); }
+        .tier-6 { 
+            background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+            background-size: 1800% 1800%;
+            animation: rainbow 6s ease infinite;
+            border: 2px solid rgba(255,255,255,0.8);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.5), inset 0 0 15px rgba(255,255,255,0.7);
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff;
+        }
+        @keyframes rainbow { 
+            0%{background-position:0% 82%} 
+            50%{background-position:100% 19%} 
+            100%{background-position:0% 82%}
+        }
+
+        /* 3D 드래그 컨테이너 */
+        .card-3d-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+        }
+        .card-3d-container:active { cursor: grabbing; }
+        .card-3d-element {
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col font-sans overflow-hidden">
 
+    <!-- Global Tooltip from v2 -->
     <div id="global-tooltip" class="hidden fixed z-[9999] pointer-events-none wf-box flex-col bg-black/95 border border-gray-500 p-3 shadow-2xl items-start text-left w-80 transition-none" style="transform: translate(15px, 15px);">
         <div id="tooltip-title" class="text-white font-bold text-xs mb-1 tracking-widest border-b border-gray-600 pb-1 w-full">Title</div>
         <div id="tooltip-desc" class="text-gray-300 text-[10px] leading-relaxed mt-1 break-words w-full">Description</div>
     </div>
 
     <header class="bg-[#0f0f0f] border-b border-[#222] p-4 flex justify-between items-center z-10 shrink-0">
-        <h1 class="text-xl font-bold tracking-[0.2em] text-white">PROJECT <span class="text-gray-500">kov</span> <span class="text-xs font-normal text-purple-400 border border-purple-400 px-2 py-1 rounded ml-2">v5.1 Polished UI</span></h1>
+        <h1 class="text-xl font-bold tracking-[0.2em] text-white">PROJECT <span class="text-gray-500">kov</span> <span class="text-xs font-normal text-purple-400 border border-purple-400 px-2 py-1 rounded ml-2">v5.3.1 (+15 Exp Test)</span></h1>
         
         <div class="flex items-center space-x-6">
-            <nav class="flex space-x-2" id="nav-buttons-v3">
-                <button onclick="showScreenV3('lobby')" class="px-4 py-2 text-sm border border-gray-700 hover:bg-gray-100 hover:text-black transition-colors rounded">1. Lobby</button>
-                <button onclick="showScreenV3('inventory')" class="px-4 py-2 text-sm border border-white bg-white text-black transition-colors rounded active-btn">2. 인벤토리</button>
-                <button onclick="showScreenV3('codex')" class="px-4 py-2 text-sm border border-gray-700 hover:bg-gray-100 hover:text-black transition-colors rounded">3. 컬렉션</button>
-                <button onclick="showScreenV3('research')" class="px-4 py-2 text-sm border border-gray-700 hover:bg-gray-100 hover:text-black transition-colors rounded">4. 연구소</button>
+            <nav class="flex space-x-2" id="nav-buttons">
+                <button onclick="showScreen('lobby')" class="nav-btn px-4 py-2 text-sm border border-gray-700 hover:bg-gray-100 hover:text-black transition-colors rounded">1. Lobby</button>
+                <button onclick="showScreen('inventory')" class="nav-btn px-4 py-2 text-sm border border-gray-700 hover:bg-gray-100 hover:text-black transition-colors rounded">2. 인벤토리</button>
+                <button onclick="showScreen('codex')" class="nav-btn px-4 py-2 text-sm border border-gray-700 hover:bg-gray-100 hover:text-black transition-colors rounded">3. 컬렉션</button>
+                <button onclick="showScreen('research')" class="nav-btn px-4 py-2 text-sm border border-gray-700 hover:bg-gray-100 hover:text-black transition-colors rounded">4. 연구소 v1 (리니지)</button>
+                <button onclick="showScreen('research-v2')" class="nav-btn px-4 py-2 text-sm border border-white bg-white text-black transition-colors rounded active-btn">5. 연구소 v2 (카드강화)</button>
             </nav>
             <div class="flex space-x-2">
                 <button onclick="toggleLogicInfoMode()" id="logic-info-toggle-btn" class="px-3 py-2 text-xs border border-sky-500 text-sky-400 bg-black/50 hover:bg-sky-500 hover:text-black font-bold tracking-widest transition-colors rounded">
@@ -93,11 +133,13 @@
     <main class="flex-1 flex items-center justify-center p-8 relative bg-[#050505]">
         <div class="w-full max-w-[1360px] aspect-video relative overflow-hidden bg-[#0a0a0a] shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-[#222] rounded-xl">
             
+            <!-- 1. Lobby -->
             <div id="lobby" class="screen-container w-full h-full absolute inset-0 flex items-center justify-center">
                 <span class="text-gray-600 text-2xl tracking-widest uppercase">Lobby Screen Placeholder</span>
             </div>
 
-            <div id="inventory" class="screen-container active w-full h-full absolute inset-0 p-8 flex flex-col">
+            <!-- 2. Inventory -->
+            <div id="inventory" class="screen-container w-full h-full absolute inset-0 p-8 flex flex-col">
                 <div class="flex justify-between items-end mb-4 border-b border-white/10 pb-4 shrink-0">
                     <div class="flex items-center space-x-4">
                         <h2 class="text-3xl font-light tracking-widest">INVENTORY</h2>
@@ -118,16 +160,17 @@
                 <div class="flex-1 flex space-x-6 h-[calc(100%-5rem)]">
                     <div class="w-2/3 h-full flex flex-col relative bg-[#0c0c0e] border border-white/5 rounded-lg overflow-hidden">
                         <div id="inventory-grid" class="w-full flex-1 p-6 grid grid-cols-10 gap-4 overflow-y-auto content-start custom-scrollbar">
-                            </div>
+                        </div>
                     </div>
                     
                     <div class="w-1/3 h-full flex flex-col">
                         <div id="inv-detail-view" class="wf-box flex-1 flex-col p-8 bg-gradient-to-t from-black to-[#111] items-start justify-start text-left border border-white/10 rounded-lg">
-                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- 3. Codex -->
             <div id="codex" class="screen-container w-full h-full absolute inset-0 p-8 flex flex-col">
                 <div class="flex justify-between items-end mb-4 border-b border-white/10 pb-4 shrink-0">
                     <div class="flex items-center space-x-4">
@@ -142,22 +185,23 @@
                 <div class="flex-1 flex space-x-6 h-[calc(100%-5rem)]">
                     <div class="w-3/4 h-full bg-[#0c0c0e] border border-white/5 rounded-lg p-6 overflow-y-auto custom-scrollbar flex justify-center">
                         <div class="grid grid-cols-4 gap-x-12 gap-y-4 w-full max-w-2xl" id="codex-52-grid">
-                            </div>
+                        </div>
                     </div>
                     
                     <div class="w-1/4 h-full flex flex-col">
                         <div id="codex-detail-view" class="wf-box flex-1 flex-col p-6 bg-gradient-to-t from-black to-[#111] items-center justify-start text-center border border-white/10 rounded-lg">
-                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- 4. Research v1 -->
             <div id="research" class="screen-container w-full h-full absolute inset-0 p-8 flex flex-col">
                 <div class="flex justify-between items-end mb-4 border-b border-white/10 pb-4 shrink-0">
                     <div class="flex items-center space-x-4">
                         <h2 class="text-3xl font-light tracking-widest">LABORATORY <span class="text-gray-600 mx-2">|</span> COLLECTION EFFECTS</h2>
                     </div>
-                    </div>
+                </div>
                 
                 <div class="flex-1 flex space-x-6 h-[calc(100%-5rem)]">
                     <div class="w-1/2 h-full bg-[#0c0c0e] border border-white/5 rounded-lg overflow-y-auto custom-scrollbar p-2">
@@ -201,7 +245,51 @@
 
                     <div class="w-1/2 h-full flex flex-col">
                         <div id="collection-detail-view" class="flex-1 bg-gradient-to-t from-black to-[#111] border border-white/10 rounded-lg p-8 flex flex-col relative">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Research v2 -->
+            <div id="research-v2" class="screen-container active w-full h-full absolute inset-0 p-8 flex flex-col">
+                <div class="flex justify-between items-end mb-4 border-b border-white/10 pb-4 shrink-0">
+                    <div>
+                        <h2 class="text-3xl font-light tracking-widest text-sky-400">FRAME UPGRADE</h2>
+                        <p class="text-xs text-gray-400 mt-1">중복 카드를 소모하여 개별 카드의 프레임 등급을 영구적으로 강화합니다.</p>
+                    </div>
+                    <div class="flex space-x-2 text-xs">
+                        <span class="bg-gray-800 text-gray-300 px-2 py-1 rounded border border-gray-600">T1: 종이</span>
+                        <span class="bg-gray-200 text-black px-2 py-1 rounded border border-gray-400">T2: 플라스틱</span>
+                        <span class="bg-slate-300 text-slate-800 px-2 py-1 rounded border border-slate-400">T3: 은</span>
+                        <span class="bg-white/20 text-white px-2 py-1 rounded border border-white/40">T4: 유리</span>
+                        <span class="bg-yellow-500 text-yellow-900 px-2 py-1 rounded border border-yellow-300">T5: 금</span>
+                        <span class="bg-gradient-to-r from-red-500 via-green-500 to-blue-500 text-white px-2 py-1 rounded font-bold">T6: 다이아</span>
+                    </div>
+                </div>
+                
+                <div class="flex-1 flex space-x-6 h-[calc(100%-5rem)]">
+                    <div class="w-2/3 h-full bg-[#0c0c0e] border border-white/5 rounded-lg p-6 overflow-y-auto custom-scrollbar">
+                        <div class="grid grid-cols-8 gap-3" id="upgrade-grid">
+                        </div>
+                    </div>
+                    
+                    <div class="w-1/3 h-full flex flex-col">
+                        <div class="wf-box flex-1 flex-col p-6 bg-gradient-to-t from-black to-[#111] items-center justify-between border border-white/10 rounded-lg relative overflow-hidden">
+                            
+                            <div class="w-full text-center border-b border-white/10 pb-3 mb-2 z-10" id="upg-detail-header">
                             </div>
+
+                            <div class="card-3d-container z-10" id="card-3d-container">
+                                <div class="card-3d-element playing-card w-48 h-64 text-7xl no-hover-effect" id="upg-detail-card">
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-gray-500 mb-4 z-10">마우스로 드래그하여 카드를 돌려보세요</div>
+
+                            <div class="w-full bg-black/60 p-4 border border-white/10 rounded-lg z-10 min-h-[96px] flex flex-col justify-center" id="upg-action-area">
+                            </div>
+                            
+                            <div id="bg-glow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-sky-500/20 blur-[100px] rounded-full pointer-events-none transition-colors duration-500"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -210,36 +298,23 @@
     </main>
 
     <script>
+        // ==========================================
+        // 네비게이션 & 툴팁 (v2 기반 병합)
+        // ==========================================
         let isLogicInfoMode = false;
-        
-        // 인벤토리 데이터 및 정렬 랭크
-        let invCards = [];
-        const suitOrder = {'♠':4, '♦':3, '♥':2, '♣':1};
-        const rankOrder = {'A':14, 'K':13, 'Q':12, 'J':11, '10':10, '9':9, '8':8, '7':7, '6':6, '5':5, '4':4, '3':3, '2':2};
+        const globalTooltip = document.getElementById('global-tooltip');
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initInventoryData();
-            initCodex52();
-            
-            // 초기 화면 컬렉션 세팅
-            const firstCol = document.querySelector('.collection-row.active-col');
-            if(firstCol) selectCollection('ready', firstCol);
-        });
-
-        // ==========================================
-        // 네비게이션 & 툴팁
-        // ==========================================
-        function showScreenV3(screenId) {
+        function showScreen(screenId) {
             hideTooltip();
             document.querySelectorAll('.screen-container').forEach(el => el.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
             
-            document.querySelectorAll('#nav-buttons-v3 button').forEach(btn => {
-                btn.className = "px-4 py-2 text-sm border border-gray-700 hover:bg-gray-100 hover:text-black transition-colors rounded";
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-4 py-2 text-sm border border-gray-700 hover:bg-gray-100 hover:text-black transition-colors rounded";
             });
-            const clickedBtn = Array.from(document.querySelectorAll('#nav-buttons-v3 button')).find(btn => btn.getAttribute('onclick').includes(`showScreenV3('${screenId}')`));
+            const clickedBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => btn.getAttribute('onclick').includes(`showScreen('${screenId}')`));
             if(clickedBtn) {
-                clickedBtn.className = "px-4 py-2 text-sm border border-white bg-white text-black transition-colors rounded active-btn";
+                clickedBtn.className = "nav-btn px-4 py-2 text-sm border border-white bg-white text-black transition-colors rounded active-btn";
             }
         }
 
@@ -260,9 +335,8 @@
             });
         }
 
-        const globalTooltip = document.getElementById('global-tooltip');
         document.addEventListener('mousemove', (e) => {
-            if(!globalTooltip.classList.contains('hidden')) {
+            if(globalTooltip && !globalTooltip.classList.contains('hidden')) {
                 globalTooltip.style.left = (e.clientX + 15) + 'px';
                 globalTooltip.style.top = (e.clientY + 15) + 'px';
             }
@@ -275,18 +349,39 @@
             globalTooltip.classList.add('flex');
         }
         function hideTooltip() {
-            globalTooltip.classList.add('hidden');
-            globalTooltip.classList.remove('flex');
+            if(globalTooltip) {
+                globalTooltip.classList.add('hidden');
+                globalTooltip.classList.remove('flex');
+            }
         }
 
         // ==========================================
-        // 1. 인벤토리 로직 (정렬 지원)
+        // 통합 초기화
         // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // v2 탭 초기화
+            initInventoryData();
+            initCodex52();
+            const firstCol = document.querySelector('.collection-row.active-col');
+            if(firstCol) selectCollection('ready', firstCol);
+
+            // v3 연구소 v2 초기화
+            initUpgradeData();
+            renderUpgradeGrid();
+            init3DDrag();
+        });
+
+        // ==========================================
+        // 1. 인벤토리 로직 (v2)
+        // ==========================================
+        let invCards = [];
+        const suitOrder = {'♠':4, '♦':3, '♥':2, '♣':1};
+        const rankOrder = {'A':14, 'K':13, 'Q':12, 'J':11, '10':10, '9':9, '8':8, '7':7, '6':6, '5':5, '4':4, '3':3, '2':2};
+
         function initInventoryData() {
             const suits = ['♠', '♦', '♥', '♣'];
             const ranks = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
             
-            // 더미 데이터 42개 생성
             for(let i=0; i<42; i++) {
                 let s = suits[Math.floor(Math.random() * suits.length)];
                 let r = ranks[Math.floor(Math.random() * ranks.length)];
@@ -294,12 +389,10 @@
             }
             
             document.getElementById('inv-total-count').innerText = `보유 카드: ${invCards.length}장`;
-            // 기본 무늬순 정렬 실행
             sortInventory('suit', document.getElementById('sort-btn-suit'));
         }
 
         function sortInventory(type, btnEl) {
-            // 버튼 UI 업데이트
             if(btnEl) {
                 document.querySelectorAll('.inv-sort-btn').forEach(b => {
                     b.className = "inv-sort-btn px-3 py-1 text-gray-500 hover:text-white transition-colors rounded-sm";
@@ -307,24 +400,19 @@
                 btnEl.className = "inv-sort-btn px-3 py-1 bg-white/10 text-white rounded-sm transition-colors";
             }
 
-            // 배열 정렬 로직
             if(type === 'suit') {
-                // 무늬 내림차순 -> 랭크 내림차순
                 invCards.sort((a,b) => {
                     if(suitOrder[a.suit] !== suitOrder[b.suit]) return suitOrder[b.suit] - suitOrder[a.suit];
                     return rankOrder[b.rank] - rankOrder[a.rank];
                 });
             } else if (type === 'rank') {
-                // 랭크 내림차순 -> 무늬 내림차순
                 invCards.sort((a,b) => {
                     if(rankOrder[a.rank] !== rankOrder[b.rank]) return rankOrder[b.rank] - rankOrder[a.rank];
                     return suitOrder[b.suit] - suitOrder[a.suit];
                 });
             } else if (type === 'acq') {
-                // 획득순 (ID 오름차순)
                 invCards.sort((a,b) => a.id - b.id);
             }
-
             renderInventoryGrid();
         }
 
@@ -345,7 +433,6 @@
             });
             grid.innerHTML = html;
             
-            // 렌더링 후 첫 번째 항목 자동 선택
             if(invCards.length > 0) selectInvCard(grid.firstElementChild, invCards[0].suit, invCards[0].rank, invCards[0].count);
         }
 
@@ -373,7 +460,7 @@
         }
 
         // ==========================================
-        // 2. 컬렉션 (4x13 도감) 렌더링
+        // 2. 컬렉션 (4x13 도감) 렌더링 (v2)
         // ==========================================
         function initCodex52() {
             const grid = document.getElementById('codex-52-grid');
@@ -383,13 +470,9 @@
             const ranks = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
             
             let html = '';
-            
-            // 4열(무늬) x 13행(랭크)을 Grid 안에서 출력.
-            // Tailwind grid-cols-4 속성으로 인해 A-스페이드, A-다이아몬드, A-하트, A-클로버 순으로 작성하면 
-            // 가로로 무늬, 세로로 랭크가 떨어집니다.
             ranks.forEach(rank => {
                 suits.forEach(suit => {
-                    let isLocked = Math.random() > 0.6; // 60% 확률 획득
+                    let isLocked = Math.random() > 0.6;
                     let colorClass = (suit === '♥' || suit === '♦') ? 'card-red' : 'card-black';
                     let lockClass = isLocked ? 'card-locked' : colorClass;
                     let display = isLocked ? '?' : rank;
@@ -404,7 +487,6 @@
             });
             
             grid.innerHTML = html;
-            // 최초 선택
             selectCodexCard('♠', 'A', true);
         }
 
@@ -428,11 +510,8 @@
                 `;
             } else {
                 detailView.innerHTML = `
-                    <div class="playing-card card-locked w-40 h-56 text-6xl mb-6 mt-8 cursor-default hover:transform-none flex items-center justify-center">
-                        ?
-                    </div>
+                    <div class="playing-card card-locked w-40 h-56 text-6xl mb-6 mt-8 cursor-default hover:transform-none flex items-center justify-center">?</div>
                     <h3 class="text-xl text-gray-500 font-bold mb-6 tracking-widest">미획득 카드</h3>
-                    
                     <div class="w-full border-t border-gray-800 pt-4 text-center">
                         <p class="text-xs text-gray-600 uppercase">게임 플레이를 통해 획득하세요.</p>
                     </div>
@@ -441,7 +520,7 @@
         }
 
         // ==========================================
-        // 3. 연구소 (리니지식 컬렉션) 상호작용
+        // 3. 연구소 v1 (리니지식 컬렉션) 상호작용 (v2)
         // ==========================================
         function selectCollection(state, el) {
             document.querySelectorAll('.collection-row').forEach(row => row.classList.remove('active-col'));
@@ -537,6 +616,198 @@
                     <button class="w-full py-4 border border-gray-700 text-gray-500 font-bold tracking-widest text-lg cursor-not-allowed rounded" disabled>등록 가능한 카드가 없습니다</button>
                 `;
             }
+        }
+
+        // ==========================================
+        // 4. 연구소 v2 (카드강화) 데이터 및 로직 (v3)
+        // ==========================================
+        const upgSuits = ['♠', '♦', '♥', '♣'];
+        const upgRanks = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
+        const tierNames = ['종이', '플라스틱', '은', '유리', '금', '다이아몬드'];
+        const expReq = [0, 5, 10, 20, 30, 50]; 
+        
+        let upgradeCards = [];
+        let selectedCardIndex = 0;
+
+        function initUpgradeData() {
+            upgSuits.forEach(suit => {
+                upgRanks.forEach(rank => {
+                    let randomTier = Math.floor(Math.random() * 3) + 1;
+                    let randomExp = Math.floor(Math.random() * expReq[randomTier]); 
+
+                    upgradeCards.push({
+                        suit: suit,
+                        rank: rank,
+                        tier: randomTier,
+                        exp: randomExp
+                    });
+                });
+            });
+        }
+
+        function renderUpgradeGrid() {
+            const grid = document.getElementById('upgrade-grid');
+            let html = '';
+
+            upgradeCards.forEach((c, i) => {
+                let colorClass = (c.suit === '♥' || c.suit === '♦') ? 'card-red' : 'card-black';
+                let tierClass = `tier-${c.tier}`;
+                let isSelected = i === selectedCardIndex ? 'selected-item' : '';
+                
+                html += `
+                <div onclick="selectCard(${i})" class="playing-card w-full aspect-[2/3] text-sm ${colorClass} ${tierClass} ${isSelected} relative p-1 transition-all">
+                    <div class="absolute top-1 left-1 text-[8px] leading-none">${c.suit}</div>
+                    <span>${c.rank}</span>
+                    <div class="absolute -bottom-2 bg-gray-900 text-white text-[8px] px-1 rounded-sm border border-gray-600 truncate w-full text-center">T${c.tier}</div>
+                </div>`;
+            });
+            grid.innerHTML = html;
+            
+            updateDetailView();
+        }
+
+        function selectCard(index) {
+            selectedCardIndex = index;
+            renderUpgradeGrid(); 
+            
+            currentX = 0; currentY = 0;
+            const el = document.getElementById('upg-detail-card');
+            el.style.transition = 'transform 0.3s ease-out';
+            el.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        }
+
+        function updateDetailView() {
+            const c = upgradeCards[selectedCardIndex];
+            const colorClass = (c.suit === '♥' || c.suit === '♦') ? 'card-red' : 'card-black';
+            const tierClass = `tier-${c.tier}`;
+            
+            document.getElementById('upg-detail-header').innerHTML = `
+                <h3 class="text-2xl text-white font-bold tracking-widest">${c.suit} ${c.rank}</h3>
+                <p class="text-sm text-sky-400 font-bold mt-1 transition-colors">Tier ${c.tier} : ${tierNames[c.tier-1]} 프레임</p>
+            `;
+
+            const detailCard = document.getElementById('upg-detail-card');
+            detailCard.className = `card-3d-element playing-card w-48 h-64 text-7xl no-hover-effect relative ${colorClass} ${tierClass}`;
+            detailCard.innerHTML = `
+                <div class="absolute top-3 left-3 text-2xl">${c.suit}</div>
+                ${c.rank}
+                <div class="absolute bottom-3 right-3 text-2xl rotate-180">${c.suit}</div>
+            `;
+
+            const glowColors = ['#fff', '#9ca3af', '#94a3b8', '#fff', '#eab308', '#ff2400'];
+            document.getElementById('bg-glow').style.backgroundColor = glowColors[c.tier-1];
+
+            const actionArea = document.getElementById('upg-action-area');
+            if (c.tier < 6) {
+                const req = expReq[c.tier];
+                const percent = Math.min((c.exp / req) * 100, 100);
+                
+                actionArea.innerHTML = `
+                    <div class="flex justify-between text-xs text-gray-400 mb-1">
+                        <span>강화 진행도</span>
+                        <span>${c.exp} / ${req}</span>
+                    </div>
+                    <div class="w-full bg-gray-800 h-2 rounded-full mb-4 overflow-hidden border border-gray-700">
+                        <div class="bg-sky-400 h-full transition-all duration-300" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm text-gray-300">
+                            테스트: <span class="text-green-400 font-bold">무제한 주입</span>
+                        </div>
+                        <button onclick="feedCard()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white rounded font-bold transition-colors shadow-lg">
+                            경험치 주입 (+15)
+                        </button>
+                    </div>
+                `;
+            } else {
+                actionArea.innerHTML = `
+                    <div class="text-center w-full">
+                        <p class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-yellow-400 to-blue-400 font-bold text-xl animate-pulse tracking-widest">MAXIMUM TIER REACHED</p>
+                        <p class="text-xs text-gray-500 mt-2">최고 등급에 도달하여 더 이상 강화할 수 없습니다.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function feedCard() {
+            let c = upgradeCards[selectedCardIndex];
+            if (c.tier >= 6) return;
+
+            c.exp += 15; // 15씩 증가
+
+            let isLevelUp = false;
+            // 한 번에 여러 티어를 오를 수 있으므로 while문 사용
+            while (c.tier < 6 && c.exp >= expReq[c.tier]) {
+                c.exp -= expReq[c.tier]; // 남은 경험치 이월
+                c.tier++;
+                isLevelUp = true;
+            }
+            
+            // 6티어(최대) 도달 시 경험치 정리
+            if (c.tier >= 6) {
+                c.exp = 0;
+            }
+
+            if (isLevelUp) {
+                const el = document.getElementById('upg-detail-card');
+                
+                el.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                el.style.transform = `scale(1.1) rotateY(360deg)`;
+                
+                setTimeout(() => {
+                    el.style.transition = 'none';
+                    el.style.transform = `scale(1) rotateY(0deg)`;
+                    currentX = 0; currentY = 0;
+                    renderUpgradeGrid();
+                }, 500);
+            } else {
+                renderUpgradeGrid();
+            }
+        }
+
+        // ==========================================
+        // 5. 3D 드래그 로직 (v3)
+        // ==========================================
+        let isDragging = false;
+        let startX, startY;
+        let currentX = 0, currentY = 0;
+
+        function init3DDrag() {
+            const container = document.getElementById('card-3d-container');
+            const card = document.getElementById('upg-detail-card');
+
+            container.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.pageX - currentY; 
+                startY = e.pageY - currentX; 
+                card.style.transition = 'none';
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                
+                currentY = (e.pageX - startX) * 0.5;
+                currentX = (e.pageY - startY) * -0.5; 
+
+                currentX = Math.max(-45, Math.min(45, currentX));
+                currentY = Math.max(-45, Math.min(45, currentY));
+
+                card.style.transform = `rotateX(${currentX}deg) rotateY(${currentY}deg)`;
+            });
+
+            const snapBack = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                card.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                currentX = 0; 
+                currentY = 0;
+                card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            };
+
+            window.addEventListener('mouseup', snapBack);
+            document.addEventListener('mouseleave', snapBack);
         }
     </script>
 </body>
