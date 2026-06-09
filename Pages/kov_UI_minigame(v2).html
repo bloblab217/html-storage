@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project kov - UI/UX Wireframes (Scratch Board v3.3)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #ffffff; }
+        
+        .wf-box {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background-color: rgba(15, 15, 15, 0.6); 
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        .board-slot {
+            width: 70px; height: 98px;
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.4);
+            transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+            position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 4px;
+        }
+        .board-slot.drag-over { border-color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
+        .board-slot.filled { border-style: solid; border-color: rgba(255, 255, 255, 0.3); background: transparent; }
+
+        /* JOKER 배치 시 특별 효과 */
+        .joker-slot {
+            border-color: #a855f7 !important;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5) inset, 0 0 10px rgba(168, 85, 247, 0.3);
+        }
+        .joker-slot::before {
+            content: '★';
+            position: absolute;
+            top: 2px; left: 4px;
+            color: #c084fc;
+            font-size: 10px;
+            z-index: 20;
+            text-shadow: 0 0 5px rgba(192, 132, 252, 0.8);
+        }
+
+        .scratch-layer {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient( 45deg, #1f2937, #1f2937 5px, #111827 5px, #111827 10px );
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            z-index: 10;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+
+        .scratched .scratch-layer {
+            opacity: 0;
+            transform: scale(1.15) rotate(4deg) translateY(-10px);
+            filter: blur(6px);
+            pointer-events: none;
+        }
+        
+        .shape-reveal {
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s; 
+            z-index: 5;
+        }
+        .scratched .shape-reveal { opacity: 1; transform: scale(1); }
+
+        .winning-slot {
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.6) inset;
+            border-color: #facc15 !important;
+            animation: pulse-border 1.5s infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: #facc15; box-shadow: 0 0 15px rgba(250, 204, 21, 0.4) inset; }
+            50% { border-color: #fef08a; box-shadow: 0 0 25px rgba(250, 204, 21, 0.8) inset; }
+        }
+
+        .fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .draw-line {
+            stroke-dasharray: 2000;
+            stroke-dashoffset: 2000;
+            animation: drawLineAnim 0.6s ease-out forwards;
+        }
+        @keyframes drawLineAnim { to { stroke-dashoffset: 0; } }
+
+        input[type="radio"] { accent-color: #10b981; }
+        input[type="radio"].rule-radio { accent-color: #38bdf8; }
+    </style>
+</head>
+<body class="h-screen flex flex-col font-sans overflow-hidden">
+
+    <div id="help-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm fade-in">
+        <div class="bg-gray-900 border border-emerald-500/50 p-8 rounded-lg shadow-[0_0_50px_rgba(16,185,129,0.3)] w-full max-w-2xl relative">
+            <button onclick="closeHelpModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
+            <h2 class="text-3xl font-black tracking-widest text-emerald-400 mb-6 text-center border-b border-gray-800 pb-4">HOW TO PLAY</h2>
+            
+            <div class="space-y-6 text-sm text-gray-300">
+                <div>
+                    <div class="flex items-center mb-3">
+                        <span class="bg-emerald-900 text-emerald-400 font-bold px-3 py-1 rounded text-xs mr-3">STEP 1. 카드 배치</span>
+                        <span class="text-gray-300 text-sm">보유중인 카드 중에서 원하는 카드를 보드위에 뒤집어서 배치하세요!<br>배치한 카드의 종류에 따라 기본 칩수 또는 기본 칩 배율이 올라갑니다.</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs ml-4">
+                        <div class="bg-black/40 border border-red-900/50 p-2 rounded flex justify-between">
+                            <span class="text-red-400 font-bold">♦♥ 빨강 무늬</span><span class="text-emerald-400 font-bold">기본 수 +1</span>
+                        </div>
+                        <div class="bg-black/40 border border-gray-700 p-2 rounded flex justify-between">
+                            <span class="text-gray-300 font-bold">♠♣ 검정 무늬</span><span class="text-sky-400 font-bold">배율 +0.1</span>
+                        </div>
+                        <div class="bg-black/40 border border-yellow-900/50 p-2 rounded flex justify-between">
+                            <span class="text-yellow-500 font-bold">J, Q, K 그림</span><span class="text-emerald-400 font-bold">기본 수 +1</span>
+                        </div>
+                        <div class="bg-black/40 border border-blue-900/50 p-2 rounded flex justify-between">
+                            <span class="text-blue-300 font-bold">2~10 숫자</span><span class="text-sky-400 font-bold">배율 +0.1</span>
+                        </div>
+                        <div class="bg-black/40 border border-emerald-900/50 p-2 rounded flex justify-between">
+                            <span class="text-emerald-300 font-bold">A 에이스</span><span class="text-white font-bold">기본 +1 & 배율 +0.1</span>
+                        </div>
+                        <div class="bg-purple-900/30 border border-purple-500/50 p-2 rounded flex justify-between">
+                            <span class="text-purple-400 font-bold">JOKER 조커</span><span class="text-white font-bold">기본 +2 & 배율 +0.2</span>
+                        </div>
+                        <div class="col-span-2 text-right text-[10px] text-purple-300 mt-[-4px]">
+                            ※ 조커 카드는 스크래치 시 무조건 만능 도형(⭐) 취급됩니다.
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center mb-1">
+                        <span class="bg-emerald-900 text-emerald-400 font-bold px-3 py-1 rounded text-xs mr-3">STEP 2. 스크래치</span>
+                        <span class="text-gray-300 text-sm">START를 눌러 카드를 긁어 4가지 도형(■, ●, ▲, ✖) 중에 1개를 확인하세요.</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center mb-3">
+                        <span class="bg-emerald-900 text-emerald-400 font-bold px-3 py-1 rounded text-xs mr-3">STEP 3. 당첨 확인</span>
+                        <span class="text-yellow-400 font-bold text-sm">배치한 가로/세로/대각선 라인이 모두 일치하면 빙고!<br><span class="text-gray-300 font-normal">그리고 일치하는 갯수에 따라서 추가 배율이 조정됩니다.</span></span>
+                    </div>
+                    
+                    <h4 class="text-lg text-yellow-400 font-black mb-3 p-3 bg-yellow-900/30 border border-yellow-500/50 rounded text-center tracking-wider">
+                        획득 칩 수 = ( 기본 수 &times; 기본 배율 ) &times; 최종 배율
+                    </h4>
+
+                    <div class="bg-black/50 p-3 rounded border border-gray-800 ml-4">
+                        <ul class="text-xs space-y-2 text-gray-400 grid grid-cols-1 gap-1">
+                            <li><span class="text-gray-500 w-16 inline-block">3개 일치:</span> 기본 <span class="text-emerald-400">+5</span> | 배율 <span class="text-sky-400">+0.2</span> | 최종 배율 <span class="text-purple-400">+0.05</span></li>
+                            <li><span class="text-gray-300 font-bold w-16 inline-block">4개 일치:</span> 기본 <span class="text-emerald-400">+30</span> | 배율 <span class="text-sky-400">+1.5</span> | 최종 배율 <span class="text-purple-400">+0.5</span></li>
+                            <li><span class="text-yellow-400 font-bold w-16 inline-block">5개 일치:</span> 기본 <span class="text-emerald-400">+80</span> | 배율 <span class="text-sky-400">+4.0</span> | 최종 배율 <span class="text-purple-400">+2.0</span></li>
+                        </ul>
+                        <div class="mt-3 pt-3 border-t border-gray-800 text-[11px] text-purple-300">
+                            ★ <strong class="text-purple-400">조커 보너스:</strong> 조커(⭐)가 당첨 라인에 포함될 경우 <strong>최종 배율 +0.15</strong> 추가!
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-center">
+                <button onclick="closeHelpModal()" class="px-12 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold tracking-widest rounded shadow-lg transition-colors">GAME START</button>
+            </div>
+        </div>
+    </div>
+    <header class="bg-[#0f0f0f] border-b border-[#222] p-4 flex justify-between items-center z-10 shrink-0">
+        <h1 class="text-xl font-bold tracking-[0.2em] text-white">PROJECT <span class="text-gray-500">kov</span> <span class="text-xs font-normal text-emerald-400 ml-2 border border-emerald-400 px-2 py-1 rounded">Board Minigame v3.3</span></h1>
+        <nav class="flex space-x-3" id="nav-buttons">
+            <button class="px-3 py-2 text-sm border border-emerald-500 bg-emerald-900/20 text-emerald-400 transition-colors rounded cursor-default font-bold tracking-widest">SCRATCH BOARD</button>
+            <button onclick="openHelpModal()" class="px-3 py-2 text-sm border border-gray-600 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors rounded font-bold tracking-widest flex items-center gap-1">
+                <span class="border border-current rounded-full w-4 h-4 flex items-center justify-center text-[10px]">?</span> HELP
+            </button>
+        </nav>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center p-4 relative bg-[#050505] overflow-hidden">
+        <div class="w-full max-w-[1280px] h-full relative overflow-hidden bg-[#111] shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-[#222] flex">
+            
+            <div class="w-2/3 h-full border-r border-[rgba(255,255,255,0.1)] relative flex flex-col p-6">
+                
+                <div class="border-b border-[rgba(255,255,255,0.1)] pb-2 mb-4 flex justify-between items-end shrink-0">
+                    <div>
+                        <h2 class="text-2xl font-light tracking-widest uppercase text-emerald-400">Shape Scratch</h2>
+                        <div id="expected-score" class="mt-2 text-sm bg-gray-900/50 border border-gray-800 px-3 py-1.5 rounded inline-block">
+                            <span class="text-gray-400 text-[10px] mr-2">예상 획득량</span>
+                            <span id="exp-base" class="text-white font-bold">10</span> 
+                            <span class="text-gray-600 mx-1">x</span> 
+                            <span id="exp-multi" class="text-sky-400 font-bold">1.0</span> 
+                            <span class="text-gray-600 mx-1">x</span> 
+                            <span id="exp-final" class="text-purple-400 font-bold">1.0</span> 
+                            <span class="text-gray-600 mx-1">=</span> 
+                            <span id="exp-total" class="text-yellow-400 font-bold text-lg">10</span>
+                            <span id="exp-label" class="text-[9px] text-gray-500 ml-2">(보드 전체 기준)</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-gray-500 block mb-1">PLACED CARDS</span>
+                        <span id="placed-counter" class="text-xl font-bold text-gray-300">0 / 9</span>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col items-center justify-center relative">
+                    <div class="relative">
+                        <div id="scratch-board" class="grid grid-cols-5 gap-3 p-6 bg-gray-900/40 border border-gray-800 rounded-lg shadow-inner z-10 relative">
+                            </div>
+                        <svg id="winning-lines" class="absolute top-0 left-0 w-full h-full pointer-events-none z-30"></svg>
+                    </div>
+
+                    <div class="mt-4 flex flex-col items-center z-10 w-full">
+                        <div class="flex gap-4 mb-3 w-full justify-center">
+                            <div class="flex items-center space-x-3 border border-gray-700 bg-gray-900/50 px-4 py-2 rounded-full text-xs text-gray-400">
+                                <span class="font-bold text-gray-300 tracking-widest">DEV 1 (결과):</span>
+                                <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="cheatMode" value="normal" checked><span>Normal</span></label>
+                                <label class="flex items-center space-x-1 cursor-pointer hover:text-white text-emerald-400"><input type="radio" name="cheatMode" value="cheat_all"><span>ALL 100%</span></label>
+                                <label class="flex items-center space-x-1 cursor-pointer hover:text-white text-sky-400"><input type="radio" name="cheatMode" value="cheat_half"><span>50%</span></label>
+                            </div>
+                            <div class="flex items-center space-x-3 border border-sky-900/50 bg-sky-900/20 px-4 py-2 rounded-full text-xs text-sky-200">
+                                <span class="font-bold text-sky-400 tracking-widest">DEV 2 (보너스 룰):</span>
+                                <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="ruleMode" value="mode_A" class="rule-radio" checked onchange="updateExpectedScore()"><span>A (보드 합산)</span></label>
+                                <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="ruleMode" value="mode_B" class="rule-radio" onchange="updateExpectedScore()"><span>B (당첨 라인 한정)</span></label>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <button onclick="resetBoard()" class="px-8 py-3 border border-gray-600 text-gray-400 hover:text-white hover:border-white transition-colors tracking-widest text-sm">RESET</button>
+                            <button onclick="startScratch()" id="btn-start" class="px-12 py-3 bg-emerald-900/30 border-2 border-emerald-500 text-emerald-400 font-bold hover:bg-emerald-600 hover:text-white transition-colors tracking-widest text-sm shadow-[0_0_15px_rgba(16,185,129,0.2)]">START SCRATCH</button>
+                        </div>
+                    </div>
+
+                    <div id="result-panel" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-[95%] bg-gray-900/95 border border-yellow-500/50 p-6 rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.9)] z-40 hidden backdrop-blur-md">
+                        <h3 class="text-center text-yellow-400 font-bold tracking-[0.3em] mb-4 text-sm">REWARD CALCULATION</h3>
+                        <div class="flex justify-between items-center bg-black/50 p-4 rounded border border-gray-800">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-gray-500 mb-1">BASE CHIPS</span>
+                                <span id="res-base" class="text-2xl font-light text-white">10</span>
+                            </div>
+                            <div class="text-gray-600 font-bold text-lg">X</div>
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-gray-500 mb-1">BASE MULTI</span>
+                                <span id="res-multi" class="text-2xl font-light text-sky-400">1.0</span>
+                            </div>
+                            <div class="text-gray-600 font-bold text-lg">X</div>
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-purple-400 mb-1">FINAL MULTI</span>
+                                <span id="res-finalMulti" class="text-2xl font-black text-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]">1.0</span>
+                            </div>
+                            <div class="text-yellow-600 font-bold text-xl">=</div>
+                            <div class="flex flex-col items-end">
+                                <span class="text-[10px] text-yellow-600 mb-1">FINAL CHIPS</span>
+                                <span id="res-final" class="text-4xl font-black text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]">0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex flex-col gap-2">
+                            <div id="res-log-bingo" class="text-[11px] text-gray-400 flex flex-wrap justify-center gap-1.5"></div>
+                            <div id="res-log-deck" class="text-[11px] flex flex-wrap justify-center gap-1.5 border-t border-gray-800 pt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-1/3 h-full flex flex-col bg-[#0a0a0a] min-h-0">
+                <div class="p-4 border-b border-[rgba(255,255,255,0.1)] flex justify-between items-end shrink-0">
+                    <span class="text-xs tracking-widest text-gray-400 font-bold uppercase">Inventory</span>
+                    <span class="text-[10px] text-gray-500 border border-gray-700 px-2 py-0.5 rounded">12 Cards</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 grid grid-cols-3 gap-3 content-start" id="inventory-grid">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let placedCount = 0;
+        let isGameStarted = false;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderInventory();
+            initBoard();
+            updateExpectedScore();
+        });
+
+        function openHelpModal() { document.getElementById('help-modal').style.display = 'flex'; }
+        function closeHelpModal() { document.getElementById('help-modal').style.display = 'none'; }
+
+        function renderInventory() {
+            const grid = document.getElementById('inventory-grid');
+            const suits = [{s:'♠', c:'text-gray-400'}, {s:'♥', c:'text-red-500'}, {s:'♣', c:'text-gray-400'}, {s:'♦', c:'text-red-500'}];
+            const values = ['A', '2', '5', '7', '10', 'J', 'Q', 'K'];
+            
+            let deckHtml = [];
+            
+            // 1장의 JOKER 카드 추가 (고정 첫번째 위치)
+            deckHtml.push(`
+                <div id="inv-card-0" class="wf-box w-full aspect-[2/3] flex flex-col items-center justify-center cursor-grab hover:-translate-y-1 hover:border-purple-500 transition-all bg-purple-900/20 relative rounded-sm shadow-[0_0_15px_rgba(168,85,247,0.3)]" 
+                     data-suit="JOKER" data-val="JOKER"
+                     draggable="true" ondragstart="handleDragStart(event, 'inv-card-0')"
+                     ondragend="this.classList.remove('opacity-50')"
+                     onmousedown="this.classList.add('cursor-grabbing')" onmouseup="this.classList.remove('cursor-grabbing')">
+                    <span class="text-lg text-purple-400 font-black tracking-widest drop-shadow-[0_0_5px_rgba(168,85,247,0.8)]">JOKER</span>
+                    <span class="absolute bottom-1 text-[8px] text-purple-300">무제한</span>
+                </div>
+            `);
+
+            // 11장의 일반 카드 배열
+            let normalCards = [];
+            for(let i = 1; i < 12; i++) {
+                const suit = suits[Math.floor(Math.random() * suits.length)];
+                const val = values[Math.floor(Math.random() * values.length)];
+                normalCards.push(`
+                    <div id="inv-card-${i}" class="wf-box w-full aspect-[2/3] flex flex-col items-center justify-center cursor-grab hover:-translate-y-1 hover:border-[rgba(255,255,255,0.4)] transition-all bg-[rgba(255,255,255,0.02)] relative rounded-sm" 
+                         data-suit="${suit.s}" data-val="${val}"
+                         draggable="true" ondragstart="handleDragStart(event, 'inv-card-${i}')"
+                         ondragend="this.classList.remove('opacity-50')"
+                         onmousedown="this.classList.add('cursor-grabbing')" onmouseup="this.classList.remove('cursor-grabbing')">
+                        <span class="text-[10px] ${suit.c} absolute top-1 left-1">${suit.s}</span>
+                        <span class="text-xl ${suit.c} font-bold">${val}</span>
+                    </div>
+                `);
+            }
+
+            // 일반 카드만 셔플
+            normalCards.sort(() => Math.random() - 0.5);
+            grid.innerHTML = deckHtml[0] + normalCards.join('');
+        }
+
+        function initBoard() {
+            const board = document.getElementById('scratch-board');
+            board.innerHTML = '';
+            for(let i = 0; i < 25; i++) {
+                const slot = document.createElement('div');
+                slot.className = "board-slot";
+                slot.dataset.index = i;
+                slot.ondragover = (e) => handleDragOver(e, slot);
+                slot.ondragleave = (e) => handleDragLeave(e, slot);
+                slot.ondrop = (e) => handleDrop(e, slot);
+                slot.onclick = () => removeCardFromSlot(slot);
+                board.appendChild(slot);
+            }
+        }
+
+        function handleDragStart(e, cardId) {
+            if(isGameStarted) { e.preventDefault(); return; }
+            e.target.classList.add('opacity-50');
+            e.dataTransfer.setData('text/plain', cardId);
+        }
+        function handleDragOver(e, slot) {
+            e.preventDefault(); 
+            if(!slot.classList.contains('filled') && placedCount < 9 && !isGameStarted) slot.classList.add('drag-over');
+        }
+        function handleDragLeave(e, slot) { slot.classList.remove('drag-over'); }
+        function handleDrop(e, slot) {
+            e.preventDefault();
+            slot.classList.remove('drag-over');
+            if(isGameStarted || slot.classList.contains('filled')) return; 
+            if(placedCount >= 9) { alert('최대 9장까지만 배치할 수 있습니다.'); return; }
+
+            const cardId = e.dataTransfer.getData('text/plain');
+            const originalCard = document.getElementById(cardId);
+            if(!originalCard) return;
+
+            // 조커 카드는 인벤토리에서 사라지지 않음 (무제한)
+            if (originalCard.dataset.val !== 'JOKER') {
+                originalCard.classList.add('invisible', 'pointer-events-none');
+            } else {
+                slot.classList.add('joker-slot');
+            }
+
+            slot.dataset.sourceCardId = cardId;
+            slot.classList.add('filled', 'cursor-pointer', 'hover:border-red-400');
+            slot.innerHTML = `<div class="scratch-layer"></div><div class="shape-reveal text-3xl font-black absolute inset-0 flex items-center justify-center"></div>`;
+            
+            placedCount++;
+            document.getElementById('placed-counter').innerText = `${placedCount} / 9`;
+            updateExpectedScore();
+        }
+
+        function removeCardFromSlot(slot) {
+            if(isGameStarted || !slot.classList.contains('filled')) return;
+            const cardId = slot.dataset.sourceCardId;
+            const originalCard = document.getElementById(cardId);
+            
+            // 조커가 아닐 때만 인벤토리 복원
+            if(originalCard && originalCard.dataset.val !== 'JOKER') {
+                originalCard.classList.remove('invisible', 'pointer-events-none');
+            }
+
+            slot.classList.remove('filled', 'cursor-pointer', 'hover:border-red-400', 'joker-slot');
+            slot.removeAttribute('data-source-card-id');
+            slot.innerHTML = '';
+            
+            placedCount--;
+            document.getElementById('placed-counter').innerText = `${placedCount} / 9`;
+            updateExpectedScore();
+        }
+
+        function updateExpectedScore() {
+            const ruleMode = document.querySelector('input[name="ruleMode"]:checked').value;
+            let expectedBase = 10;
+            let expectedMulti = 1.0;
+            const expectedFinal = 1.0; 
+            const labelEl = document.getElementById('exp-label');
+
+            if (ruleMode === 'mode_A') {
+                labelEl.innerText = '(A옵션: 현재 보드 전체 합산)';
+                let bBonus = 0, mBonus = 0;
+                document.querySelectorAll('.board-slot.filled').forEach(slot => {
+                    const card = document.getElementById(slot.dataset.sourceCardId);
+                    if(!card) return;
+                    const suit = card.dataset.suit;
+                    const val = card.dataset.val;
+
+                    if (val === 'JOKER') {
+                        bBonus += 2;
+                        mBonus += 0.2;
+                        return;
+                    }
+
+                    if (suit === '♥' || suit === '♦') bBonus += 1;
+                    else mBonus += 0.1;
+
+                    if (val === 'A') { bBonus += 1; mBonus += 0.1; }
+                    else if (['J', 'Q', 'K'].includes(val)) { bBonus += 1; }
+                    else { mBonus += 0.1; }
+                });
+                expectedBase += bBonus;
+                expectedMulti += mBonus;
+            } else {
+                labelEl.innerText = '(B옵션: 당첨 라인만 반영하므로 예측 불가)';
+            }
+
+            document.getElementById('exp-base').innerText = expectedBase;
+            document.getElementById('exp-multi').innerText = expectedMulti.toFixed(1);
+            document.getElementById('exp-final').innerText = expectedFinal.toFixed(1);
+            document.getElementById('exp-total').innerText = Math.floor(expectedBase * expectedMulti * expectedFinal);
+        }
+
+        const shapes = [
+            { char: '■', color: 'text-sky-400', filter: 'drop-shadow(0 0 10px rgba(56,189,248,0.6))' },
+            { char: '●', color: 'text-red-400', filter: 'drop-shadow(0 0 10px rgba(248,113,113,0.6))' },
+            { char: '▲', color: 'text-emerald-400', filter: 'drop-shadow(0 0 10px rgba(52,211,153,0.6))' },
+            { char: '✖', color: 'text-yellow-400', filter: 'drop-shadow(0 0 10px rgba(250,204,21,0.6))' }
+        ];
+
+        function startScratch() {
+            if(placedCount < 3) { alert('최소 3장의 카드를 배치해야 시작할 수 있습니다.'); return; }
+            if(isGameStarted) return;
+            isGameStarted = true;
+            document.getElementById('btn-start').classList.add('opacity-50', 'cursor-not-allowed');
+
+            const cheatMode = document.querySelector('input[name="cheatMode"]:checked').value;
+            let cheatAllShape = cheatMode === 'cheat_all' ? shapes[Math.floor(Math.random() * shapes.length)] : null;
+            const filledSlots = document.querySelectorAll('.board-slot.filled');
+            let completedAnimations = 0;
+            
+            filledSlots.forEach((slot, index) => {
+                let assignedShape;
+                const cardVal = document.getElementById(slot.dataset.sourceCardId).dataset.val;
+
+                if (cardVal === 'JOKER') {
+                    assignedShape = { char: '⭐', color: 'text-purple-400', filter: 'drop-shadow(0 0 10px rgba(168,85,247,0.8))' };
+                } else {
+                    if (cheatMode === 'cheat_all') assignedShape = cheatAllShape;
+                    else if (cheatMode === 'cheat_half') assignedShape = [shapes[1], shapes[3]][Math.floor(Math.random() * 2)];
+                    else assignedShape = shapes[Math.floor(Math.random() * shapes.length)];
+                }
+
+                const shapeContainer = slot.querySelector('.shape-reveal');
+                shapeContainer.innerText = assignedShape.char;
+                shapeContainer.dataset.shapeChar = assignedShape.char; 
+                shapeContainer.className = `shape-reveal text-4xl font-black absolute inset-0 flex items-center justify-center ${assignedShape.color}`;
+                shapeContainer.style.filter = assignedShape.filter;
+
+                setTimeout(() => {
+                    slot.classList.add('scratched');
+                    slot.classList.remove('hover:border-red-400');
+                    completedAnimations++;
+                    if(completedAnimations === filledSlots.length) setTimeout(calculateResult, 600);
+                }, index * 200);
+            });
+        }
+
+        const winLines = [
+            [0,1,2,3,4], [5,6,7,8,9], [10,11,12,13,14], [15,16,17,18,19], [20,21,22,23,24],
+            [0,5,10,15,20], [1,6,11,16,21], [2,7,12,17,22], [3,8,13,18,23], [4,9,14,19,24],
+            [0,6,12,18,24], [1,7,13,19], [2,8,14], [5,11,17,23], [10,16,22],
+            [4,8,12,16,20], [3,7,11,15], [2,6,10], [9,13,17,21], [14,18,22]
+        ];
+
+        function calculateResult() {
+            const ruleMode = document.querySelector('input[name="ruleMode"]:checked').value;
+            let baseChips = 10;
+            let baseMulti = 1.0;
+            let finalMulti = 1.0;
+            
+            let bingoLogTexts = [];
+            let deckLogTexts = [];
+
+            const boardShapes = new Array(25).fill(null);
+            document.querySelectorAll('.board-slot').forEach(slot => {
+                if(slot.classList.contains('filled')) {
+                    boardShapes[parseInt(slot.dataset.index)] = slot.querySelector('.shape-reveal').dataset.shapeChar;
+                }
+            });
+
+            // 1. 빙고 라인 계산 (만능 도형 로직)
+            let foundLines = [];
+            winLines.forEach(line => {
+                const filledIndices = line.filter(idx => boardShapes[idx] !== null);
+                const N = filledIndices.length;
+
+                if (N >= 3) {
+                    const nonJokerShapes = filledIndices.map(idx => boardShapes[idx]).filter(s => s !== '⭐');
+                    let isMatch = false;
+                    let targetShape = '⭐';
+
+                    if (nonJokerShapes.length === 0) {
+                        isMatch = true;
+                    } else {
+                        targetShape = nonJokerShapes[0];
+                        isMatch = nonJokerShapes.every(s => s === targetShape);
+                    }
+
+                    if (isMatch) {
+                        foundLines.push({ shape: targetShape, count: N, indices: filledIndices });
+                    }
+                }
+            });
+
+            if(foundLines.length === 0) {
+                document.getElementById('res-base').innerText = "-";
+                document.getElementById('res-multi').innerText = "-";
+                document.getElementById('res-finalMulti').innerText = "-";
+                document.getElementById('res-final').innerText = "0";
+                document.getElementById('res-final').className = "text-4xl font-black text-gray-500";
+                document.getElementById('res-log-bingo').innerHTML = "<span class='text-gray-500 py-1'>당첨된 라인이 없습니다.</span>";
+                document.getElementById('res-log-deck').innerHTML = "";
+                showResultPanel();
+                return;
+            }
+
+            // 2. 카드 스탯 추출
+            let redCount = 0, blackCount = 0, faceCount = 0, numCount = 0, aCount = 0, jokerCount = 0;
+            
+            const extractStats = (cardId) => {
+                const card = document.getElementById(cardId);
+                if(!card) return;
+                const suit = card.dataset.suit;
+                const val = card.dataset.val;
+
+                if (val === 'JOKER') {
+                    jokerCount++;
+                    return;
+                }
+
+                if (suit === '♥' || suit === '♦') redCount++; else blackCount++;
+
+                if (val === 'A') aCount++;
+                else if (['J', 'Q', 'K'].includes(val)) faceCount++;
+                else numCount++;
+            };
+
+            if (ruleMode === 'mode_A') {
+                document.querySelectorAll('.board-slot.filled').forEach(slot => { extractStats(slot.dataset.sourceCardId); });
+            } else {
+                const uniqueWinningIndices = new Set();
+                foundLines.forEach(res => res.indices.forEach(idx => uniqueWinningIndices.add(idx)));
+                uniqueWinningIndices.forEach(idx => {
+                    const slot = document.querySelector(`.board-slot[data-index="${idx}"]`);
+                    extractStats(slot.dataset.sourceCardId);
+                });
+            }
+
+            baseChips += (redCount + faceCount + aCount + (jokerCount * 2));
+            baseMulti += (blackCount * 0.1) + (numCount * 0.1) + (aCount * 0.1) + (jokerCount * 0.2);
+
+            if (redCount > 0) deckLogTexts.push(`<span class="bg-red-900/40 border border-red-800 px-2 py-1 rounded text-red-300">♦♥빨간(${redCount}장): 기본 +${redCount}</span>`);
+            if (faceCount > 0) deckLogTexts.push(`<span class="bg-gray-800 border border-gray-600 px-2 py-1 rounded text-white">그림(${faceCount}장): 기본 +${faceCount}</span>`);
+            if (blackCount > 0) deckLogTexts.push(`<span class="bg-gray-900 border border-gray-700 px-2 py-1 rounded text-gray-400">♠♣검은(${blackCount}장): 배율 +${(blackCount*0.1).toFixed(1)}</span>`);
+            if (numCount > 0) deckLogTexts.push(`<span class="bg-sky-900/40 border border-sky-800 px-2 py-1 rounded text-sky-300">숫자(${numCount}장): 배율 +${(numCount*0.1).toFixed(1)}</span>`);
+            if (aCount > 0) deckLogTexts.push(`<span class="bg-emerald-900/40 border border-emerald-800 px-2 py-1 rounded text-emerald-300">에이스(${aCount}장): 기본+${aCount},배율+${(aCount*0.1).toFixed(1)}</span>`);
+            if (jokerCount > 0) deckLogTexts.push(`<span class="bg-purple-900/40 border border-purple-800 px-2 py-1 rounded text-purple-300">조커(${jokerCount}장): 기본+${jokerCount*2},배율+${(jokerCount*0.2).toFixed(1)}</span>`);
+            
+            if (deckLogTexts.length === 0) deckLogTexts.push(`<span class="text-gray-600">적용된 덱 보너스가 없습니다.</span>`);
+
+            // 3. 빙고 라인 보너스 및 조커 최종 배율 계산
+            const uniqueWinningIndices = new Set();
+            foundLines.forEach((res, i) => {
+                setTimeout(() => { drawWinningLine(res.indices[0], res.indices[res.indices.length - 1]); }, i * 200);
+
+                if(res.count === 3) { baseChips += 5; baseMulti += 0.2; finalMulti += 0.05; bingoLogTexts.push(`<span class="bg-gray-800 px-2 py-1 rounded">[${res.shape}] 3연속 (기+5,배+0.2,최+0.05)</span>`); }
+                else if(res.count === 4) { baseChips += 30; baseMulti += 1.5; finalMulti += 0.5; bingoLogTexts.push(`<span class="bg-gray-800 px-2 py-1 rounded text-emerald-400">[${res.shape}] 4연속 (기+30,배+1.5,최+0.5)</span>`); }
+                else if(res.count === 5) { baseChips += 80; baseMulti += 4.0; finalMulti += 2.0; bingoLogTexts.push(`<span class="bg-gray-800 px-2 py-1 rounded text-yellow-400">[${res.shape}] 5연속 (기+80,배+4.0,최+2.0)</span>`); }
+                
+                res.indices.forEach(idx => { 
+                    document.querySelector(`.board-slot[data-index="${idx}"]`).classList.add('winning-slot', 'z-20'); 
+                    uniqueWinningIndices.add(idx);
+                });
+            });
+
+            // 조커 보너스 (빙고 당첨된 칸 중에 조커가 있다면 +0.15)
+            let jokerActivated = false;
+            uniqueWinningIndices.forEach(idx => {
+                if (boardShapes[idx] === '⭐') jokerActivated = true;
+            });
+
+            if (jokerActivated) {
+                finalMulti += 0.15;
+                bingoLogTexts.push(`<span class="bg-purple-900/40 border border-purple-800 px-2 py-1 rounded text-purple-300 font-bold">★ JOKER 보너스 (최종 배율 +0.15)</span>`);
+            }
+
+            const finalChips = Math.floor(baseChips * baseMulti * finalMulti);
+            document.getElementById('res-base').innerText = baseChips;
+            document.getElementById('res-multi').innerText = baseMulti.toFixed(1);
+            document.getElementById('res-finalMulti').innerText = finalMulti.toFixed(2);
+            document.getElementById('res-final').innerText = finalChips;
+            document.getElementById('res-final').className = "text-4xl font-black text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]";
+
+            document.getElementById('res-log-bingo').innerHTML = bingoLogTexts.join('');
+            document.getElementById('res-log-deck').innerHTML = deckLogTexts.join('');
+
+            setTimeout(showResultPanel, foundLines.length * 200 + 400); 
+        }
+
+        function showResultPanel() {
+            const panel = document.getElementById('result-panel');
+            panel.classList.remove('hidden');
+            panel.classList.add('fade-in-up');
+        }
+
+        function drawWinningLine(startIndex, endIndex) {
+            const board = document.getElementById('scratch-board');
+            const svgLayer = document.getElementById('winning-lines');
+            const startSlot = document.querySelector(`.board-slot[data-index="${startIndex}"]`);
+            const endSlot = document.querySelector(`.board-slot[data-index="${endIndex}"]`);
+            const boardRect = board.getBoundingClientRect();
+            const startRect = startSlot.getBoundingClientRect();
+            const endRect = endSlot.getBoundingClientRect();
+            
+            const x1 = (startRect.left + startRect.width / 2) - boardRect.left;
+            const y1 = (startRect.top + startRect.height / 2) - boardRect.top;
+            const x2 = (endRect.left + endRect.width / 2) - boardRect.left;
+            const y2 = (endRect.top + endRect.height / 2) - boardRect.top;
+
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+            line.setAttribute('stroke', '#facc15'); line.setAttribute('stroke-width', '6');
+            line.setAttribute('stroke-linecap', 'round');
+            line.style.filter = 'drop-shadow(0 0 10px rgba(250,204,21,0.8))';
+            line.classList.add('draw-line');
+            svgLayer.appendChild(line);
+        }
+
+        function resetBoard() {
+            document.querySelectorAll('#inventory-grid > div').forEach(card => card.classList.remove('invisible', 'pointer-events-none'));
+            placedCount = 0;
+            isGameStarted = false;
+            document.getElementById('placed-counter').innerText = `0 / 9`;
+            document.getElementById('btn-start').classList.remove('opacity-50', 'cursor-not-allowed');
+            document.getElementById('winning-lines').innerHTML = ''; 
+            document.getElementById('result-panel').classList.add('hidden');
+            document.getElementById('result-panel').classList.remove('fade-in-up');
+            
+            // 조커 UI 리셋 방어 코드는 removeCardFromSlot과 동일하게 적용됨 (initBoard시 재생성)
+            initBoard();
+            updateExpectedScore();
+        }
+    </script>
+</body>
+</html>
