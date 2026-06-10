@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project kov - UI/UX Wireframes (Pack Opening v5.0)</title>
+    <title>Project kov - UI/UX Wireframes (Pack Opening v5.2)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0a0a0a; color: #ffffff; }
@@ -19,7 +19,7 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             backdrop-filter: blur(8px);
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
         
         .slot-zone {
@@ -32,37 +32,56 @@
         .slot-zone.drag-over { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
         .slot-zone.filled { border-style: solid; border-color: rgba(255, 255, 255, 0.1); background: transparent; }
 
-        /* Booster Pack Styles */
+        /* Synergy Highlight */
+        .synergy-highlight {
+            box-shadow: 0 0 15px #a855f7 !important;
+            border-color: #a855f7 !important;
+            animation: pulse-purple 1.5s infinite;
+        }
+        @keyframes pulse-purple { 0%, 100% { box-shadow: 0 0 15px #a855f7; } 50% { box-shadow: 0 0 25px #c084fc; border-color: #c084fc; } }
+
+        /* Tiers */
+        .tier-t1 { background-color: #2d3748 !important; color: #e2e8f0 !important; border-color: #4a5568 !important; } 
+        .tier-t2 { background-color: #e2e8f0 !important; color: #1e293b !important; border-color: #cbd5e1 !important; } 
+        .tier-t3 { background-color: #cbd5e1 !important; color: #0f172a !important; border-color: #94a3b8 !important; } 
+        .tier-t4 { background-color: #4b5563 !important; color: #f8fafc !important; border-color: #6b7280 !important; } 
+        .tier-t5 { background-color: #eab308 !important; color: #713f12 !important; border-color: #facc15 !important; } 
+        .tier-t6 { background: linear-gradient(135deg, #ef4444, #10b981, #3b82f6) !important; color: white !important; border-color: #ffffff !important; box-shadow: 0 0 20px rgba(255,255,255,0.4); } 
+
+        .card-inner {
+            position: relative; width: 100%; height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .card-container.is-flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .card-front { transform: rotateY(180deg); }
+        .card-back {
+            background: repeating-linear-gradient(45deg, #1f2937, #1f2937 5px, #111827 5px, #111827 10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .card-back::after { content: '?'; color: rgba(255,255,255,0.3); font-size: 2rem; font-weight: 900; }
+
         .booster-pack {
             width: 140px; height: 200px;
             background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-            border: 4px solid #60a5fa;
-            border-radius: 10px;
-            position: relative;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-            cursor: pointer;
-            transition: transform 0.2s, filter 0.2s;
-            display: flex; flex-direction: column; items-center; justify-content: center;
+            border: 4px solid #60a5fa; border-radius: 10px;
+            position: relative; box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+            cursor: pointer; transition: transform 0.2s, filter 0.2s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             text-align: center; overflow: hidden;
         }
         .booster-pack:hover { transform: scale(1.05) translateY(-5px); filter: brightness(1.2); }
-        .booster-pack::before {
-            content: 'PREMIUM';
-            position: absolute; top: 10px; left: 0; right: 0;
-            color: rgba(255,255,255,0.5); font-weight: 900; letter-spacing: 4px; font-size: 10px;
-        }
-        
-        /* Safe / Lock Styles */
-        .safe-container {
-            position: relative; width: 160px; height: 220px;
-        }
+        .safe-container { position: relative; width: 160px; height: 220px; }
         .safe-lock {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 60px; height: 60px;
-            background: #333; border: 4px solid #777; border-radius: 50%;
+            width: 60px; height: 60px; background: #333; border: 4px solid #777; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.8);
-            transition: all 0.3s;
+            z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.8); transition: all 0.3s;
         }
         .safe-chain {
             position: absolute; top: 0; left: 50%; transform: translateX(-50%);
@@ -72,42 +91,119 @@
 
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0) rotate(-2deg); } 20%, 80% { transform: translate3d(4px, 0, 0) rotate(2deg); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0) rotate(-4deg); } 40%, 60% { transform: translate3d(6px, 0, 0) rotate(4deg); } }
-        
         .explode { animation: explodeAnim 0.6s forwards; }
         @keyframes explodeAnim {
             0% { transform: scale(1); filter: brightness(1); }
             50% { transform: scale(1.3); filter: brightness(3) drop-shadow(0 0 50px red); opacity: 1; }
             100% { transform: scale(0); filter: brightness(0); opacity: 0; }
         }
-        
         .unlock { animation: unlockAnim 0.8s forwards; }
         @keyframes unlockAnim {
             0% { transform: translate(-50%, -50%) scale(1); }
             50% { transform: translate(-50%, -50%) scale(1.2); border-color: #facc15; box-shadow: 0 0 30px #facc15; }
             100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
         }
+        .pack-tear { animation: tearAnim 0.5s forwards; }
+        @keyframes tearAnim {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5) rotate(10deg); opacity: 0; filter: brightness(2); }
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col font-sans overflow-hidden">
 
+    <div id="help-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-gray-900 border border-emerald-500/50 p-8 rounded-xl shadow-[0_0_50px_rgba(16,185,129,0.3)] w-full max-w-2xl relative">
+            <button onclick="closeHelpModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
+            <h2 id="help-title" class="text-3xl font-black tracking-widest text-emerald-400 mb-6 text-center border-b border-gray-800 pb-4">HOW TO PLAY</h2>
+            <div id="help-content" class="space-y-4 text-sm text-gray-300">
+                </div>
+            <div class="mt-8 flex justify-center">
+                <button onclick="closeHelpModal()" class="px-12 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold tracking-widest rounded shadow-lg transition-colors">GAME START</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="prob-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-gray-900 border border-purple-500/50 p-6 rounded-xl shadow-[0_0_30px_rgba(168,85,247,0.3)] w-full max-w-md relative">
+            <button onclick="closeProbModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
+            <h2 class="text-xl font-bold text-purple-400 mb-4 text-center border-b border-gray-800 pb-2">팩 등급 및 확률 안내</h2>
+            
+            <div class="space-y-4 text-sm">
+                <p class="text-gray-400 text-xs">연성된 팩의 5장 카드는 다음 확률에 따라 티어가 결정됩니다.</p>
+                <ul class="list-disc list-inside text-gray-300 text-xs space-y-1 bg-black/50 p-3 rounded">
+                    <li><span class="text-white">1~3번째 카드:</span> <span class="tier-t1 px-1 rounded text-[10px]">T1 확정</span></li>
+                    <li><span class="text-white">4번째 카드:</span> <span class="tier-t1 px-1 rounded text-[10px]">T1(70%)</span> / <span class="tier-t2 px-1 rounded text-[10px]">T2(30%)</span></li>
+                </ul>
+                <div class="bg-gray-800 rounded p-3">
+                    <div class="font-bold text-white mb-2 text-center border-b border-gray-700 pb-1">5번째 카드 (메인 보상) 확률</div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="flex justify-between items-center"><span class="tier-t1 px-2 py-0.5 rounded w-20 text-center">T1: 종이</span> <span>48.8%</span></div>
+                        <div class="flex justify-between items-center"><span class="tier-t2 px-2 py-0.5 rounded w-20 text-center">T2: 플라스틱</span> <span>30.0%</span></div>
+                        <div class="flex justify-between items-center"><span class="tier-t3 px-2 py-0.5 rounded w-20 text-center">T3: 은</span> <span>15.0%</span></div>
+                        <div class="flex justify-between items-center"><span class="tier-t4 px-2 py-0.5 rounded w-20 text-center">T4: 유리</span> <span class="text-sky-300">5.0%</span></div>
+                        <div class="flex justify-between items-center"><span class="tier-t5 px-2 py-0.5 rounded w-20 text-center font-bold">T5: 금</span> <span class="text-yellow-400 font-bold">1.0%</span></div>
+                        <div class="flex justify-between items-center"><span class="tier-t6 px-2 py-0.5 rounded w-20 text-center font-bold">T6: 다이아</span> <span class="text-red-400 font-bold animate-pulse">0.2%</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="t2-formula-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-gray-900 border border-yellow-500/50 p-6 rounded-xl shadow-[0_0_30px_rgba(234,179,8,0.3)] w-full max-w-lg relative">
+            <button onclick="closeT2FormulaModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
+            <h2 class="text-xl font-bold text-yellow-500 mb-4 text-center border-b border-gray-800 pb-2">금고 해킹 공식 안내</h2>
+            
+            <div class="space-y-4 text-sm">
+                <div class="bg-gray-800 rounded p-3">
+                    <h3 class="text-emerald-400 font-bold mb-1 text-xs">보상 차감 규칙</h3>
+                    <p class="text-xs text-gray-400 mb-2">실패 시 최초 보상(100)에서 투입한 카드 랭크에 비례하여 보상이 차감됩니다.</p>
+                    <div class="bg-black/50 p-2 text-xs font-mono text-gray-300 rounded border border-gray-700">
+                        차감액 = 현재 보상 × (투입 랭크 / 100)<br>
+                        <span class="text-gray-500">ex) 랭크 2 투입 후 실패 시: 100 × (2/100) = 2 차감. 잔여 98.</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded p-3">
+                    <h3 class="text-sky-400 font-bold mb-1 text-xs">오픈 확률 공식</h3>
+                    <p class="text-xs text-gray-400 mb-2">기본 확률과 시너지 보너스를 합산한 후 <strong class="text-red-400">-30%의 난이도 패널티</strong>가 적용됩니다.</p>
+                    <div class="bg-black/50 p-2 text-xs font-mono text-gray-300 rounded border border-gray-700 mb-2">
+                        기본 = {(10 + 랭크) / (100 - 랭크)} × 100<br>
+                        최종 오픈 확률 = (기본 + 시너지 보너스) × <strong class="text-red-400">0.7</strong>
+                    </div>
+                    <ul class="text-[10px] text-gray-400 list-disc list-inside">
+                        <li>색상 연속: +0.2%p × 연속 횟수</li>
+                        <li>무늬 연속: +0.4%p × 연속 횟수</li>
+                        <li>랭크 연속: +0.8%p × 연속 횟수</li>
+                        <li>투입 횟수: +0.5%p × 투입 횟수</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <header class="bg-[#0f0f0f] border-b border-[#222] p-4 flex flex-col z-10 shrink-0">
         <div class="flex justify-between items-center w-full mb-2">
-            <h1 class="text-xl font-bold tracking-[0.2em] text-white">PROJECT <span class="text-gray-500">kov</span> <span class="text-xs font-normal text-emerald-400 ml-2 border border-emerald-400 px-2 py-1 rounded">Pack Opening v5.0</span></h1>
-            <button onclick="resetGame()" class="px-4 py-1.5 border border-gray-600 text-xs text-gray-400 hover:text-white rounded">ALL RESET</button>
+            <h1 class="text-xl font-bold tracking-[0.2em] text-white">PROJECT <span class="text-gray-500">kov</span> <span class="text-xs font-normal text-emerald-400 ml-2 border border-emerald-400 px-2 py-1 rounded">Pack Opening v5.2</span></h1>
+            <div class="flex items-center gap-2">
+                <button onclick="forceOpenHelpModal()" class="px-3 py-1.5 border border-emerald-600 text-xs text-emerald-400 hover:bg-emerald-900 rounded font-bold">HOW TO PLAY</button>
+                <button onclick="resetGame()" class="px-4 py-1.5 border border-gray-600 text-xs text-gray-400 hover:text-white rounded">ALL RESET</button>
+            </div>
         </div>
         
-        <div id="dev-tools" class="flex items-center space-x-4 border border-sky-900/50 bg-sky-900/20 px-4 py-1.5 rounded text-xs text-sky-200 self-start mb-2 hidden">
-            <span class="font-bold text-sky-400 tracking-widest">DEV (금고 룰):</span>
-            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devRule" value="normal" checked><span>Normal (순수 확률)</span></label>
-            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devRule" value="optionA"><span class="text-emerald-400">Option A (천장: 누적 100pt 시 100%)</span></label>
-            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devRule" value="optionB"><span class="text-red-400">Option B (과열: 실패시 확률+1%, 자폭+2%)</span></label>
+        <div id="dev-tools-2" class="flex items-center space-x-4 border border-yellow-900/50 bg-yellow-900/20 px-4 py-1.5 rounded text-xs text-yellow-200 self-start mb-2 hidden">
+            <span class="font-bold text-yellow-400 tracking-widest">DEV (금고 룰):</span>
+            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devRule" value="normal" checked onchange="resetGame()"><span>Normal</span></label>
+            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devRule" value="optionA" onchange="resetGame()"><span class="text-emerald-400">Option A (천장 100pt)</span></label>
+            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devRule" value="optionB" onchange="resetGame()"><span class="text-red-400">Option B (과열 자폭)</span></label>
         </div>
 
-        <div class="flex space-x-1 border-b border-gray-800">
+        <div class="flex space-x-1 border-b border-gray-800 mt-1">
             <button onclick="switchTab(1)" id="tab-btn-1" class="px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-purple-500 text-purple-400 bg-gray-900">🔮 SACRIFICE PACK</button>
             <button onclick="switchTab(2)" id="tab-btn-2" class="px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-transparent text-gray-500 hover:text-gray-300">🔐 CRACK THE SAFE</button>
         </div>
@@ -119,119 +215,162 @@
             <div class="w-2/3 h-full border-r border-[rgba(255,255,255,0.1)] relative flex flex-col p-6 overflow-hidden">
                 
                 <div id="tab-content-1" class="flex-1 flex flex-col w-full h-full fade-in">
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-light tracking-widest uppercase text-purple-400">The Sacrifice Pack</h2>
-                        <div class="text-[11px] text-gray-500 mt-1">하위 카드를 제물로 바쳐 새로운 팩을 연성하세요. (최대 5장)</div>
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h2 class="text-2xl font-light tracking-widest uppercase text-purple-400">The Sacrifice Pack</h2>
+                            <div class="text-[11px] text-gray-500 mt-1">인벤토리의 카드를 클릭하거나 드래그하여 제물로 바치세요.</div>
+                        </div>
+                        <button onclick="openProbModal()" class="w-8 h-8 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center text-gray-300 hover:bg-gray-700 hover:text-white transition-colors" title="확률표 가이드">
+                            ?
+                        </button>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-center relative">
-                        <div id="t1-craft-zone" class="w-full max-w-lg">
-                            <div class="flex justify-between text-xs text-gray-500 mb-2 px-2">
-                                <span>SACRIFICE SLOTS</span>
-                                <span id="t1-counter">0 / 5</span>
-                            </div>
-                            <div class="bg-gray-900/50 border border-purple-900/50 p-4 rounded-xl flex gap-3 h-40" id="t1-slots">
+                        <div id="t1-craft-zone" class="w-full max-w-2xl">
+                            <div class="flex justify-between items-end mb-2 px-2 border-b border-gray-800 pb-2">
+                                <div class="text-xs text-gray-500">SACRIFICE SLOTS (Min 5, Max 10)</div>
+                                <div class="flex items-center gap-4">
+                                    <div class="text-xs text-gray-400">투입 총합: <span id="t1-total-value" class="text-white font-bold text-lg">0</span></div>
+                                    <div class="text-xs text-gray-400"><span id="t1-counter" class="text-white font-bold">0</span> / 10</div>
                                 </div>
-                            <div class="mt-6 flex justify-center">
+                            </div>
+                            <div class="bg-gray-900/50 border border-purple-900/50 p-4 rounded-xl grid grid-cols-5 gap-3 h-64" id="t1-slots"></div>
+                            
+                            <div class="mt-6 flex flex-col items-center gap-2">
+                                <div class="text-xs text-purple-300 font-bold bg-purple-900/30 px-4 py-1 rounded border border-purple-500/50">예상 생성 팩 가치: <span id="t1-expected-value">0</span></div>
                                 <button onclick="craftPack()" id="btn-craft" class="px-12 py-3 bg-purple-900/30 border border-purple-500 text-purple-400 font-bold hover:bg-purple-600 hover:text-white transition-colors tracking-widest rounded shadow-[0_0_15px_rgba(168,85,247,0.2)]">CRAFT PACK</button>
                             </div>
                         </div>
 
-                        <div id="t1-pack-zone" class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 hidden z-20 backdrop-blur-sm">
-                            <h3 class="text-xl text-white tracking-widest mb-8 font-bold animate-pulse">팩이 연성되었습니다! 클릭하여 열어보세요.</h3>
-                            <div class="booster-pack" onclick="openCraftedPack()">
+                        <div id="t1-pack-zone" class="absolute inset-0 flex flex-col items-center justify-center bg-black/95 hidden z-20 backdrop-blur-md fade-in">
+                            <h3 id="t1-pack-title" class="text-xl text-white tracking-widest mb-8 font-bold animate-pulse">팩이 연성되었습니다! 클릭하여 찢으세요.</h3>
+                            
+                            <div id="t1-booster" class="booster-pack" onclick="tearPack()">
                                 <div class="text-4xl">🔮</div>
-                                <div class="mt-2 text-white font-black tracking-widest" id="t1-pack-tier">RARE PACK</div>
+                                <div class="mt-2 text-white font-black tracking-widest" id="t1-pack-tier">MYSTIC PACK</div>
+                            </div>
+
+                            <div id="t1-reveal-zone" class="hidden flex-col items-center">
+                                <div class="flex gap-4 mb-8" id="t1-cards-container"></div>
+                                <div class="text-gray-400 text-sm animate-pulse mb-4">카드를 클릭하여 순서대로 확인하세요...</div>
+                                <button onclick="resetGame()" id="t1-btn-finish" class="hidden px-8 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold tracking-widest rounded transition-colors">수령하고 나가기</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div id="tab-content-2" class="flex-1 flex flex-col w-full h-full hidden fade-in">
-                    <div class="mb-4">
-                        <h2 class="text-2xl font-light tracking-widest uppercase text-yellow-500">Crack The Safe</h2>
-                        <div class="text-[11px] text-gray-500 mt-1">카드를 하나씩 소모하여 금고를 여세요. 높은 카드일수록 확률이 상승합니다.</div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h2 class="text-2xl font-light tracking-widest uppercase text-yellow-500">Crack The Safe</h2>
+                            <div class="text-[11px] text-gray-500 mt-1">인벤토리 카드를 클릭/드래그하여 금고를 해킹하세요. 우측에서 시너지 추천 카드를 확인하세요.</div>
+                        </div>
+                        <button onclick="openT2FormulaModal()" class="w-8 h-8 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center text-gray-300 hover:bg-gray-700 hover:text-white transition-colors" title="확률/보상 공식 안내">
+                            ?
+                        </button>
                     </div>
                     
-                    <div class="flex-1 flex items-center justify-center gap-12 relative">
+                    <div class="flex-1 flex items-stretch justify-center gap-6 relative">
                         
-                        <div class="w-56 bg-gray-900/80 border border-gray-700 p-4 rounded-lg shadow-lg">
-                            <h3 class="text-xs font-bold text-gray-400 tracking-widest border-b border-gray-700 pb-2 mb-3">손익 계산기 (ROI)</h3>
-                            
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs text-gray-500">팩 기대 가치</span>
-                                <span class="text-emerald-400 font-bold">50 pts</span>
-                            </div>
-                            
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="text-xs text-red-400/80">누적 소모 가치</span>
-                                <span id="t2-sunk-cost" class="text-red-400 font-bold text-lg">0 pts</span>
-                            </div>
-
-                            <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden relative mb-1">
-                                <div id="t2-cost-bar" class="h-full bg-red-500 transition-all" style="width: 0%;"></div>
-                                <div class="absolute top-0 left-[100%] w-0.5 h-full bg-emerald-400 z-10 -ml-0.5" title="Break-even Point (50pts)"></div>
-                            </div>
-                            <div class="text-[9px] text-gray-600 text-right mb-4">손익분기점(50pts)</div>
-                            
-                            <div id="t2-sys-log" class="text-[10px] text-sky-300 font-mono bg-black/50 p-2 rounded h-16 overflow-y-auto break-words">시스템 대기 중...</div>
-                        </div>
-
-                        <div class="safe-container flex flex-col items-center">
-                            <div id="t2-safe-group" class="relative">
-                                <div class="booster-pack opacity-50 filter grayscale">
-                                    <div class="text-4xl">💎</div>
-                                    <div class="mt-2 text-white font-black tracking-widest text-sm">PREMIUM</div>
+                        <div class="w-56 flex flex-col gap-3">
+                            <div class="bg-gray-900/80 border border-gray-700 p-3 rounded-lg shadow-lg">
+                                <h3 class="text-[10px] font-bold text-gray-500 tracking-widest border-b border-gray-700 pb-1 mb-2">보상 및 비용</h3>
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs text-emerald-400">현재 누적 보상</span>
+                                    <span id="t2-total-reward" class="text-emerald-400 font-black text-lg drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]">100</span>
                                 </div>
-                                <div id="t2-chain" class="safe-chain"></div>
-                                <div id="t2-lock" class="safe-lock text-2xl">🔒</div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-red-400/80">실패 시 차감액</span>
+                                    <span id="t2-penalty-pred" class="text-red-400 font-bold text-sm">-0</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-900/80 border border-gray-700 p-3 rounded-lg shadow-lg flex-1 flex flex-col">
+                                <h3 class="text-[10px] font-bold text-gray-500 tracking-widest border-b border-gray-700 pb-1 mb-2">연속 시너지 스택</h3>
+                                <div class="flex gap-2 mb-2">
+                                    <div class="bg-black/50 border border-gray-700 rounded flex-1 flex flex-col items-center p-1">
+                                        <span class="text-[9px] text-gray-500">색상(0.2)</span>
+                                        <span id="syn-color" class="text-white font-bold">0</span>
+                                    </div>
+                                    <div class="bg-black/50 border border-gray-700 rounded flex-1 flex flex-col items-center p-1">
+                                        <span class="text-[9px] text-gray-500">무늬(0.4)</span>
+                                        <span id="syn-suit" class="text-white font-bold">0</span>
+                                    </div>
+                                    <div class="bg-black/50 border border-gray-700 rounded flex-1 flex flex-col items-center p-1">
+                                        <span class="text-[9px] text-gray-500">랭크(0.8)</span>
+                                        <span id="syn-rank" class="text-white font-bold">0</span>
+                                    </div>
+                                </div>
+                                
+                                <div id="t2-hover-preview" class="mt-auto p-2 rounded border border-emerald-500/30 bg-emerald-900/20 hidden">
+                                    <div class="text-[10px] text-emerald-400 font-bold mb-1 text-center">오픈 확률 (Hover)</div>
+                                    <div class="text-2xl font-black text-white text-center" id="t2-preview-rate">0.0%</div>
+                                    <div class="text-[9px] text-gray-400 text-center mt-1" id="t2-preview-detail">(기본 0% + 시너지 0%)</div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="w-40 flex flex-col items-center">
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="safe-container flex flex-col items-center">
+                                <div id="t2-safe-group" class="relative">
+                                    <div class="booster-pack opacity-50 filter grayscale"><div class="text-4xl">💎</div><div class="mt-2 text-white font-black tracking-widest text-sm">PREMIUM</div></div>
+                                    <div id="t2-chain" class="safe-chain"></div>
+                                    <div id="t2-lock" class="safe-lock text-2xl">🔒</div>
+                                </div>
+                            </div>
+                            <div id="t2-action-log" class="mt-4 text-sm font-bold text-center h-6"></div>
+                        </div>
+
+                        <div class="w-48 flex flex-col gap-3">
                             <div class="bg-gray-900/50 border border-gray-800 p-3 rounded-xl w-full">
                                 <div class="text-[10px] text-gray-500 mb-2 text-center tracking-widest">INSERT CARD</div>
-                                <div id="t2-slot" class="slot-zone w-full h-40 relative" 
+                                <div id="t2-slot" class="slot-zone w-full h-32 relative" 
                                      ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleHackDrop(event)">
-                                    <span class="text-gray-600 text-xs text-center pointer-events-none px-4">Drop Here</span>
+                                    <span class="text-gray-600 text-xs text-center pointer-events-none px-4">Click or Drop Here</span>
                                 </div>
                             </div>
-                            <div id="t2-action-log" class="mt-3 text-[11px] text-center text-gray-400 h-8"></div>
+                            
+                            <div class="bg-gray-900/80 border border-gray-700 p-3 rounded-lg shadow-lg flex-1 flex flex-col">
+                                <h3 class="text-[10px] font-bold text-gray-500 tracking-widest border-b border-gray-700 pb-1 mb-2">투입 히스토리</h3>
+                                <div id="t2-history" class="flex-1 overflow-y-auto flex flex-col gap-1 pr-1">
+                                    <div class="text-xs text-gray-600 italic text-center mt-2" id="t2-hist-empty">No cards inserted.</div>
+                                </div>
+                            </div>
                         </div>
-
                     </div>
                     
                     <div id="t2-reward-zone" class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 hidden z-20 backdrop-blur-sm fade-in">
                         <div class="booster-pack !scale-125 !filter-none" style="box-shadow: 0 0 50px rgba(250,204,21,0.6); border-color: #facc15; background: linear-gradient(135deg, #a16207, #facc15);">
                             <div class="text-5xl drop-shadow-lg">✨</div>
-                            <div class="mt-4 text-white font-black tracking-widest">SUCCESS!</div>
-                            <div class="text-xs text-yellow-100 mt-1">+50 PTS</div>
+                            <div class="mt-4 text-white font-black tracking-widest">UNLOCKED!</div>
                         </div>
-                        <button onclick="resetGame()" class="mt-12 px-8 py-2 bg-yellow-600 hover:bg-yellow-500 text-white font-bold tracking-widest rounded transition-colors">CONTINUE</button>
+                        <div class="mt-6 text-xl text-emerald-400 font-bold bg-black/50 px-6 py-2 rounded-full border border-emerald-500">최종 획득 보상: <span id="t2-final-reward" class="text-white">0</span> PTS</div>
+                        <button onclick="resetGame()" class="mt-8 px-8 py-2 bg-yellow-600 hover:bg-yellow-500 text-white font-bold tracking-widest rounded transition-colors">계속하기</button>
                     </div>
 
                 </div>
-
             </div>
 
             <div class="w-1/3 h-full flex flex-col bg-[#0a0a0a] min-h-0 relative">
                 <div class="p-4 border-b border-[rgba(255,255,255,0.1)] flex justify-between items-end shrink-0">
-                    <span class="text-xs tracking-widest text-gray-400 font-bold uppercase">Inventory</span>
+                    <span class="text-xs tracking-widest text-gray-400 font-bold uppercase">Inventory (<span id="inv-count">0</span>/20)</span>
                     <button onclick="renderInventory()" class="text-[10px] border border-gray-600 px-2 py-0.5 rounded text-gray-400 hover:text-white">REFILL DECK</button>
                 </div>
-                <div class="flex-1 overflow-y-auto p-4 grid grid-cols-3 gap-3 content-start" id="inventory-grid"></div>
+                <div class="flex-1 overflow-y-auto p-4 grid grid-cols-4 gap-2 content-start" id="inventory-grid"></div>
             </div>
         </div>
     </main>
 
     <script>
-        // --- GLOBAL ---
         let currentTab = 1;
+        let seenHelp1 = false;
+        let seenHelp2 = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             renderInventory();
             initTab1();
             initTab2();
+            switchTab(1); // triggers help automatically
         });
 
         function switchTab(tabId) {
@@ -245,51 +384,143 @@
             
             document.getElementById('tab-content-1').style.display = tabId === 1 ? 'flex' : 'none';
             document.getElementById('tab-content-2').style.display = tabId === 2 ? 'flex' : 'none';
-            document.getElementById('dev-tools').style.display = tabId === 2 ? 'flex' : 'none';
+            document.getElementById('dev-tools-1').style.display = tabId === 1 ? 'flex' : 'none';
+            document.getElementById('dev-tools-2').style.display = tabId === 2 ? 'flex' : 'none';
             
-            resetGame();
+            // Auto Help Popups
+            if (tabId === 1 && !seenHelp1) { forceOpenHelpModal(); seenHelp1 = true; }
+            if (tabId === 2 && !seenHelp2) { forceOpenHelpModal(); seenHelp2 = true; }
+
+            updateSynergyHighlight();
+        }
+
+        // --- MODALS ---
+        function forceOpenHelpModal() {
+            const content = document.getElementById('help-content');
+            const title = document.getElementById('help-title');
+            
+            if(currentTab === 1) {
+                title.innerText = "HOW TO PLAY (SACRIFICE)";
+                title.className = "text-3xl font-black tracking-widest text-purple-400 mb-6 text-center border-b border-gray-800 pb-4";
+                content.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="bg-gray-800/50 p-3 border border-gray-700 rounded"><strong class="text-emerald-400">STEP 1.</strong> 인벤토리에서 카드 5~10장을 <strong class="text-white">클릭 또는 드래그</strong>하여 제물로 바칩니다.</div>
+                        <div class="bg-gray-800/50 p-3 border border-gray-700 rounded"><strong class="text-emerald-400">STEP 2.</strong> 투입한 카드의 <strong class="text-yellow-400">숫자 총합의 50%</strong>가 연성될 팩의 가치로 전환됩니다.</div>
+                        <div class="bg-gray-800/50 p-3 border border-gray-700 rounded"><strong class="text-emerald-400">STEP 3.</strong> [CRAFT PACK]을 누르면 제물이 소멸하며 랜덤 티어 카드 5장이 든 팩을 획득합니다!</div>
+                    </div>
+                `;
+            } else {
+                title.innerText = "HOW TO PLAY (CRACK THE SAFE)";
+                title.className = "text-3xl font-black tracking-widest text-yellow-500 mb-6 text-center border-b border-gray-800 pb-4";
+                content.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="bg-gray-800/50 p-3 border border-gray-700 rounded"><strong class="text-emerald-400">STEP 1.</strong> 카드를 <strong class="text-white">클릭 또는 드래그</strong>하여 슬롯에 넣고 자물쇠를 해킹합니다. 최초 보상금은 100입니다.</div>
+                        <div class="bg-gray-800/50 p-3 border border-gray-700 rounded"><strong class="text-emerald-400">STEP 2.</strong> 해킹 실패 시, 투입한 <strong class="text-red-400">카드의 랭크에 비례하여 보상금이 영구 차감</strong>됩니다!</div>
+                        <div class="bg-gray-800/50 p-3 border border-gray-700 rounded"><strong class="text-emerald-400">STEP 3.</strong> 인벤토리에서 <strong class="text-purple-400">보라색으로 빛나는 시너지 카드</strong>를 연달아 투입해 확률을 높이고 팩을 뜯어내세요!</div>
+                    </div>
+                `;
+            }
+            document.getElementById('help-modal').classList.remove('hidden'); 
+            document.getElementById('help-modal').classList.add('fade-in'); 
+        }
+        function closeHelpModal() { document.getElementById('help-modal').classList.add('hidden'); }
+
+        function openProbModal() { document.getElementById('prob-modal').classList.remove('hidden'); document.getElementById('prob-modal').classList.add('fade-in'); }
+        function closeProbModal() { document.getElementById('prob-modal').classList.add('hidden'); }
+
+        function openT2FormulaModal() { document.getElementById('t2-formula-modal').classList.remove('hidden'); document.getElementById('t2-formula-modal').classList.add('fade-in'); }
+        function closeT2FormulaModal() { document.getElementById('t2-formula-modal').classList.add('hidden'); }
+
+
+        // --- UTILS & INVENTORY ---
+        function getRankNum(val) {
+            if(val === 'A') return 14;
+            if(val === 'K') return 13;
+            if(val === 'Q') return 12;
+            if(val === 'J') return 11;
+            if(val === 'JOKER') return 15;
+            return parseInt(val);
+        }
+
+        function getTierClass(tierStr) {
+            const m = {'T1': 'tier-t1', 'T2': 'tier-t2', 'T3': 'tier-t3', 'T4': 'tier-t4', 'T5': 'tier-t5', 'T6': 'tier-t6'};
+            return m[tierStr] || 'tier-t1';
+        }
+        function getTierLabel(tierStr) {
+            const m = {'T1': '종이', 'T2': '플라스틱', 'T3': '은', 'T4': '유리', 'T5': '금', 'T6': '다이아'};
+            return m[tierStr] || '종이';
         }
 
         function renderInventory() {
             const grid = document.getElementById('inventory-grid');
-            const suits = [{s:'♠', c:'text-gray-400'}, {s:'♥', c:'text-red-500'}, {s:'♣', c:'text-gray-400'}, {s:'♦', c:'text-red-500'}];
-            const values = ['A', '2', '3', '5', '7', '10', 'J', 'Q', 'K'];
+            const suits = [{s:'♠', c:'text-gray-400', color:'black'}, {s:'♥', c:'text-red-500', color:'red'}, {s:'♣', c:'text-gray-400', color:'black'}, {s:'♦', c:'text-red-500', color:'red'}];
+            const values = ['2','3','5','7','10','J','Q','K','A'];
             let html = [`
-                <div class="aspect-[2/3] cursor-grab hover:-translate-y-1 transition-transform relative" draggable="true" ondragstart="handleDragStart(event, 'JOKER', 'JOKER', 'text-purple-400')">
+                <div id="inv-joker-wrap" class="aspect-[2/3] cursor-pointer hover:-translate-y-1 transition-transform relative" 
+                     draggable="true" 
+                     ondragstart="handleDragStart(event, 'JOKER', 'JOKER', 'text-purple-400', 'purple', 'inv-joker-wrap')"
+                     onclick="handleInvCardClick('JOKER', 'JOKER', 'text-purple-400', 'purple', 'inv-joker-wrap')"
+                     onmouseenter="hoverInvCard('JOKER', 'JOKER', 'purple')" onmouseleave="clearHover()"
+                     data-suit="JOKER" data-val="JOKER" data-color="purple">
                     <div class="wf-box bg-[rgba(255,255,255,0.02)] border-purple-500/50">
-                        <span class="text-xl text-purple-400 font-black">JOKER</span>
+                        <span class="text-lg text-purple-400 font-black">JOKER</span>
                     </div>
                 </div>
             `];
-            for(let i = 0; i < 14; i++) {
+            // 늘어난 인벤토리: 19장 + 1조커 = 20장
+            for(let i = 0; i < 19; i++) {
                 const suit = suits[Math.floor(Math.random() * suits.length)];
                 const val = values[Math.floor(Math.random() * values.length)];
                 html.push(`
-                    <div id="inv-card-${i}" class="aspect-[2/3] cursor-grab hover:-translate-y-1 transition-transform relative" 
-                         draggable="true" ondragstart="handleDragStart(event, '${suit.s}', '${val}', '${suit.c}', 'inv-card-${i}')">
+                    <div id="inv-card-${i}-wrap" class="aspect-[2/3] cursor-pointer hover:-translate-y-1 transition-transform relative" 
+                         draggable="true" 
+                         ondragstart="handleDragStart(event, '${suit.s}', '${val}', '${suit.c}', '${suit.color}', 'inv-card-${i}-wrap')"
+                         onclick="handleInvCardClick('${suit.s}', '${val}', '${suit.c}', '${suit.color}', 'inv-card-${i}-wrap')"
+                         onmouseenter="hoverInvCard('${suit.s}', '${val}', '${suit.color}')" onmouseleave="clearHover()"
+                         data-suit="${suit.s}" data-val="${val}" data-color="${suit.color}">
                         <div class="wf-box bg-[rgba(255,255,255,0.02)]">
                             <span class="text-[10px] ${suit.c} absolute top-1 left-1">${suit.s}</span>
-                            <span class="text-xl ${suit.c} font-bold">${val}</span>
+                            <span class="text-lg ${suit.c} font-bold">${val}</span>
                         </div>
                     </div>
                 `);
             }
             grid.innerHTML = html.join('');
+            document.getElementById('inv-count').innerText = "20";
+            updateSynergyHighlight();
         }
 
-        function handleDragStart(e, suit, val, colorClass, domId) {
-            e.dataTransfer.setData('text/plain', JSON.stringify({suit, val, colorClass, domId}));
+        function updateInvCount() {
+            const count = document.querySelectorAll('#inventory-grid > div').length - document.querySelectorAll('#inventory-grid > div[style*="visibility: hidden"]').length;
+            document.getElementById('inv-count').innerText = count;
+        }
+
+        function handleDragStart(e, suit, val, colorClass, baseColor, domId) {
+            e.dataTransfer.setData('text/plain', JSON.stringify({suit, val, colorClass, baseColor, domId}));
         }
         function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
         function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
 
-        function getCardValue(val) {
-            if(val === 'A') return 15;
-            if(val === 'K') return 13;
-            if(val === 'Q') return 12;
-            if(val === 'J') return 11;
-            if(val === 'JOKER') return 20;
-            return parseInt(val);
+        function handleInvCardClick(suit, val, colorClass, baseColor, domId) {
+            const el = document.getElementById(domId);
+            if(el.style.visibility === 'hidden') return;
+
+            const data = {suit, val, colorClass, baseColor, domId};
+            
+            if (currentTab === 1) {
+                if(t1Cards.length >= 10) return;
+                const slots = document.querySelectorAll('#t1-slots .slot-zone');
+                for(let slot of slots) {
+                    if(!slot.classList.contains('filled')) {
+                        processT1Drop(slot, data);
+                        break;
+                    }
+                }
+            } else if (currentTab === 2) {
+                if(isSafeGameOver) return;
+                const slot = document.getElementById('t2-slot');
+                processT2Drop(slot, data);
+            }
         }
 
         function resetGame() {
@@ -298,93 +529,237 @@
             if(currentTab === 2) initTab2();
         }
 
-        // --- TAB 1: SACRIFICE PACK (제물 연성) ---
+        // --- TAB 1: SACRIFICE PACK ---
         let t1Cards = [];
+        let t1Sum = 0;
+        let t1GeneratedCards = [];
+        let t1RevealIndex = 0;
 
         function initTab1() {
-            t1Cards = [];
+            t1Cards = []; t1Sum = 0; t1GeneratedCards = []; t1RevealIndex = 0;
             const container = document.getElementById('t1-slots');
             container.innerHTML = '';
-            for(let i=0; i<5; i++) {
+            for(let i=0; i<10; i++) {
                 const slot = document.createElement('div');
-                slot.className = "slot-zone flex-1 h-full relative";
+                slot.className = "slot-zone w-full h-24 relative";
                 slot.ondragover = handleDragOver;
                 slot.ondragleave = handleDragLeave;
-                slot.ondrop = handleCraftDrop;
+                slot.ondrop = handleCraftDrop1;
                 container.appendChild(slot);
             }
-            document.getElementById('t1-counter').innerText = "0 / 5";
+            document.getElementById('t1-counter').innerText = "0";
+            document.getElementById('t1-total-value').innerText = "0";
+            document.getElementById('t1-expected-value').innerText = "0";
             document.getElementById('t1-pack-zone').classList.add('hidden');
+            document.getElementById('t1-booster').classList.remove('hidden');
+            document.getElementById('t1-reveal-zone').classList.add('hidden');
+            document.getElementById('t1-pack-title').innerText = "팩이 연성되었습니다! 클릭하여 찢으세요.";
         }
 
-        function handleCraftDrop(e) {
+        function handleCraftDrop1(e) {
             e.preventDefault();
             const slot = e.currentTarget;
             slot.classList.remove('drag-over');
-            if(slot.classList.contains('filled') || t1Cards.length >= 5) return;
+            if(slot.classList.contains('filled') || t1Cards.length >= 10) return;
 
             const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            processT1Drop(slot, data);
+        }
+
+        function processT1Drop(slot, data) {
             if(data.domId) document.getElementById(data.domId).style.visibility = 'hidden';
 
-            slot.innerHTML = `<div class="wf-box pop-in"><span class="text-[10px] ${data.colorClass} absolute top-1 left-1">${data.suit}</span><span class="text-2xl ${data.colorClass} font-bold">${data.val}</span></div>`;
+            slot.innerHTML = `<div class="wf-box pop-in"><span class="text-[10px] ${data.colorClass} absolute top-1 left-1">${data.suit}</span><span class="text-xl ${data.colorClass} font-bold">${data.val}</span></div>`;
             slot.classList.add('filled');
             
             t1Cards.push(data);
-            document.getElementById('t1-counter').innerText = `${t1Cards.length} / 5`;
+            t1Sum += getRankNum(data.val);
+            
+            document.getElementById('t1-counter').innerText = t1Cards.length;
+            document.getElementById('t1-total-value').innerText = t1Sum;
+            document.getElementById('t1-expected-value').innerText = Math.max(10, Math.floor(t1Sum * 0.5));
+            updateInvCount();
         }
 
         function craftPack() {
-            if(t1Cards.length === 0) return alert('최소 1장의 제물이 필요합니다.');
+            if(t1Cards.length < 5) return alert('최소 5장의 제물이 필요합니다.');
             
-            let sum = t1Cards.reduce((acc, curr) => acc + getCardValue(curr.val), 0);
-            let tier = "COMMON PACK";
-            let color = "#9ca3af"; // gray
-            
-            if(sum > 40) { tier = "LEGENDARY PACK"; color = "#facc15"; }
-            else if(sum > 20) { tier = "RARE PACK"; color = "#60a5fa"; }
+            // 1. 값 50%
+            let targetSum = Math.floor(t1Sum * 0.5);
+            if(targetSum < 10) targetSum = 10; 
 
-            document.getElementById('t1-pack-tier').innerText = tier;
-            document.getElementById('t1-pack-tier').style.color = color;
+            // 3. 분배 로직
+            let distVals = [2,2,2,2,2];
+            let remain = targetSum - 10;
+            for(let i=0; i<remain; i++) {
+                let avail = distVals.map((v, i) => v < 14 ? i : -1).filter(idx => idx !== -1);
+                if(avail.length === 0) break;
+                distVals[avail[Math.floor(Math.random() * avail.length)]]++;
+            }
+
+            // 4. 티어 로직
+            let distTiers = ['T1', 'T1', 'T1']; 
+            distTiers.push(Math.random() < 0.3 ? 'T2' : 'T1'); 
+            
+            let r = Math.random(); 
+            if(r < 0.002) distTiers.push('T6');
+            else if(r < 0.012) distTiers.push('T5');
+            else if(r < 0.062) distTiers.push('T4');
+            else if(r < 0.212) distTiers.push('T3');
+            else if(r < 0.512) distTiers.push('T2');
+            else distTiers.push('T1');
+
+            // DEV 치트
+            const devOpt = document.querySelector('input[name="devT1"]:checked')?.value || 'normal';
+            if(devOpt === 'forceT6') distTiers[4] = 'T6';
+
+            t1GeneratedCards = distVals.map((v, i) => {
+                let displayVal = v;
+                if(v === 11) displayVal = 'J'; else if(v === 12) displayVal = 'Q'; else if(v === 13) displayVal = 'K'; else if(v === 14) displayVal = 'A';
+                return { val: displayVal, tier: distTiers[i] };
+            });
+
             document.getElementById('t1-pack-zone').classList.remove('hidden');
         }
 
-        function openCraftedPack() {
-            alert(`팩을 찢었습니다! 획득: 조커 카드 + 1000 Gold (기본 뼈대 데모)`);
-            initTab1();
+        function tearPack() {
+            const pack = document.getElementById('t1-booster');
+            pack.classList.add('pack-tear');
+            setTimeout(() => {
+                pack.classList.add('hidden');
+                pack.classList.remove('pack-tear');
+                showRevealZone();
+            }, 500);
         }
 
-        // --- TAB 2: CRACK THE SAFE (금고 해킹) ---
-        let sunkCost = 0;
-        const PACK_VALUE = 50;
+        function showRevealZone() {
+            document.getElementById('t1-pack-title').innerText = "결과 확인";
+            document.getElementById('t1-reveal-zone').classList.remove('hidden');
+            document.getElementById('t1-reveal-zone').classList.add('flex');
+            
+            const container = document.getElementById('t1-cards-container');
+            container.innerHTML = '';
+            
+            t1GeneratedCards.forEach((c, idx) => {
+                const tierClass = getTierClass(c.tier);
+                const tierLabel = getTierLabel(c.tier);
+                
+                const cardHtml = `
+                    <div class="card-container w-24 h-36 cursor-pointer relative" id="t1-res-${idx}" onclick="flipResultCard(${idx})">
+                        <div class="card-inner shadow-lg">
+                            <div class="card-back"></div>
+                            <div class="card-front wf-box ${tierClass}">
+                                <span class="text-[10px] absolute top-1 left-1 opacity-70">${c.tier}</span>
+                                <span class="text-3xl font-black">${c.val}</span>
+                                <span class="text-[8px] absolute bottom-1 tracking-widest bg-black/30 px-2 rounded">${tierLabel}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        function flipResultCard(idx) {
+            if(idx !== t1RevealIndex) return;
+            const el = document.getElementById(`t1-res-${idx}`);
+            if(!el.classList.contains('is-flipped')) {
+                el.classList.add('is-flipped');
+                t1RevealIndex++;
+                if(t1RevealIndex >= 5) {
+                    document.getElementById('t1-btn-finish').classList.remove('hidden');
+                    document.getElementById('t1-btn-finish').classList.add('pop-in');
+                }
+            }
+        }
+
+        // --- TAB 2: CRACK THE SAFE ---
+        let t2Stats = { colorStreak: 0, suitStreak: 0, rankStreak: 0, lastColor: null, lastSuit: null, lastRank: null, totalCount: 0 };
+        let t2CurrentReward = 100;
         let isSafeGameOver = false;
-        
-        // Option B variables
-        let bonusRate = 0;
-        let explodeRate = 0;
 
         function initTab2() {
-            sunkCost = 0;
-            bonusRate = 0;
-            explodeRate = 0;
+            t2Stats = { colorStreak: 0, suitStreak: 0, rankStreak: 0, lastColor: null, lastSuit: null, lastRank: null, totalCount: 0 };
+            t2CurrentReward = 100; 
             isSafeGameOver = false;
             
-            document.getElementById('t2-sunk-cost').innerText = "0 pts";
-            document.getElementById('t2-cost-bar').style.width = "0%";
-            document.getElementById('t2-cost-bar').className = "h-full bg-red-500 transition-all";
-            document.getElementById('t2-sys-log').innerHTML = "시스템 대기 중...";
+            document.getElementById('t2-total-reward').innerText = "100";
+            document.getElementById('t2-penalty-pred').innerText = "-0";
+            document.getElementById('t2-hover-preview').classList.add('hidden');
+            
+            document.getElementById('syn-color').innerText = "0";
+            document.getElementById('syn-suit').innerText = "0";
+            document.getElementById('syn-rank').innerText = "0";
             
             document.getElementById('t2-safe-group').classList.remove('explode');
             document.getElementById('t2-lock').classList.remove('unlock');
             document.getElementById('t2-reward-zone').classList.add('hidden');
             document.getElementById('t2-action-log').innerText = "";
             
-            resetT2Slot();
+            document.getElementById('t2-history').innerHTML = '<div class="text-xs text-gray-600 italic text-center mt-2" id="t2-hist-empty">No cards inserted.</div>';
+            
+            const slot = document.getElementById('t2-slot');
+            slot.innerHTML = '<span class="text-gray-600 text-xs text-center pointer-events-none px-4">Click or Drop Here</span>';
+            slot.classList.remove('filled');
+            
+            updateSynergyHighlight();
         }
 
-        function resetT2Slot() {
-            const slot = document.getElementById('t2-slot');
-            slot.innerHTML = '<span class="text-gray-600 text-xs text-center pointer-events-none px-4">Drop Here</span>';
-            slot.classList.remove('filled');
+        function calcSafeProb(val, suit, color) {
+            let r = getRankNum(val);
+            let baseRate = (10 + r) / (100 - r) * 100;
+            if(val === 'JOKER') baseRate = 100;
+
+            let cStreak = (color === t2Stats.lastColor && color) ? t2Stats.colorStreak + 1 : 0;
+            let sStreak = (suit === t2Stats.lastSuit && suit) ? t2Stats.suitStreak + 1 : 0;
+            let rStreak = (val === t2Stats.lastRank && val) ? t2Stats.rankStreak + 1 : 0;
+            let tCount = t2Stats.totalCount + 1; 
+
+            let bonus = (cStreak * 0.2) + (sStreak * 0.4) + (rStreak * 0.8) + (tCount * 0.5);
+            let total = (baseRate + bonus) * 0.7; // 30% 감소
+            
+            return { base: baseRate * 0.7, bonus: bonus * 0.7, total: total };
+        }
+
+        function hoverInvCard(suit, val, color) {
+            if(currentTab !== 2 || isSafeGameOver) return;
+            const res = calcSafeProb(val, suit, color);
+            
+            const preview = document.getElementById('t2-hover-preview');
+            preview.classList.remove('hidden');
+            
+            document.getElementById('t2-preview-rate').innerText = `${Math.min(res.total, 100).toFixed(1)}%`;
+            document.getElementById('t2-preview-detail').innerText = `(기본 ${res.base.toFixed(1)}% + 시너지 ${res.bonus.toFixed(1)}%)`;
+
+            // 예측 차감액 계산
+            let r = getRankNum(val);
+            let penalty = Math.floor(t2CurrentReward * (r / 100));
+            document.getElementById('t2-penalty-pred').innerText = `-${penalty}`;
+        }
+
+        function clearHover() {
+            if(currentTab === 2) {
+                document.getElementById('t2-hover-preview').classList.add('hidden');
+                document.getElementById('t2-penalty-pred').innerText = "-0";
+            }
+        }
+
+        function updateSynergyHighlight() {
+            if(currentTab !== 2 || isSafeGameOver) return;
+            document.querySelectorAll('#inventory-grid > div').forEach(el => {
+                const inner = el.querySelector('.wf-box');
+                inner.classList.remove('synergy-highlight');
+                
+                if(el.style.visibility !== 'hidden' && t2Stats.totalCount > 0) {
+                    let dColor = el.dataset.color;
+                    let dSuit = el.dataset.suit;
+                    let dVal = el.dataset.val;
+                    
+                    if (dVal === 'JOKER' || dColor === t2Stats.lastColor || dSuit === t2Stats.lastSuit || dVal === t2Stats.lastRank) {
+                        inner.classList.add('synergy-highlight');
+                    }
+                }
+            });
         }
 
         function handleHackDrop(e) {
@@ -394,93 +769,105 @@
             if(isSafeGameOver) return;
 
             const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            processT2Drop(slot, data);
+        }
+
+        function processT2Drop(slot, data) {
             if(data.domId) document.getElementById(data.domId).style.visibility = 'hidden';
 
             slot.innerHTML = `<div class="wf-box pop-in"><span class="text-[10px] ${data.colorClass} absolute top-1 left-1">${data.suit}</span><span class="text-2xl ${data.colorClass} font-bold">${data.val}</span></div>`;
             slot.classList.add('filled');
+            document.getElementById('t2-hover-preview').classList.add('hidden');
+            document.getElementById('t2-penalty-pred').innerText = "-0";
 
-            processHackAttempt(data.val);
+            updateInvCount();
+            processHackAttempt(data.val, data.suit, data.baseColor, data.colorClass);
         }
 
-        function processHackAttempt(val) {
-            const rule = document.querySelector('input[name="devRule"]:checked').value;
-            const cardCost = getCardValue(val);
-            sunkCost += cardCost;
+        function processHackAttempt(val, suit, color, colorClass) {
+            const rule = document.querySelector('input[name="devRule"]:checked')?.value || 'normal';
             
-            // UI Update
-            document.getElementById('t2-sunk-cost').innerText = `${sunkCost} pts`;
-            let barWidth = Math.min((sunkCost / PACK_VALUE) * 50, 100); // 50pts = 50% 폭
-            document.getElementById('t2-cost-bar').style.width = `${barWidth}%`;
-            if(sunkCost > PACK_VALUE) document.getElementById('t2-cost-bar').classList.replace('bg-red-500', 'bg-orange-500'); // 적자 돌파 시 색상 변경
+            // Prob Calculation (before update state)
+            const res = calcSafeProb(val, suit, color);
 
-            // 확률 계산
-            let baseRate = 0;
-            if(val === 'JOKER') baseRate = 100;
-            else if(val === 'A') baseRate = 15;
-            else if(['J','Q','K'].includes(val)) baseRate = 12;
-            else baseRate = parseInt(val);
+            // State Update
+            if (color === t2Stats.lastColor && color) t2Stats.colorStreak++; else t2Stats.colorStreak = 0;
+            if (suit === t2Stats.lastSuit && suit) t2Stats.suitStreak++; else t2Stats.suitStreak = 0;
+            if (val === t2Stats.lastRank && val) t2Stats.rankStreak++; else t2Stats.rankStreak = 0;
+            
+            t2Stats.lastColor = color; t2Stats.lastSuit = suit; t2Stats.lastRank = val;
+            t2Stats.totalCount++;
 
-            let finalRate = baseRate;
+            // History Update
+            const histEmpty = document.getElementById('t2-hist-empty');
+            if(histEmpty) histEmpty.remove();
+            const histDiv = document.createElement('div');
+            histDiv.className = "flex justify-between items-center bg-black/40 p-1 rounded border border-gray-700/50 text-xs fade-in";
+            histDiv.innerHTML = `<span class="${colorClass} font-bold">${suit} ${val}</span><span class="text-gray-500">#${t2Stats.totalCount}</span>`;
+            document.getElementById('t2-history').prepend(histDiv);
+
+            // Synergy UI Update
+            document.getElementById('syn-color').innerText = t2Stats.colorStreak;
+            document.getElementById('syn-suit').innerText = t2Stats.suitStreak;
+            document.getElementById('syn-rank').innerText = t2Stats.rankStreak;
+
+            updateSynergyHighlight(); // 다음 카드를 위한 하이라이트 갱신
+
             let isSuccess = false;
-            let logStr = `<div class="text-gray-400 border-b border-gray-800 pb-1 mb-1">투입: [${val}] (가치 ${cardCost}pt)</div>`;
-
-            // B안 자폭 체크
-            if(rule === 'optionB' && explodeRate > 0) {
-                let explodeRoll = Math.random() * 100;
-                logStr += `<div>과열 자폭 굴림: ${explodeRoll.toFixed(1)} / ${explodeRate}% ...</div>`;
-                if(explodeRoll < explodeRate) {
-                    triggerExplode(logStr);
-                    return;
-                }
+            let roll = Math.random() * 100;
+            
+            if(rule === 'optionB' && roll < 5) { // 자폭 예시
+                triggerExplode(); return;
             }
 
-            // A안 천장 체크
-            if(rule === 'optionA' && sunkCost >= 100) {
-                logStr += `<div class="text-emerald-400">천장 발동 (누적 100pt 이상) -> 100% 성공!</div>`;
+            if(rule === 'optionA' && t2Stats.totalCount >= 10) { // 천장 10회
                 isSuccess = true;
             } else {
-                if(rule === 'optionB') finalRate += bonusRate;
-                let roll = Math.random() * 100;
-                logStr += `<div>해킹 굴림: ${roll.toFixed(1)} / ${finalRate}% ...</div>`;
-                if(roll < finalRate) isSuccess = true;
+                if(roll < res.total) isSuccess = true;
             }
-
-            document.getElementById('t2-sys-log').innerHTML = logStr;
             
             setTimeout(() => {
-                if(isSuccess) {
-                    triggerSuccess();
-                } else {
+                if(isSuccess) { triggerSuccess(); } 
+                else {
                     document.getElementById('t2-safe-group').classList.remove('shake');
-                    void document.getElementById('t2-safe-group').offsetWidth; // reflow
+                    void document.getElementById('t2-safe-group').offsetWidth;
                     document.getElementById('t2-safe-group').classList.add('shake');
+                    document.getElementById('t2-action-log').innerHTML = `<span class="text-red-500 font-bold drop-shadow-md">해킹 실패! 보상 차감</span>`;
                     
-                    document.getElementById('t2-action-log').innerHTML = `<span class="text-red-500 font-bold">FAILED</span>`;
-                    
-                    if(rule === 'optionB') {
-                        bonusRate += 1; explodeRate += 2;
-                        document.getElementById('t2-sys-log').innerHTML += `<div class="text-red-400 mt-1">과열 발생! (성공률+1%, 자폭률+2%)</div>`;
-                    }
-                    setTimeout(resetT2Slot, 500);
+                    // 실패 시 보상 차감 (1 - (100 - r)/100 -> r / 100)
+                    let r = getRankNum(val);
+                    let penalty = Math.floor(t2CurrentReward * (r / 100));
+                    t2CurrentReward -= penalty;
+                    if(t2CurrentReward < 0) t2CurrentReward = 0;
+                    document.getElementById('t2-total-reward').innerText = t2CurrentReward;
+
+                    setTimeout(() => {
+                        const slot = document.getElementById('t2-slot');
+                        slot.innerHTML = '<span class="text-gray-600 text-xs text-center pointer-events-none px-4">Click or Drop Here</span>';
+                        slot.classList.remove('filled');
+                        document.getElementById('t2-action-log').innerHTML = "";
+                    }, 800);
                 }
             }, 300);
         }
 
         function triggerSuccess() {
             isSafeGameOver = true;
-            document.getElementById('t2-action-log').innerHTML = `<span class="text-yellow-400 font-bold">UNLOCKED!</span>`;
+            document.getElementById('t2-action-log').innerHTML = `<span class="text-yellow-400 font-bold drop-shadow-md">UNLOCKED!</span>`;
             document.getElementById('t2-lock').classList.add('unlock');
+            document.getElementById('t2-final-reward').innerText = t2CurrentReward;
             
-            setTimeout(() => {
-                document.getElementById('t2-reward-zone').classList.remove('hidden');
-            }, 800);
+            // 모든 하이라이트 제거
+            document.querySelectorAll('.synergy-highlight').forEach(el => el.classList.remove('synergy-highlight'));
+
+            setTimeout(() => { document.getElementById('t2-reward-zone').classList.remove('hidden'); }, 800);
         }
 
-        function triggerExplode(logStr) {
+        function triggerExplode() {
             isSafeGameOver = true;
-            document.getElementById('t2-sys-log').innerHTML = logStr + `<div class="text-red-500 font-bold mt-1">💥 팩 자폭! 보상 소멸!</div>`;
-            document.getElementById('t2-action-log').innerHTML = `<span class="text-red-500 font-bold">EXPLODED!</span>`;
+            document.getElementById('t2-action-log').innerHTML = `<span class="text-red-500 font-bold drop-shadow-md">EXPLODED!</span>`;
             document.getElementById('t2-safe-group').classList.add('explode');
+            document.querySelectorAll('.synergy-highlight').forEach(el => el.classList.remove('synergy-highlight'));
         }
 
     </script>
