@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project kov - UI/UX Wireframes (Alchemy v4.1)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #ffffff; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        .wf-box {
+            width: 100%; height: 100%;
+            background-color: rgba(15, 15, 15, 0.9); 
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        
+        .slot-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.4);
+            transition: all 0.2s;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .slot-zone.drag-over { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .slot-zone.filled { border-style: solid; border-color: rgba(255, 255, 255, 0.1); background: transparent; }
+
+        /* Map Styles */
+        #map-grid {
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            grid-template-rows: repeat(15, 1fr);
+            gap: 2px;
+            background-color: rgba(255,255,255,0.05);
+            padding: 2px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .map-cell {
+            aspect-ratio: 1;
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 2px;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+        }
+        .cell-path { background-color: rgba(16, 185, 129, 0.2); }
+        .cell-preview { background-color: rgba(56, 189, 248, 0.3) !important; border: 1px dashed #38bdf8 !important; }
+        .cell-void { background-color: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239,68,68,0.5); }
+        .cell-target { background-color: rgba(250, 204, 21, 0.2); border: 1px solid rgba(250,204,21,0.5); box-shadow: 0 0 10px rgba(250,204,21,0.5) inset; animation: pulse-yellow 2s infinite; }
+        .player-marker {
+            width: 80%; height: 80%;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981, 0 0 20px #10b981;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        /* Compass Styles */
+        .compass-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            width: 80px; height: 80px;
+            text-align: center;
+            font-size: 10px; font-weight: bold;
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%;
+            padding: 4px;
+        }
+
+        /* Cauldron Styles */
+        .thermometer-container {
+            width: 50px; height: 300px;
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        }
+        .thermometer-fill {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, #3b82f6, #8b5cf6, #ef4444);
+            height: 0%;
+            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 0 0 30px 30px;
+        }
+        .target-zone {
+            position: absolute; left: 0; right: 0;
+            background: rgba(250, 204, 21, 0.3);
+            border-top: 2px dashed #facc15;
+            border-bottom: 2px dashed #facc15;
+            z-index: 5;
+        }
+        .temp-marker {
+            position: absolute; right: -25px;
+            transform: translateY(-50%);
+            color: white; font-weight: bold; font-size: 12px;
+            transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10; text-shadow: 0 0 5px black;
+        }
+        .temp-marker::before { content: '◀'; position: absolute; left: -14px; color: white; }
+
+        @keyframes pulse-yellow { 0%, 100% { opacity: 0.8; } 50% { opacity: 0.4; } }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+    </style>
+</head>
+<body class="h-screen flex flex-col font-sans overflow-hidden">
+
+    <header class="bg-[#0f0f0f] border-b border-[#222] p-4 flex flex-col z-10 shrink-0">
+        <div class="flex justify-between items-center w-full mb-4">
+            <h1 class="text-xl font-bold tracking-[0.2em] text-white">PROJECT <span class="text-gray-500">kov</span> <span class="text-xs font-normal text-emerald-400 ml-2 border border-emerald-400 px-2 py-1 rounded">Alchemy v4.1</span></h1>
+        </div>
+        <div class="flex space-x-1 border-b border-gray-800">
+            <button onclick="switchTab(1)" id="tab-btn-1" class="px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-emerald-500 text-emerald-400 bg-gray-900">🗺️ MAP EXPLORATION</button>
+            <button onclick="switchTab(2)" id="tab-btn-2" class="px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-transparent text-gray-500 hover:text-gray-300">🧪 CAULDRON BREWING</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center p-4 relative bg-[#050505] overflow-hidden">
+        <div class="w-full max-w-[1280px] h-full relative overflow-hidden bg-[#111] shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-[#222] flex">
+            
+            <div class="w-2/3 h-full border-r border-[rgba(255,255,255,0.1)] relative flex flex-col p-6 overflow-hidden">
+                
+                <div id="tab-content-1" class="flex-1 flex flex-col w-full h-full fade-in">
+                    <div class="flex justify-between items-end mb-2">
+                        <div>
+                            <h2 class="text-2xl font-light tracking-widest uppercase text-emerald-400">Map of Alchemy</h2>
+                            <div class="text-[11px] text-gray-500 mt-1 flex items-center gap-4">
+                                <span>방향 지시계를 참고하여 목표(★)로 이동하세요.</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <div class="compass-grid mr-4">
+                                <div></div><div class="text-red-500 flex flex-col items-center justify-center leading-tight"><span class="text-sm">♦</span>UP</div><div></div>
+                                <div class="text-gray-400 flex flex-col items-center justify-center leading-tight"><span class="text-sm">♠</span>LFT</div>
+                                <div class="flex items-center justify-center"><div class="w-2 h-2 rounded-full bg-gray-600"></div></div>
+                                <div class="text-gray-400 flex flex-col items-center justify-center leading-tight"><span class="text-sm">♣</span>RGT</div>
+                                <div></div><div class="text-red-500 flex flex-col items-center justify-center leading-tight"><span class="text-sm">♥</span>DWN</div><div></div>
+                            </div>
+                            <button onclick="resetMap()" class="px-4 py-1.5 border border-gray-700 text-xs text-gray-400 hover:text-white rounded">RESET</button>
+                            <button onclick="claimMapReward()" id="btn-claim-map" class="px-4 py-1.5 bg-yellow-900/30 border border-yellow-600 text-xs text-yellow-500 font-bold rounded hidden">STOP & CLAIM</button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 flex gap-6 items-center justify-center">
+                        <div id="map-grid" class="w-[400px] h-[400px] shadow-[0_0_30px_rgba(0,0,0,0.8)]"></div>
+                        
+                        <div class="w-[160px] flex flex-col gap-4">
+                            <div class="bg-gray-900/50 border border-gray-800 p-3 rounded">
+                                <div class="text-[10px] text-gray-500 mb-2 text-center">COMPASS SLOT</div>
+                                <div id="map-slot" class="slot-zone w-full h-32 relative mb-2" 
+                                     ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleMapDrop(event)">
+                                    <span class="text-gray-600 text-xs text-center pointer-events-none px-2">Drop Card Here</span>
+                                </div>
+                                <div id="map-action-btns" class="flex gap-2 hidden">
+                                    <button onclick="cancelMapMove()" class="flex-1 py-1 bg-red-900/40 text-red-400 text-xs font-bold rounded border border-red-800 hover:bg-red-800 hover:text-white">CANCEL</button>
+                                    <button onclick="confirmMapMove()" class="flex-1 py-1 bg-emerald-600 text-white text-xs font-bold rounded border border-emerald-500 hover:bg-emerald-500">CONFIRM</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-900/50 border border-gray-800 p-3 rounded flex-1">
+                                <div class="text-[10px] text-gray-500 mb-1">STATUS LOG</div>
+                                <div id="map-log" class="text-xs text-sky-300 font-mono break-words">Ready to explore...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-2" class="flex-1 flex flex-col w-full h-full hidden fade-in">
+                    <div class="flex justify-between items-end mb-4">
+                        <div>
+                            <h2 class="text-2xl font-light tracking-widest uppercase text-red-400">Cauldron of Elements</h2>
+                            <div class="text-[11px] text-gray-500 mt-1">♥♦(온도+) ♠♣(온도-) / 목표 구간 진입 시 탈출 가능</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="resetCauldron()" class="px-4 py-1.5 border border-gray-700 text-xs text-gray-400 hover:text-white rounded">RESET</button>
+                            <button onclick="claimCauldronReward()" id="btn-claim-cauldron" class="px-4 py-1.5 bg-yellow-900/30 border border-yellow-600 text-xs text-yellow-500 font-bold rounded opacity-50 cursor-not-allowed">STOP & CLAIM</button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 flex gap-8 items-center justify-center relative">
+                        
+                        <div class="w-48 flex flex-col h-[350px] bg-gray-900/50 p-3 rounded border border-gray-800">
+                            <div class="text-[10px] text-gray-500 mb-2 font-bold tracking-widest">EXPECTED SCORE</div>
+                            <div class="mb-3 bg-black/60 p-2 rounded text-xs border border-gray-700">
+                                <div class="flex justify-between text-gray-400 mb-1"><span>Base:</span> <span id="c-base" class="text-white">0</span></div>
+                                <div class="flex justify-between text-gray-400 mb-2 border-b border-gray-700 pb-1"><span>Multi:</span> <span id="c-multi" class="text-sky-300">1.0</span></div>
+                                <div class="flex justify-between font-bold">
+                                    <span class="text-yellow-600">Total:</span> 
+                                    <span id="c-total" class="text-yellow-400 text-sm">0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="text-[10px] text-gray-500 mb-1 font-bold tracking-widest">CARD HISTORY</div>
+                            <div id="cauldron-history" class="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-1">
+                                <div class="text-xs text-gray-600 italic text-center mt-4">No cards added yet.</div>
+                            </div>
+                        </div>
+
+                        <div class="relative h-[350px] flex items-center ml-4">
+                            <div class="text-[10px] text-gray-500 absolute -left-8 top-0">100°</div>
+                            <div class="text-[10px] text-gray-500 absolute -left-6 bottom-0">0°</div>
+                            
+                            <div class="thermometer-container" id="thermo-bg">
+                                <div id="thermo-target" class="target-zone" style="bottom: 60%; height: 20%;"></div>
+                                <div id="thermo-fill" class="thermometer-fill" style="height: 0%;"></div>
+                            </div>
+                            <div id="thermo-marker" class="temp-marker" style="bottom: 0%;">0°C</div>
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            <div class="text-4xl mb-4 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]">🧪</div>
+                            <div class="bg-gray-900/50 border border-gray-800 p-4 rounded-xl w-48">
+                                <div class="text-[10px] text-gray-500 mb-2 text-center">CAULDRON SLOT</div>
+                                <div id="cauldron-slot" class="slot-zone w-full h-40 relative" 
+                                     ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleCauldronDrop(event)">
+                                    <span class="text-gray-600 text-xs text-center pointer-events-none px-4">Drop Card Here</span>
+                                </div>
+                            </div>
+                            <div id="cauldron-log" class="mt-4 text-xs text-gray-400 h-10 text-center">가마솥이 차갑습니다.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="w-1/3 h-full flex flex-col bg-[#0a0a0a] min-h-0 relative">
+                <div class="p-4 border-b border-[rgba(255,255,255,0.1)] flex justify-between items-end shrink-0">
+                    <span class="text-xs tracking-widest text-gray-400 font-bold uppercase">Ingredients (Cards)</span>
+                    <button onclick="renderInventory()" class="text-[10px] border border-gray-600 px-2 py-0.5 rounded text-gray-400 hover:text-white">REFILL DECK</button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 grid grid-cols-3 gap-3 content-start" id="inventory-grid"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- GLOBAL & INVENTORY ---
+        let currentTab = 1;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderInventory();
+            initMap();
+            initCauldron();
+        });
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.getElementById('tab-btn-1').className = tabId === 1 
+                ? "px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-emerald-500 text-emerald-400 bg-gray-900"
+                : "px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-transparent text-gray-500 hover:text-gray-300";
+            document.getElementById('tab-btn-2').className = tabId === 2 
+                ? "px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-red-500 text-red-400 bg-gray-900"
+                : "px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-transparent text-gray-500 hover:text-gray-300";
+            
+            document.getElementById('tab-content-1').style.display = tabId === 1 ? 'flex' : 'none';
+            document.getElementById('tab-content-2').style.display = tabId === 2 ? 'flex' : 'none';
+            
+            renderInventory(); 
+            if(tabId === 1) cancelMapMove(); // 탭 이동 시 맵 미확정 상태면 초기화
+        }
+
+        function renderInventory() {
+            const grid = document.getElementById('inventory-grid');
+            const suits = [{s:'♠', c:'text-gray-400', color:'black'}, {s:'♥', c:'text-red-500', color:'red'}, {s:'♣', c:'text-gray-400', color:'black'}, {s:'♦', c:'text-red-500', color:'red'}];
+            const values = ['A', '2', '3', '5', '7', '10', 'J', 'Q', 'K'];
+            let normalCards = [];
+            for(let i = 0; i < 15; i++) {
+                const suit = suits[Math.floor(Math.random() * suits.length)];
+                const val = values[Math.floor(Math.random() * values.length)];
+                normalCards.push(`
+                    <div id="inv-card-${i}" class="aspect-[2/3] cursor-grab hover:-translate-y-1 transition-transform relative" 
+                         draggable="true" 
+                         ondragstart="handleDragStart(event, '${suit.s}', '${val}', '${suit.c}', '${suit.color}', 'inv-card-${i}')"
+                         onmouseenter="previewMapHover('${suit.s}', '${val}')"
+                         onmouseleave="clearMapHover()">
+                        <div class="wf-box bg-[rgba(255,255,255,0.02)]">
+                            <span class="text-[10px] ${suit.c} absolute top-1 left-1">${suit.s}</span>
+                            <span class="text-xl ${suit.c} font-bold">${val}</span>
+                        </div>
+                    </div>
+                `);
+            }
+            grid.innerHTML = normalCards.join('');
+        }
+
+        function handleDragStart(e, suit, val, colorClass, baseColor, domId) {
+            e.dataTransfer.setData('text/plain', JSON.stringify({suit, val, colorClass, baseColor, domId}));
+        }
+        function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+
+        function getCardNumericValue(val) {
+            if(val === 'A') return 1;
+            if(['J','Q','K'].includes(val)) return 3; 
+            return parseInt(val);
+        }
+
+        // --- TAB 1: MAP LOGIC ---
+        const MAP_SIZE = 15;
+        let playerPos = {x: 7, y: 7};
+        let isMapGameOver = false;
+        let isMoving = false;
+        let pendingMove = null; 
+        let previewPathCells = [];
+
+        function initMap() {
+            playerPos = {x: 7, y: 7};
+            isMapGameOver = false;
+            isMoving = false;
+            pendingMove = null;
+            document.getElementById('map-log').innerHTML = "<span class='text-gray-400'>Ready to explore...</span>";
+            document.getElementById('btn-claim-map').classList.add('hidden');
+            resetMapSlot();
+            drawMap();
+        }
+
+        function resetMapSlot() {
+            document.getElementById('map-slot').innerHTML = '<span class="text-gray-600 text-xs text-center pointer-events-none px-2">Drop Card Here</span>';
+            document.getElementById('map-slot').classList.remove('filled');
+            document.getElementById('map-action-btns').classList.add('hidden');
+            clearPreviewPath();
+        }
+
+        function drawMap() {
+            const grid = document.getElementById('map-grid');
+            grid.innerHTML = '';
+            
+            const targets = [{x: 2, y: 2}, {x: 12, y: 2}, {x: 7, y: 12}];
+            const voids = [{x: 5, y: 5}, {x: 9, y: 5}, {x: 5, y: 9}, {x: 9, y: 9}, {x: 7, y: 3}, {x: 3, y: 7}];
+
+            for(let y = 0; y < MAP_SIZE; y++) {
+                for(let x = 0; x < MAP_SIZE; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'map-cell';
+                    cell.id = `cell-${x}-${y}`;
+                    
+                    if(targets.some(t => t.x === x && t.y === y)) { cell.classList.add('cell-target'); cell.innerText = '★'; }
+                    else if(voids.some(v => v.x === x && v.y === y)) { cell.classList.add('cell-void'); cell.innerText = '☠'; }
+                    
+                    if(x === playerPos.x && y === playerPos.y) {
+                        const marker = document.createElement('div');
+                        marker.className = 'player-marker';
+                        cell.appendChild(marker);
+                    }
+                    grid.appendChild(cell);
+                }
+            }
+        }
+
+        // 호버 프리뷰
+        function previewMapHover(suit, val) {
+            if(currentTab !== 1 || isMapGameOver || isMoving || pendingMove) return;
+            const dist = Math.min(getCardNumericValue(val), 5);
+            let dirName = "";
+            if(suit === '♦') dirName = "위쪽(UP)";
+            else if(suit === '♥') dirName = "아래쪽(DOWN)";
+            else if(suit === '♠') dirName = "왼쪽(LEFT)";
+            else if(suit === '♣') dirName = "오른쪽(RIGHT)";
+            
+            document.getElementById('map-log').innerHTML = `<span class="text-gray-400">예상 이동: <span class="text-white font-bold">${dirName}</span>으로 <span class="text-white font-bold">${dist}</span>칸</span>`;
+        }
+        function clearMapHover() {
+            if(currentTab !== 1 || isMapGameOver || isMoving || pendingMove) return;
+            document.getElementById('map-log').innerHTML = "<span class='text-gray-400'>Ready to explore...</span>";
+        }
+
+        function handleMapDrop(e) {
+            e.preventDefault();
+            const slot = e.currentTarget;
+            slot.classList.remove('drag-over');
+            if(isMapGameOver || currentTab !== 1 || isMoving) return;
+
+            // 이미 슬롯에 카드가 있으면 기존 카드 복구
+            if(pendingMove) cancelMapMove();
+
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            pendingMove = data;
+            
+            document.getElementById(data.domId).classList.add('opacity-30', 'pointer-events-none');
+
+            slot.innerHTML = `<div class="wf-box" style="animation: popIn 0.3s forwards"><span class="text-[10px] ${data.colorClass} absolute top-1 left-1">${data.suit}</span><span class="text-2xl ${data.colorClass} font-bold">${data.val}</span></div>`;
+            slot.classList.add('filled');
+
+            document.getElementById('map-action-btns').classList.remove('hidden');
+            
+            drawPreviewPath(data.suit, data.val);
+        }
+
+        function drawPreviewPath(suit, val) {
+            clearPreviewPath();
+            let dist = Math.min(getCardNumericValue(val), 5);
+            let dx = 0, dy = 0, dirName = "";
+
+            if(suit === '♦') { dy = -1; dirName = "UP"; }
+            else if(suit === '♥') { dy = 1; dirName = "DOWN"; }
+            else if(suit === '♠') { dx = -1; dirName = "LEFT"; }
+            else if(suit === '♣') { dx = 1; dirName = "RIGHT"; }
+
+            document.getElementById('map-log').innerHTML = `<span class="text-sky-300">경로 확인 중: ${dirName}으로 ${dist}칸<br/>(CONFIRM을 눌러 이동 확정)</span>`;
+
+            let tempX = playerPos.x;
+            let tempY = playerPos.y;
+            for(let i=0; i<dist; i++) {
+                tempX += dx; tempY += dy;
+                if(tempX < 0 || tempX >= MAP_SIZE || tempY < 0 || tempY >= MAP_SIZE) break;
+                const cell = document.getElementById(`cell-${tempX}-${tempY}`);
+                if(cell) {
+                    cell.classList.add('cell-preview');
+                    previewPathCells.push(cell);
+                }
+            }
+        }
+
+        function clearPreviewPath() {
+            previewPathCells.forEach(cell => cell.classList.remove('cell-preview'));
+            previewPathCells = [];
+        }
+
+        function cancelMapMove() {
+            if(!pendingMove) return;
+            const originalCard = document.getElementById(pendingMove.domId);
+            if(originalCard) originalCard.classList.remove('opacity-30', 'pointer-events-none');
+            pendingMove = null;
+            resetMapSlot();
+            document.getElementById('map-log').innerHTML = "<span class='text-gray-400'>이동 취소됨.</span>";
+        }
+
+        function confirmMapMove() {
+            if(!pendingMove) return;
+            isMoving = true;
+            document.getElementById('map-action-btns').classList.add('hidden');
+            clearPreviewPath();
+            
+            const suit = pendingMove.suit;
+            const val = pendingMove.val;
+            
+            // 삭제 처리 확정
+            const originalCard = document.getElementById(pendingMove.domId);
+            if(originalCard) originalCard.style.visibility = 'hidden'; 
+            
+            let dist = Math.min(getCardNumericValue(val), 5);
+            let dx = 0, dy = 0;
+            if(suit === '♦') dy = -1; else if(suit === '♥') dy = 1; else if(suit === '♠') dx = -1; else if(suit === '♣') dx = 1;
+
+            document.getElementById('map-log').innerHTML = `<span class="text-emerald-400 font-bold">이동 중...</span>`;
+
+            let currentStep = 0;
+            const moveInterval = setInterval(() => {
+                if(currentStep >= dist || isMapGameOver) {
+                    clearInterval(moveInterval);
+                    isMoving = false;
+                    pendingMove = null;
+                    resetMapSlot();
+                    checkMapTile();
+                    return;
+                }
+
+                document.getElementById(`cell-${playerPos.x}-${playerPos.y}`).classList.add('cell-path');
+                playerPos.x += dx; playerPos.y += dy;
+
+                if(playerPos.x < 0 || playerPos.x >= MAP_SIZE || playerPos.y < 0 || playerPos.y >= MAP_SIZE) {
+                    clearInterval(moveInterval);
+                    mapGameOver("맵 밖으로 벗어났습니다. 탐험 실패!");
+                    return;
+                }
+
+                drawMap(); 
+                currentStep++;
+                
+                const currentCell = document.getElementById(`cell-${playerPos.x}-${playerPos.y}`);
+                if(currentCell && currentCell.classList.contains('cell-void')) {
+                    clearInterval(moveInterval);
+                    document.getElementById('map-grid').classList.add('shake');
+                    mapGameOver("☠ 독성 지대를 밟았습니다. 탐험 실패!");
+                }
+            }, 200);
+        }
+
+        function checkMapTile() {
+            if(isMapGameOver) return;
+            const currentCell = document.getElementById(`cell-${playerPos.x}-${playerPos.y}`);
+            if(currentCell && currentCell.classList.contains('cell-target')) {
+                document.getElementById('map-log').innerHTML = `<span class="text-yellow-400 font-bold">★ 레시피 노드 발견! 탈출 가능!</span>`;
+                document.getElementById('btn-claim-map').classList.remove('hidden');
+                document.getElementById('btn-claim-map').classList.add('pop-in');
+            } else {
+                document.getElementById('map-log').innerHTML = "<span class='text-gray-400'>안전 구역. 다음 방향을 설정하세요.</span>";
+            }
+        }
+
+        function mapGameOver(msg) {
+            isMapGameOver = true;
+            isMoving = false;
+            document.getElementById('map-log').innerHTML = `<span class="text-red-500 font-bold">${msg}</span>`;
+            document.getElementById('btn-claim-map').classList.add('hidden');
+            document.getElementById('map-action-btns').classList.add('hidden');
+        }
+
+        function claimMapReward() { alert("🎉 성공적으로 연금술 지도를 그려내고 탈출했습니다!"); resetMap(); }
+        function resetMap() { renderInventory(); initMap(); }
+
+
+        // --- TAB 2: CAULDRON LOGIC ---
+        let currentTemp = 0;
+        let targetMin = 0; let targetMax = 0;
+        let isCauldronGameOver = false;
+        
+        let cBaseScore = 0;
+        let cMulti = 1.0;
+        let cardHistoryCount = 0;
+
+        function initCauldron() {
+            currentTemp = 20; 
+            isCauldronGameOver = false;
+            cBaseScore = 0; cMulti = 1.0; cardHistoryCount = 0;
+            
+            const zoneSize = 15;
+            targetMin = Math.floor(Math.random() * 40) + 40; 
+            targetMax = targetMin + zoneSize;
+            
+            document.getElementById('thermo-target').style.bottom = `${targetMin}%`;
+            document.getElementById('thermo-target').style.height = `${zoneSize}%`;
+            
+            document.getElementById('cauldron-slot').innerHTML = '<span class="text-gray-600 text-xs text-center pointer-events-none px-4">Drop Card Here</span>';
+            document.getElementById('cauldron-slot').classList.remove('filled');
+            document.getElementById('cauldron-log').innerText = `목표 온도: ${targetMin}°C ~ ${targetMax}°C`;
+            
+            document.getElementById('cauldron-history').innerHTML = '<div class="text-xs text-gray-600 italic text-center mt-4">No cards added yet.</div>';
+            updateCauldronScoreUI();
+            updateThermometer();
+        }
+
+        function handleCauldronDrop(e) {
+            e.preventDefault();
+            const slot = e.currentTarget;
+            slot.classList.remove('drag-over');
+            if(isCauldronGameOver || currentTab !== 2) return;
+
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const originalCard = document.getElementById(data.domId);
+            if(originalCard) originalCard.style.visibility = 'hidden'; // 완전 소모
+
+            slot.innerHTML = `<div class="wf-box" style="animation: popIn 0.3s forwards"><span class="text-[10px] ${data.colorClass} absolute top-1 left-1">${data.suit}</span><span class="text-2xl ${data.colorClass} font-bold">${data.val}</span></div>`;
+            slot.classList.add('filled');
+
+            processCauldronTemp(data.suit, data.val, data.colorClass);
+            
+            setTimeout(() => {
+                slot.innerHTML = '<span class="text-gray-600 text-xs text-center pointer-events-none px-4">Drop Card Here</span>';
+                slot.classList.remove('filled');
+            }, 600);
+        }
+
+        function processCauldronTemp(suit, val, colorClass) {
+            // 온도 변화폭
+            let magnitude = getCardNumericValue(val);
+            if(['J','Q','K'].includes(val)) magnitude = 15; 
+            if(val === 'A') magnitude = 5;
+
+            // 수정된 로직: Red(♥,♦)는 +, Black(♠,♣)은 -
+            let change = (suit === '♥' || suit === '♦') ? magnitude : -magnitude;
+            currentTemp += change;
+            
+            // 점수 체급
+            let cardScore = (val === 'A') ? 15 : (['J','Q','K'].includes(val) ? 12 : parseInt(val));
+            cBaseScore += cardScore;
+            cardHistoryCount++;
+            cMulti = 1.0 + (cardHistoryCount * 0.1);
+            updateCauldronScoreUI();
+
+            // 히스토리 리스트 추가
+            addHistoryItem(suit, val, colorClass, change);
+
+            let logMsg = change > 0 ? `<span class="text-red-400 font-bold">온도 상승 (+${change}°)</span>` : `<span class="text-blue-400 font-bold">온도 하락 (${change}°)</span>`;
+            document.getElementById('cauldron-log').innerHTML = logMsg;
+
+            updateThermometer();
+
+            setTimeout(() => {
+                if(currentTemp >= 100) { cauldronGameOver("💥 OVERHEAT! 가마솥이 폭발했습니다!"); }
+                else if(currentTemp <= 0) { cauldronGameOver("🧊 FROZEN! 재료가 모두 얼어붙었습니다!"); }
+                else { checkCauldronTarget(); }
+            }, 500);
+        }
+
+        function addHistoryItem(suit, val, colorClass, change) {
+            const historyContainer = document.getElementById('cauldron-history');
+            if(cardHistoryCount === 1) historyContainer.innerHTML = ''; // 플레이스홀더 삭제
+            
+            const changeStr = change > 0 ? `+${change}°` : `${change}°`;
+            const changeColor = change > 0 ? 'text-red-400' : 'text-blue-400';
+            
+            const item = document.createElement('div');
+            item.className = "flex justify-between items-center bg-black/40 p-1.5 rounded border border-gray-700/50 text-xs fade-in";
+            item.innerHTML = `
+                <span class="${colorClass} font-bold">${suit} ${val}</span>
+                <span class="${changeColor} font-mono">${changeStr}</span>
+            `;
+            // 맨 위에 추가
+            historyContainer.insertBefore(item, historyContainer.firstChild);
+        }
+
+        function updateCauldronScoreUI() {
+            document.getElementById('c-base').innerText = cBaseScore;
+            document.getElementById('c-multi').innerText = cMulti.toFixed(1);
+            document.getElementById('c-total').innerText = Math.floor(cBaseScore * cMulti);
+        }
+
+        function updateThermometer() {
+            let displayTemp = Math.max(0, Math.min(100, currentTemp));
+            document.getElementById('thermo-fill').style.height = `${displayTemp}%`;
+            document.getElementById('thermo-marker').style.bottom = `${displayTemp}%`;
+            document.getElementById('thermo-marker').innerText = `${currentTemp}°C`;
+
+            let fillDiv = document.getElementById('thermo-fill');
+            if(currentTemp > 80) fillDiv.style.background = 'linear-gradient(to top, #ef4444, #b91c1c)';
+            else if(currentTemp < 30) fillDiv.style.background = 'linear-gradient(to top, #1e3a8a, #3b82f6)';
+            else fillDiv.style.background = 'linear-gradient(to top, #3b82f6, #8b5cf6, #ef4444)';
+        }
+
+        function checkCauldronTarget() {
+            const btn = document.getElementById('btn-claim-cauldron');
+            if(currentTemp >= targetMin && currentTemp <= targetMax) {
+                document.getElementById('cauldron-log').innerHTML = `<span class="text-yellow-400 font-bold">안정적인 배합 구간 진입! 추출 가능!</span>`;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.classList.add('pop-in', 'shadow-[0_0_15px_rgba(250,204,21,0.4)]');
+            } else {
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.classList.remove('pop-in', 'shadow-[0_0_15px_rgba(250,204,21,0.4)]');
+            }
+        }
+
+        function cauldronGameOver(msg) {
+            isCauldronGameOver = true;
+            document.getElementById('cauldron-log').innerHTML = `<span class="text-red-500 font-bold">${msg}</span>`;
+            document.getElementById('thermo-bg').classList.add('shake');
+            document.getElementById('btn-claim-cauldron').classList.add('opacity-50', 'cursor-not-allowed');
+            document.getElementById('c-total').innerText = "0";
+            document.getElementById('c-total').className = "text-red-500 text-sm";
+        }
+
+        function claimCauldronReward() {
+            if(currentTemp >= targetMin && currentTemp <= targetMax) {
+                let finalScore = Math.floor(cBaseScore * cMulti);
+                let isPerfect = (currentTemp === Math.floor((targetMin+targetMax)/2));
+                if(isPerfect) alert(`✨ MASTERPIECE! 완벽한 온도로 전설의 영약을 추출했습니다! (획득: ${finalScore*2} pts)`);
+                else alert(`🧪 성공적으로 포션을 추출했습니다! (획득: ${finalScore} pts)`);
+                resetCauldron();
+            }
+        }
+        function resetCauldron() { 
+            document.getElementById('c-total').className = "text-yellow-400 text-sm";
+            renderInventory(); 
+            initCauldron(); 
+        }
+
+    </script>
+</body>
+</html>
