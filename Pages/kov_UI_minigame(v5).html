@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project kov - UI/UX Wireframes (Pack Opening v5.0)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #ffffff; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        .wf-box {
+            width: 100%; height: 100%;
+            background-color: rgba(15, 15, 15, 0.9); 
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        
+        .slot-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.4);
+            transition: all 0.2s;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .slot-zone.drag-over { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .slot-zone.filled { border-style: solid; border-color: rgba(255, 255, 255, 0.1); background: transparent; }
+
+        /* Booster Pack Styles */
+        .booster-pack {
+            width: 140px; height: 200px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border: 4px solid #60a5fa;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+            cursor: pointer;
+            transition: transform 0.2s, filter 0.2s;
+            display: flex; flex-direction: column; items-center; justify-content: center;
+            text-align: center; overflow: hidden;
+        }
+        .booster-pack:hover { transform: scale(1.05) translateY(-5px); filter: brightness(1.2); }
+        .booster-pack::before {
+            content: 'PREMIUM';
+            position: absolute; top: 10px; left: 0; right: 0;
+            color: rgba(255,255,255,0.5); font-weight: 900; letter-spacing: 4px; font-size: 10px;
+        }
+        
+        /* Safe / Lock Styles */
+        .safe-container {
+            position: relative; width: 160px; height: 220px;
+        }
+        .safe-lock {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px;
+            background: #333; border: 4px solid #777; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10; box-shadow: 0 0 15px rgba(0,0,0,0.8);
+            transition: all 0.3s;
+        }
+        .safe-chain {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 8px; height: 100%; background: repeating-linear-gradient(to bottom, #555, #555 10px, #222 10px, #222 20px);
+            z-index: 5;
+        }
+
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0) rotate(-2deg); } 20%, 80% { transform: translate3d(4px, 0, 0) rotate(2deg); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0) rotate(-4deg); } 40%, 60% { transform: translate3d(6px, 0, 0) rotate(4deg); } }
+        
+        .explode { animation: explodeAnim 0.6s forwards; }
+        @keyframes explodeAnim {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.3); filter: brightness(3) drop-shadow(0 0 50px red); opacity: 1; }
+            100% { transform: scale(0); filter: brightness(0); opacity: 0; }
+        }
+        
+        .unlock { animation: unlockAnim 0.8s forwards; }
+        @keyframes unlockAnim {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); border-color: #facc15; box-shadow: 0 0 30px #facc15; }
+            100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col font-sans overflow-hidden">
+
+    <header class="bg-[#0f0f0f] border-b border-[#222] p-4 flex flex-col z-10 shrink-0">
+        <div class="flex justify-between items-center w-full mb-2">
+            <h1 class="text-xl font-bold tracking-[0.2em] text-white">PROJECT <span class="text-gray-500">kov</span> <span class="text-xs font-normal text-emerald-400 ml-2 border border-emerald-400 px-2 py-1 rounded">Pack Opening v5.0</span></h1>
+            <button onclick="resetGame()" class="px-4 py-1.5 border border-gray-600 text-xs text-gray-400 hover:text-white rounded">ALL RESET</button>
+        </div>
+        
+        <div id="dev-tools" class="flex items-center space-x-4 border border-sky-900/50 bg-sky-900/20 px-4 py-1.5 rounded text-xs text-sky-200 self-start mb-2 hidden">
+            <span class="font-bold text-sky-400 tracking-widest">DEV (금고 룰):</span>
+            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devRule" value="normal" checked><span>Normal (순수 확률)</span></label>
+            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devRule" value="optionA"><span class="text-emerald-400">Option A (천장: 누적 100pt 시 100%)</span></label>
+            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devRule" value="optionB"><span class="text-red-400">Option B (과열: 실패시 확률+1%, 자폭+2%)</span></label>
+        </div>
+
+        <div class="flex space-x-1 border-b border-gray-800">
+            <button onclick="switchTab(1)" id="tab-btn-1" class="px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-purple-500 text-purple-400 bg-gray-900">🔮 SACRIFICE PACK</button>
+            <button onclick="switchTab(2)" id="tab-btn-2" class="px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-transparent text-gray-500 hover:text-gray-300">🔐 CRACK THE SAFE</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center p-4 relative bg-[#050505] overflow-hidden">
+        <div class="w-full max-w-[1280px] h-full relative overflow-hidden bg-[#111] shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-[#222] flex">
+            
+            <div class="w-2/3 h-full border-r border-[rgba(255,255,255,0.1)] relative flex flex-col p-6 overflow-hidden">
+                
+                <div id="tab-content-1" class="flex-1 flex flex-col w-full h-full fade-in">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-light tracking-widest uppercase text-purple-400">The Sacrifice Pack</h2>
+                        <div class="text-[11px] text-gray-500 mt-1">하위 카드를 제물로 바쳐 새로운 팩을 연성하세요. (최대 5장)</div>
+                    </div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center relative">
+                        <div id="t1-craft-zone" class="w-full max-w-lg">
+                            <div class="flex justify-between text-xs text-gray-500 mb-2 px-2">
+                                <span>SACRIFICE SLOTS</span>
+                                <span id="t1-counter">0 / 5</span>
+                            </div>
+                            <div class="bg-gray-900/50 border border-purple-900/50 p-4 rounded-xl flex gap-3 h-40" id="t1-slots">
+                                </div>
+                            <div class="mt-6 flex justify-center">
+                                <button onclick="craftPack()" id="btn-craft" class="px-12 py-3 bg-purple-900/30 border border-purple-500 text-purple-400 font-bold hover:bg-purple-600 hover:text-white transition-colors tracking-widest rounded shadow-[0_0_15px_rgba(168,85,247,0.2)]">CRAFT PACK</button>
+                            </div>
+                        </div>
+
+                        <div id="t1-pack-zone" class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 hidden z-20 backdrop-blur-sm">
+                            <h3 class="text-xl text-white tracking-widest mb-8 font-bold animate-pulse">팩이 연성되었습니다! 클릭하여 열어보세요.</h3>
+                            <div class="booster-pack" onclick="openCraftedPack()">
+                                <div class="text-4xl">🔮</div>
+                                <div class="mt-2 text-white font-black tracking-widest" id="t1-pack-tier">RARE PACK</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-2" class="flex-1 flex flex-col w-full h-full hidden fade-in">
+                    <div class="mb-4">
+                        <h2 class="text-2xl font-light tracking-widest uppercase text-yellow-500">Crack The Safe</h2>
+                        <div class="text-[11px] text-gray-500 mt-1">카드를 하나씩 소모하여 금고를 여세요. 높은 카드일수록 확률이 상승합니다.</div>
+                    </div>
+                    
+                    <div class="flex-1 flex items-center justify-center gap-12 relative">
+                        
+                        <div class="w-56 bg-gray-900/80 border border-gray-700 p-4 rounded-lg shadow-lg">
+                            <h3 class="text-xs font-bold text-gray-400 tracking-widest border-b border-gray-700 pb-2 mb-3">손익 계산기 (ROI)</h3>
+                            
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs text-gray-500">팩 기대 가치</span>
+                                <span class="text-emerald-400 font-bold">50 pts</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-xs text-red-400/80">누적 소모 가치</span>
+                                <span id="t2-sunk-cost" class="text-red-400 font-bold text-lg">0 pts</span>
+                            </div>
+
+                            <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden relative mb-1">
+                                <div id="t2-cost-bar" class="h-full bg-red-500 transition-all" style="width: 0%;"></div>
+                                <div class="absolute top-0 left-[100%] w-0.5 h-full bg-emerald-400 z-10 -ml-0.5" title="Break-even Point (50pts)"></div>
+                            </div>
+                            <div class="text-[9px] text-gray-600 text-right mb-4">손익분기점(50pts)</div>
+                            
+                            <div id="t2-sys-log" class="text-[10px] text-sky-300 font-mono bg-black/50 p-2 rounded h-16 overflow-y-auto break-words">시스템 대기 중...</div>
+                        </div>
+
+                        <div class="safe-container flex flex-col items-center">
+                            <div id="t2-safe-group" class="relative">
+                                <div class="booster-pack opacity-50 filter grayscale">
+                                    <div class="text-4xl">💎</div>
+                                    <div class="mt-2 text-white font-black tracking-widest text-sm">PREMIUM</div>
+                                </div>
+                                <div id="t2-chain" class="safe-chain"></div>
+                                <div id="t2-lock" class="safe-lock text-2xl">🔒</div>
+                            </div>
+                        </div>
+
+                        <div class="w-40 flex flex-col items-center">
+                            <div class="bg-gray-900/50 border border-gray-800 p-3 rounded-xl w-full">
+                                <div class="text-[10px] text-gray-500 mb-2 text-center tracking-widest">INSERT CARD</div>
+                                <div id="t2-slot" class="slot-zone w-full h-40 relative" 
+                                     ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleHackDrop(event)">
+                                    <span class="text-gray-600 text-xs text-center pointer-events-none px-4">Drop Here</span>
+                                </div>
+                            </div>
+                            <div id="t2-action-log" class="mt-3 text-[11px] text-center text-gray-400 h-8"></div>
+                        </div>
+
+                    </div>
+                    
+                    <div id="t2-reward-zone" class="absolute inset-0 flex flex-col items-center justify-center bg-black/90 hidden z-20 backdrop-blur-sm fade-in">
+                        <div class="booster-pack !scale-125 !filter-none" style="box-shadow: 0 0 50px rgba(250,204,21,0.6); border-color: #facc15; background: linear-gradient(135deg, #a16207, #facc15);">
+                            <div class="text-5xl drop-shadow-lg">✨</div>
+                            <div class="mt-4 text-white font-black tracking-widest">SUCCESS!</div>
+                            <div class="text-xs text-yellow-100 mt-1">+50 PTS</div>
+                        </div>
+                        <button onclick="resetGame()" class="mt-12 px-8 py-2 bg-yellow-600 hover:bg-yellow-500 text-white font-bold tracking-widest rounded transition-colors">CONTINUE</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="w-1/3 h-full flex flex-col bg-[#0a0a0a] min-h-0 relative">
+                <div class="p-4 border-b border-[rgba(255,255,255,0.1)] flex justify-between items-end shrink-0">
+                    <span class="text-xs tracking-widest text-gray-400 font-bold uppercase">Inventory</span>
+                    <button onclick="renderInventory()" class="text-[10px] border border-gray-600 px-2 py-0.5 rounded text-gray-400 hover:text-white">REFILL DECK</button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 grid grid-cols-3 gap-3 content-start" id="inventory-grid"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- GLOBAL ---
+        let currentTab = 1;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderInventory();
+            initTab1();
+            initTab2();
+        });
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.getElementById('tab-btn-1').className = tabId === 1 
+                ? "px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-purple-500 text-purple-400 bg-gray-900"
+                : "px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-transparent text-gray-500 hover:text-gray-300";
+            document.getElementById('tab-btn-2').className = tabId === 2 
+                ? "px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-yellow-500 text-yellow-400 bg-gray-900"
+                : "px-6 py-2 text-sm font-bold tracking-widest transition-colors border-b-2 border-transparent text-gray-500 hover:text-gray-300";
+            
+            document.getElementById('tab-content-1').style.display = tabId === 1 ? 'flex' : 'none';
+            document.getElementById('tab-content-2').style.display = tabId === 2 ? 'flex' : 'none';
+            document.getElementById('dev-tools').style.display = tabId === 2 ? 'flex' : 'none';
+            
+            resetGame();
+        }
+
+        function renderInventory() {
+            const grid = document.getElementById('inventory-grid');
+            const suits = [{s:'♠', c:'text-gray-400'}, {s:'♥', c:'text-red-500'}, {s:'♣', c:'text-gray-400'}, {s:'♦', c:'text-red-500'}];
+            const values = ['A', '2', '3', '5', '7', '10', 'J', 'Q', 'K'];
+            let html = [`
+                <div class="aspect-[2/3] cursor-grab hover:-translate-y-1 transition-transform relative" draggable="true" ondragstart="handleDragStart(event, 'JOKER', 'JOKER', 'text-purple-400')">
+                    <div class="wf-box bg-[rgba(255,255,255,0.02)] border-purple-500/50">
+                        <span class="text-xl text-purple-400 font-black">JOKER</span>
+                    </div>
+                </div>
+            `];
+            for(let i = 0; i < 14; i++) {
+                const suit = suits[Math.floor(Math.random() * suits.length)];
+                const val = values[Math.floor(Math.random() * values.length)];
+                html.push(`
+                    <div id="inv-card-${i}" class="aspect-[2/3] cursor-grab hover:-translate-y-1 transition-transform relative" 
+                         draggable="true" ondragstart="handleDragStart(event, '${suit.s}', '${val}', '${suit.c}', 'inv-card-${i}')">
+                        <div class="wf-box bg-[rgba(255,255,255,0.02)]">
+                            <span class="text-[10px] ${suit.c} absolute top-1 left-1">${suit.s}</span>
+                            <span class="text-xl ${suit.c} font-bold">${val}</span>
+                        </div>
+                    </div>
+                `);
+            }
+            grid.innerHTML = html.join('');
+        }
+
+        function handleDragStart(e, suit, val, colorClass, domId) {
+            e.dataTransfer.setData('text/plain', JSON.stringify({suit, val, colorClass, domId}));
+        }
+        function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+
+        function getCardValue(val) {
+            if(val === 'A') return 15;
+            if(val === 'K') return 13;
+            if(val === 'Q') return 12;
+            if(val === 'J') return 11;
+            if(val === 'JOKER') return 20;
+            return parseInt(val);
+        }
+
+        function resetGame() {
+            renderInventory();
+            if(currentTab === 1) initTab1();
+            if(currentTab === 2) initTab2();
+        }
+
+        // --- TAB 1: SACRIFICE PACK (제물 연성) ---
+        let t1Cards = [];
+
+        function initTab1() {
+            t1Cards = [];
+            const container = document.getElementById('t1-slots');
+            container.innerHTML = '';
+            for(let i=0; i<5; i++) {
+                const slot = document.createElement('div');
+                slot.className = "slot-zone flex-1 h-full relative";
+                slot.ondragover = handleDragOver;
+                slot.ondragleave = handleDragLeave;
+                slot.ondrop = handleCraftDrop;
+                container.appendChild(slot);
+            }
+            document.getElementById('t1-counter').innerText = "0 / 5";
+            document.getElementById('t1-pack-zone').classList.add('hidden');
+        }
+
+        function handleCraftDrop(e) {
+            e.preventDefault();
+            const slot = e.currentTarget;
+            slot.classList.remove('drag-over');
+            if(slot.classList.contains('filled') || t1Cards.length >= 5) return;
+
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            if(data.domId) document.getElementById(data.domId).style.visibility = 'hidden';
+
+            slot.innerHTML = `<div class="wf-box pop-in"><span class="text-[10px] ${data.colorClass} absolute top-1 left-1">${data.suit}</span><span class="text-2xl ${data.colorClass} font-bold">${data.val}</span></div>`;
+            slot.classList.add('filled');
+            
+            t1Cards.push(data);
+            document.getElementById('t1-counter').innerText = `${t1Cards.length} / 5`;
+        }
+
+        function craftPack() {
+            if(t1Cards.length === 0) return alert('최소 1장의 제물이 필요합니다.');
+            
+            let sum = t1Cards.reduce((acc, curr) => acc + getCardValue(curr.val), 0);
+            let tier = "COMMON PACK";
+            let color = "#9ca3af"; // gray
+            
+            if(sum > 40) { tier = "LEGENDARY PACK"; color = "#facc15"; }
+            else if(sum > 20) { tier = "RARE PACK"; color = "#60a5fa"; }
+
+            document.getElementById('t1-pack-tier').innerText = tier;
+            document.getElementById('t1-pack-tier').style.color = color;
+            document.getElementById('t1-pack-zone').classList.remove('hidden');
+        }
+
+        function openCraftedPack() {
+            alert(`팩을 찢었습니다! 획득: 조커 카드 + 1000 Gold (기본 뼈대 데모)`);
+            initTab1();
+        }
+
+        // --- TAB 2: CRACK THE SAFE (금고 해킹) ---
+        let sunkCost = 0;
+        const PACK_VALUE = 50;
+        let isSafeGameOver = false;
+        
+        // Option B variables
+        let bonusRate = 0;
+        let explodeRate = 0;
+
+        function initTab2() {
+            sunkCost = 0;
+            bonusRate = 0;
+            explodeRate = 0;
+            isSafeGameOver = false;
+            
+            document.getElementById('t2-sunk-cost').innerText = "0 pts";
+            document.getElementById('t2-cost-bar').style.width = "0%";
+            document.getElementById('t2-cost-bar').className = "h-full bg-red-500 transition-all";
+            document.getElementById('t2-sys-log').innerHTML = "시스템 대기 중...";
+            
+            document.getElementById('t2-safe-group').classList.remove('explode');
+            document.getElementById('t2-lock').classList.remove('unlock');
+            document.getElementById('t2-reward-zone').classList.add('hidden');
+            document.getElementById('t2-action-log').innerText = "";
+            
+            resetT2Slot();
+        }
+
+        function resetT2Slot() {
+            const slot = document.getElementById('t2-slot');
+            slot.innerHTML = '<span class="text-gray-600 text-xs text-center pointer-events-none px-4">Drop Here</span>';
+            slot.classList.remove('filled');
+        }
+
+        function handleHackDrop(e) {
+            e.preventDefault();
+            const slot = e.currentTarget;
+            slot.classList.remove('drag-over');
+            if(isSafeGameOver) return;
+
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            if(data.domId) document.getElementById(data.domId).style.visibility = 'hidden';
+
+            slot.innerHTML = `<div class="wf-box pop-in"><span class="text-[10px] ${data.colorClass} absolute top-1 left-1">${data.suit}</span><span class="text-2xl ${data.colorClass} font-bold">${data.val}</span></div>`;
+            slot.classList.add('filled');
+
+            processHackAttempt(data.val);
+        }
+
+        function processHackAttempt(val) {
+            const rule = document.querySelector('input[name="devRule"]:checked').value;
+            const cardCost = getCardValue(val);
+            sunkCost += cardCost;
+            
+            // UI Update
+            document.getElementById('t2-sunk-cost').innerText = `${sunkCost} pts`;
+            let barWidth = Math.min((sunkCost / PACK_VALUE) * 50, 100); // 50pts = 50% 폭
+            document.getElementById('t2-cost-bar').style.width = `${barWidth}%`;
+            if(sunkCost > PACK_VALUE) document.getElementById('t2-cost-bar').classList.replace('bg-red-500', 'bg-orange-500'); // 적자 돌파 시 색상 변경
+
+            // 확률 계산
+            let baseRate = 0;
+            if(val === 'JOKER') baseRate = 100;
+            else if(val === 'A') baseRate = 15;
+            else if(['J','Q','K'].includes(val)) baseRate = 12;
+            else baseRate = parseInt(val);
+
+            let finalRate = baseRate;
+            let isSuccess = false;
+            let logStr = `<div class="text-gray-400 border-b border-gray-800 pb-1 mb-1">투입: [${val}] (가치 ${cardCost}pt)</div>`;
+
+            // B안 자폭 체크
+            if(rule === 'optionB' && explodeRate > 0) {
+                let explodeRoll = Math.random() * 100;
+                logStr += `<div>과열 자폭 굴림: ${explodeRoll.toFixed(1)} / ${explodeRate}% ...</div>`;
+                if(explodeRoll < explodeRate) {
+                    triggerExplode(logStr);
+                    return;
+                }
+            }
+
+            // A안 천장 체크
+            if(rule === 'optionA' && sunkCost >= 100) {
+                logStr += `<div class="text-emerald-400">천장 발동 (누적 100pt 이상) -> 100% 성공!</div>`;
+                isSuccess = true;
+            } else {
+                if(rule === 'optionB') finalRate += bonusRate;
+                let roll = Math.random() * 100;
+                logStr += `<div>해킹 굴림: ${roll.toFixed(1)} / ${finalRate}% ...</div>`;
+                if(roll < finalRate) isSuccess = true;
+            }
+
+            document.getElementById('t2-sys-log').innerHTML = logStr;
+            
+            setTimeout(() => {
+                if(isSuccess) {
+                    triggerSuccess();
+                } else {
+                    document.getElementById('t2-safe-group').classList.remove('shake');
+                    void document.getElementById('t2-safe-group').offsetWidth; // reflow
+                    document.getElementById('t2-safe-group').classList.add('shake');
+                    
+                    document.getElementById('t2-action-log').innerHTML = `<span class="text-red-500 font-bold">FAILED</span>`;
+                    
+                    if(rule === 'optionB') {
+                        bonusRate += 1; explodeRate += 2;
+                        document.getElementById('t2-sys-log').innerHTML += `<div class="text-red-400 mt-1">과열 발생! (성공률+1%, 자폭률+2%)</div>`;
+                    }
+                    setTimeout(resetT2Slot, 500);
+                }
+            }, 300);
+        }
+
+        function triggerSuccess() {
+            isSafeGameOver = true;
+            document.getElementById('t2-action-log').innerHTML = `<span class="text-yellow-400 font-bold">UNLOCKED!</span>`;
+            document.getElementById('t2-lock').classList.add('unlock');
+            
+            setTimeout(() => {
+                document.getElementById('t2-reward-zone').classList.remove('hidden');
+            }, 800);
+        }
+
+        function triggerExplode(logStr) {
+            isSafeGameOver = true;
+            document.getElementById('t2-sys-log').innerHTML = logStr + `<div class="text-red-500 font-bold mt-1">💥 팩 자폭! 보상 소멸!</div>`;
+            document.getElementById('t2-action-log').innerHTML = `<span class="text-red-500 font-bold">EXPLODED!</span>`;
+            document.getElementById('t2-safe-group').classList.add('explode');
+        }
+
+    </script>
+</body>
+</html>
