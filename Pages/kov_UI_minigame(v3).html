@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project kov - UI/UX Wireframes (Yabawi v3.4)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #ffffff; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+        .board-slot {
+            width: 80px; height: 112px;
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.4);
+            transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s, opacity 0.3s ease;
+            position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 6px;
+        }
+        .board-slot.drag-over { border-color: #38bdf8; background: rgba(56, 189, 248, 0.1); }
+        .board-slot.filled { border-style: solid; border-color: rgba(255, 255, 255, 0.1); background: transparent; }
+
+        .wf-box {
+            width: 100%; height: 100%;
+            perspective: 1000px;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%; height: 100%;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .wf-box.is-flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            border-radius: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        
+        .card-front {
+            background-color: rgba(15, 15, 15, 0.9); 
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+        }
+        .joker-front { border-color: #a855f7 !important; box-shadow: 0 0 15px rgba(168, 85, 247, 0.3) inset; }
+        .bomb-front { border-color: #ef4444 !important; background-color: rgba(69, 10, 10, 0.8); box-shadow: 0 0 20px rgba(239, 68, 68, 0.5) inset; }
+
+        .card-back {
+            background: repeating-linear-gradient(45deg, #1f2937, #1f2937 5px, #111827 5px, #111827 10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transform: rotateY(180deg);
+        }
+        .card-back::after {
+            content: 'kov'; color: rgba(255,255,255,0.2); font-weight: 900; letter-spacing: 2px; font-size: 1.2rem;
+        }
+
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
+        .guess-correct .card-front { border-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4) inset; }
+        .guess-wrong .card-front { border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) inset; }
+    </style>
+</head>
+<body class="h-screen flex flex-col font-sans overflow-hidden">
+
+    <div id="help-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="bg-gray-900 border border-emerald-500/50 p-8 rounded-xl shadow-[0_0_50px_rgba(16,185,129,0.3)] w-full max-w-xl relative">
+            <button onclick="closeHelpModal()" class="absolute top-4 right-4 text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
+            <h2 class="text-3xl font-black tracking-widest text-emerald-400 mb-6 text-center border-b border-gray-800 pb-4">HOW TO PLAY</h2>
+            
+            <div class="space-y-4 text-sm text-gray-300">
+                <div class="bg-gray-900/80 border border-gray-700 p-4 rounded-lg">
+                    <h3 class="text-emerald-400 font-bold mb-2 flex items-center"><span class="bg-emerald-900 text-white px-2 py-0.5 rounded text-xs mr-2">STEP 1</span> 카드 배치 및 폭탄</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">슬롯의 <strong>조건(무늬/색상)</strong>에 맞춰 카드를 <strong>3~9장</strong> 배치하세요. (조커는 프리패스!)<br/>시작을 누르면 여러분이 모르게 <strong>폭탄(💣) 1장</strong>이 추가되어 섞입니다.</p>
+                </div>
+                
+                <div class="bg-gray-900/80 border border-gray-700 p-4 rounded-lg">
+                    <h3 class="text-emerald-400 font-bold mb-2 flex items-center"><span class="bg-emerald-900 text-white px-2 py-0.5 rounded text-xs mr-2">STEP 2</span> 추리와 생존</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">상단에 제시된 <strong>타겟 카드</strong>와 똑같은 카드를 찾아 뒤집으세요.<br/><span class="text-red-400 font-bold">주의:</span> 타겟이 아닌 카드나 폭탄을 뒤집으면 누적 보상을 <strong class="text-white">모두 잃고 패배</strong>합니다!</p>
+                </div>
+
+                <div class="bg-gray-900/80 border border-yellow-900/50 p-4 rounded-lg shadow-[0_0_15px_rgba(202,138,4,0.1)_inset]">
+                    <h3 class="text-yellow-400 font-bold mb-2 flex items-center"><span class="bg-yellow-900 text-white px-2 py-0.5 rounded text-xs mr-2">STEP 3</span> 리스크 & 리턴 (탈출)</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">연속으로 정답을 맞출수록 <strong>점수 배율(Multi)</strong>이 크게 상승합니다.<br/>더 큰 보상을 위해 <strong>계속(CONTINUE)</strong>할지, 안전하게 <strong>탈출(STOP & CLAIM)</strong>할지 결정하세요.</p>
+                </div>
+
+                <div class="text-[11px] text-gray-500 text-center mt-2">
+                    * 최종 점수 = <span class="text-gray-300">기본 점수</span>(카드 체급 합) × <span class="text-sky-300">기본 배율</span>(연속 성공) × <span class="text-purple-300">최종 배율</span>
+                </div>
+            </div>
+            
+            <div class="mt-8 flex justify-center">
+                <button onclick="closeHelpModal()" class="px-12 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold tracking-widest rounded shadow-lg transition-colors">START GAME</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-[#0f0f0f] border-b border-[#222] p-4 flex flex-col z-10 shrink-0">
+        <div class="flex justify-between items-center w-full">
+            <h1 class="text-xl font-bold tracking-[0.2em] text-white">PROJECT <span class="text-gray-500">kov</span> <span class="text-xs font-normal text-emerald-400 ml-2 border border-emerald-400 px-2 py-1 rounded">Yabawi v3.4</span></h1>
+            <button onclick="openHelpModal()" class="px-3 py-2 text-sm border border-gray-600 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors rounded font-bold tracking-widest flex items-center gap-1">HELP</button>
+        </div>
+        <div class="mt-3 flex items-center space-x-4 border border-sky-900/50 bg-sky-900/20 px-4 py-2 rounded text-xs text-sky-200 self-start">
+            <span class="font-bold text-sky-400 tracking-widest">DEV 1 (셔플 속도 조절):</span>
+            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devSpeed" value="1000" checked><span>Slow (기본)</span></label>
+            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devSpeed" value="500"><span>Normal</span></label>
+            <label class="flex items-center space-x-1 cursor-pointer hover:text-white"><input type="radio" name="devSpeed" value="200"><span>Fast</span></label>
+            <label class="flex items-center space-x-1 cursor-pointer hover:text-white text-yellow-400"><input type="radio" name="devSpeed" value="50"><span>CRAZY</span></label>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center p-4 relative bg-[#050505] overflow-hidden">
+        <div class="w-full max-w-[1280px] h-full relative overflow-hidden bg-[#111] shadow-[0_0_50px_rgba(0,0,0,0.8)] border border-[#222] flex">
+            
+            <div class="w-2/3 h-full border-r border-[rgba(255,255,255,0.1)] relative flex flex-col p-6">
+                <div class="border-b border-[rgba(255,255,255,0.1)] pb-2 mb-4 flex justify-between items-end shrink-0">
+                    <div>
+                        <h2 class="text-2xl font-light tracking-widest uppercase text-emerald-400">Card Memory</h2>
+                        <div class="text-[11px] text-gray-500 mt-1">슬롯 제약을 지켜 3~9장의 카드를 배치하세요. (폭탄 1장 강제 추가)</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-gray-500 block mb-1">PLACED CARDS</span>
+                        <span id="placed-counter" class="text-xl font-bold text-gray-300">0 / 9</span>
+                    </div>
+                </div>
+
+                <div id="target-area" class="h-24 mb-4 flex items-center justify-center opacity-0 transition-opacity duration-500">
+                    <div class="flex flex-col items-center">
+                        <span class="text-[10px] text-yellow-400 tracking-[0.2em] mb-2 font-bold animate-pulse">FIND THIS CARD!</span>
+                        <div id="target-card-display" class="w-16 h-20 border border-yellow-400/50 bg-black/50 rounded flex items-center justify-center shadow-[0_0_15px_rgba(250,204,21,0.2)]"></div>
+                    </div>
+                </div>
+
+                <div class="flex-1 flex flex-col items-center justify-center relative">
+                    <div id="yabawi-board" class="grid grid-cols-5 gap-4 p-8 bg-gray-900/40 border border-gray-800 rounded-lg shadow-inner z-10 relative w-[80%] max-w-[500px]"></div>
+
+                    <div class="mt-8 flex flex-col items-center z-10 w-full h-16 relative">
+                        <div id="action-start" class="flex space-x-4 absolute inset-0 justify-center">
+                            <button onclick="resetBoard()" class="px-8 py-3 border border-gray-600 text-gray-400 hover:text-white hover:border-white transition-colors tracking-widest text-sm rounded">RESET</button>
+                            <button onclick="startSequence()" id="btn-start" class="px-12 py-3 bg-emerald-900/30 border-2 border-emerald-500 text-emerald-400 font-bold hover:bg-emerald-600 hover:text-white transition-colors tracking-widest text-sm rounded shadow-[0_0_15px_rgba(16,185,129,0.2)]">START</button>
+                        </div>
+                        <div id="action-info" class="absolute inset-0 flex items-center justify-center hidden">
+                            <span id="info-text" class="text-sky-400 font-bold tracking-[0.3em] animate-pulse"></span>
+                        </div>
+                        <div id="action-choice" class="flex space-x-4 absolute inset-0 justify-center hidden pop-in">
+                            <button onclick="claimReward()" class="px-8 py-3 border-2 border-yellow-600 bg-yellow-900/20 text-yellow-400 hover:bg-yellow-600 hover:text-white transition-colors tracking-widest text-sm rounded font-bold shadow-[0_0_15px_rgba(202,138,4,0.3)]">STOP & CLAIM (<span id="btn-score">0</span> pts)</button>
+                            <button onclick="presentNextTarget()" class="px-12 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold tracking-widest rounded shadow-lg transition-colors text-sm">CONTINUE NEXT</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="game-status-log" class="absolute bottom-6 left-6 hidden bg-gray-900/80 border border-gray-700 p-3 rounded backdrop-blur-sm">
+                    <div class="text-[10px] text-gray-400 mb-2 border-b border-gray-700 pb-1">SCORE CALCULATION</div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <div class="flex flex-col items-center"><span class="text-[9px] text-gray-500">Base</span><span id="score-base" class="text-white font-bold">0</span></div>
+                        <span class="text-gray-600">×</span>
+                        <div class="flex flex-col items-center"><span class="text-[9px] text-gray-500">Multi (<span id="streak-val" class="text-emerald-400">0</span>연속)</span><span id="score-multi" class="text-sky-400 font-bold">1.0</span></div>
+                        <span class="text-gray-600">×</span>
+                        <div class="flex flex-col items-center"><span class="text-[9px] text-gray-500">Final</span><span class="text-purple-400 font-bold">1.0</span></div>
+                        <span class="text-yellow-600">=</span>
+                        <div class="flex flex-col items-center"><span class="text-[9px] text-gray-500">Total</span><span id="score-total" class="text-yellow-400 font-black text-lg">0</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-1/3 h-full flex flex-col bg-[#0a0a0a] min-h-0 relative" id="inventory-container">
+                <div id="inventory-overlay" class="absolute inset-0 bg-black/60 z-20 hidden backdrop-blur-sm flex items-center justify-center"></div>
+                <div class="p-4 border-b border-[rgba(255,255,255,0.1)] flex justify-between items-end shrink-0">
+                    <span class="text-xs tracking-widest text-gray-400 font-bold uppercase">Inventory</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 grid grid-cols-3 gap-3 content-start" id="inventory-grid"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let placedCount = 0;
+        let gameState = 'IDLE'; 
+        let remainingTargets = [];
+        let currentTarget = null;
+        
+        let sysBaseScore = 0;
+        let sysBaseMulti = 1.0;
+        let currentStreak = 0;
+        let totalScore = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderInventory();
+            initBoard();
+            openHelpModal();
+        });
+
+        function openHelpModal() { document.getElementById('help-modal').classList.remove('hidden'); document.getElementById('help-modal').classList.add('fade-in'); }
+        function closeHelpModal() { document.getElementById('help-modal').classList.add('hidden'); }
+
+        function renderInventory() {
+            const grid = document.getElementById('inventory-grid');
+            const suits = [{s:'♠', c:'text-gray-400', color:'black'}, {s:'♥', c:'text-red-500', color:'red'}, {s:'♣', c:'text-gray-400', color:'black'}, {s:'♦', c:'text-red-500', color:'red'}];
+            const values = ['A', '2', '5', '7', '10', 'J', 'Q', 'K'];
+            let deckHtml = [`
+                <div class="inv-item aspect-[2/3] cursor-grab hover:-translate-y-1 transition-transform relative" draggable="true" ondragstart="handleDragStart(event, 'JOKER', 'JOKER', 'purple')">
+                    <div class="w-full h-full border border-purple-500/50 bg-purple-900/20 flex flex-col items-center justify-center rounded">
+                        <span class="text-lg text-purple-400 font-black tracking-widest">JOKER</span>
+                    </div>
+                </div>
+            `];
+
+            let normalCards = [];
+            for(let i = 1; i < 12; i++) {
+                const suit = suits[Math.floor(Math.random() * suits.length)];
+                const val = values[Math.floor(Math.random() * values.length)];
+                normalCards.push(`
+                    <div class="inv-item aspect-[2/3] cursor-grab hover:-translate-y-1 transition-transform relative" draggable="true" ondragstart="handleDragStart(event, '${suit.s}', '${val}', '${suit.c}', '${suit.color}')">
+                        <div class="w-full h-full border border-[rgba(255,255,255,0.15)] bg-[rgba(255,255,255,0.02)] flex flex-col items-center justify-center rounded">
+                            <span class="text-[10px] ${suit.c} absolute top-1 left-1">${suit.s}</span>
+                            <span class="text-xl ${suit.c} font-bold">${val}</span>
+                        </div>
+                    </div>
+                `);
+            }
+            grid.innerHTML = deckHtml[0] + normalCards.join('');
+        }
+
+        const restrictionPool = [
+            { id: 'none', label: '' }, { id: 'none', label: '' }, { id: 'none', label: '' }, { id: 'none', label: '' },
+            { id: 'color-red', label: 'RED 전용', class: 'text-red-400/50' },
+            { id: 'color-black', label: 'BLACK 전용', class: 'text-gray-400/50' },
+            { id: 'suit-♠', label: '♠ 전용', class: 'text-gray-400/50' },
+            { id: 'suit-♥', label: '♥ 전용', class: 'text-red-400/50' }
+        ];
+
+        function initBoard() {
+            const board = document.getElementById('yabawi-board');
+            board.innerHTML = '';
+            for(let i = 0; i < 10; i++) {
+                const req = restrictionPool[Math.floor(Math.random() * restrictionPool.length)];
+                const slot = document.createElement('div');
+                slot.className = "board-slot";
+                slot.dataset.req = req.id;
+                slot.innerHTML = `<div class="absolute inset-0 flex items-center justify-center text-[11px] font-bold pointer-events-none ${req.class || ''}">${req.label}</div>`;
+                slot.ondragover = (e) => handleDragOver(e, slot);
+                slot.ondragleave = (e) => handleDragLeave(e, slot);
+                slot.ondrop = (e) => handleDrop(e, slot);
+                board.appendChild(slot);
+            }
+        }
+
+        function handleDragStart(e, suit, val, colorClass, baseColor) {
+            if(gameState !== 'IDLE') return e.preventDefault();
+            e.dataTransfer.setData('text/plain', JSON.stringify({suit, val, colorClass, baseColor}));
+        }
+        function handleDragOver(e, slot) {
+            e.preventDefault(); 
+            if(!slot.classList.contains('filled') && placedCount < 9 && gameState === 'IDLE') slot.classList.add('drag-over');
+        }
+        function handleDragLeave(e, slot) { slot.classList.remove('drag-over'); }
+        function handleDrop(e, slot) {
+            e.preventDefault();
+            slot.classList.remove('drag-over');
+            if(gameState !== 'IDLE' || slot.classList.contains('filled') || placedCount >= 9) return; 
+            
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            
+            const req = slot.dataset.req;
+            if (data.val !== 'JOKER' && req !== 'none') {
+                const [reqType, reqVal] = req.split('-');
+                if (reqType === 'color' && data.baseColor !== reqVal) { alert(`${reqVal} 색상 카드만 배치할 수 있습니다.`); return; }
+                if (reqType === 'suit' && data.suit !== reqVal) { alert(`${reqVal} 무늬 카드만 배치할 수 있습니다.`); return; }
+            }
+
+            const isJoker = data.val === 'JOKER';
+            const frontClass = isJoker ? 'joker-front' : '';
+            const content = isJoker 
+                ? `<span class="text-[14px] text-purple-400 font-black tracking-widest">JOKER</span>`
+                : `<span class="text-[10px] ${data.colorClass} absolute top-1 left-1">${data.suit}</span><span class="text-2xl ${data.colorClass} font-bold">${data.val}</span>`;
+
+            slot.innerHTML = `
+                <div class="wf-box" data-suit="${data.suit}" data-val="${data.val}" data-color="${data.colorClass || ''}" onclick="handleCardClick(this)">
+                    <div class="card-inner"><div class="card-front ${frontClass}">${content}</div><div class="card-back"></div></div>
+                </div>
+            `;
+            slot.classList.add('filled');
+            placedCount++;
+            document.getElementById('placed-counter').innerText = `${placedCount} / 9`;
+            document.getElementById('placed-counter').className = placedCount >= 3 ? "text-xl font-bold text-emerald-400" : "text-xl font-bold text-gray-300";
+        }
+
+        function calculateBaseScore() {
+            let sum = 0;
+            document.querySelectorAll('.board-slot .wf-box:not([data-val="BOMB"])').forEach(card => {
+                const v = card.dataset.val;
+                if(v === 'A') sum += 15;
+                else if(v === 'K') sum += 13;
+                else if(v === 'Q') sum += 12;
+                else if(v === 'J') sum += 11;
+                else if(v === 'JOKER') sum += 20;
+                else sum += parseInt(v);
+            });
+            sysBaseScore = sum;
+            document.getElementById('score-base').innerText = sysBaseScore;
+        }
+
+        function setInfoText(text, colorClass) {
+            const infoDiv = document.getElementById('action-info');
+            const infoText = document.getElementById('info-text');
+            infoDiv.classList.remove('hidden');
+            infoText.className = `font-bold tracking-[0.2em] animate-pulse ${colorClass}`;
+            infoText.innerText = text;
+        }
+
+        function startSequence() {
+            if(placedCount < 3) return alert('최소 3장을 배치해야 합니다.');
+            
+            gameState = 'ADDING_BOMB';
+            document.getElementById('action-start').classList.add('hidden');
+            document.getElementById('inventory-overlay').classList.remove('hidden');
+            
+            calculateBaseScore();
+            setInfoText('ADDING BOMB...', 'text-red-500');
+
+            const emptySlots = Array.from(document.querySelectorAll('.board-slot:not(.filled)'));
+            const targetSlot = emptySlots.shift();
+            targetSlot.innerHTML = `
+                <div class="wf-box pop-in" data-val="BOMB" onclick="handleCardClick(this)">
+                    <div class="card-inner"><div class="card-front bomb-front"><span class="text-3xl">💣</span><span class="text-[8px] text-red-300 mt-1 font-bold">BOMB</span></div><div class="card-back"></div></div>
+                </div>
+            `;
+            targetSlot.classList.add('filled');
+
+            emptySlots.forEach(slot => {
+                slot.style.opacity = '0';
+                slot.style.pointerEvents = 'none';
+            });
+
+            setTimeout(() => {
+                setInfoText('SHUFFLING CARDS...', 'text-sky-400');
+                const cards = document.querySelectorAll('.board-slot .wf-box');
+                remainingTargets = [];
+                cards.forEach(card => {
+                    if (card.dataset.val !== 'BOMB') remainingTargets.push({ suit: card.dataset.suit, val: card.dataset.val, colorClass: card.dataset.color, element: card });
+                    card.classList.add('is-flipped');
+                });
+                
+                setTimeout(runShuffleAnimation, 600);
+            }, 1200);
+        }
+
+        function runShuffleAnimation() {
+            const speedInterval = parseInt(document.querySelector('input[name="devSpeed"]:checked').value);
+            const shuffleDuration = 3000;
+            const maxShuffles = Math.floor(shuffleDuration / speedInterval);
+            let shuffleCount = 0;
+
+            const shuffleIntervalId = setInterval(() => {
+                const filledSlots = Array.from(document.querySelectorAll('.board-slot.filled'));
+                const cards = filledSlots.map(slot => slot.firstElementChild).filter(c => c);
+                
+                const firstPositions = new Map();
+                cards.forEach(card => firstPositions.set(card, card.getBoundingClientRect()));
+                
+                filledSlots.sort(() => Math.random() - 0.5);
+                cards.forEach((card, i) => filledSlots[i].appendChild(card));
+                
+                cards.forEach(card => {
+                    const first = firstPositions.get(card);
+                    const last = card.getBoundingClientRect();
+                    const deltaX = first.left - last.left;
+                    const deltaY = first.top - last.top;
+                    
+                    const inner = card.querySelector('.card-inner');
+                    inner.style.transition = 'none';
+                    inner.style.transform = `translate(${deltaX}px, ${deltaY}px) rotateY(180deg)`;
+                    
+                    requestAnimationFrame(() => {
+                        inner.style.transition = `transform ${speedInterval * 0.8}ms ease-in-out`;
+                        inner.style.transform = `translate(0, 0) rotateY(180deg)`;
+                    });
+                });
+
+                shuffleCount++;
+                if(shuffleCount >= maxShuffles) {
+                    clearInterval(shuffleIntervalId);
+                    setTimeout(() => {
+                        document.getElementById('action-info').classList.add('hidden');
+                        document.getElementById('game-status-log').classList.remove('hidden');
+                        document.getElementById('game-status-log').classList.add('flex');
+                        presentNextTarget();
+                    }, speedInterval + 100);
+                }
+            }, speedInterval);
+        }
+
+        function presentNextTarget() {
+            if(remainingTargets.length === 0) { alert('PERFECT CLEAR!'); return claimReward(); }
+            gameState = 'GUESSING';
+            document.getElementById('action-choice').classList.add('hidden');
+            
+            currentTarget = remainingTargets[Math.floor(Math.random() * remainingTargets.length)];
+            const displayObj = document.getElementById('target-card-display');
+            if(currentTarget.val === 'JOKER') {
+                displayObj.innerHTML = `<span class="text-[12px] text-purple-400 font-black">JOKER</span>`;
+                displayObj.className = "w-16 h-20 border-2 border-purple-500 bg-purple-900/40 rounded flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.5)]";
+            } else {
+                displayObj.innerHTML = `<span class="text-xl ${currentTarget.colorClass} font-bold">${currentTarget.val}</span><span class="text-xs ${currentTarget.colorClass} absolute top-1 left-2">${currentTarget.suit}</span>`;
+                displayObj.className = "w-16 h-20 border border-[rgba(255,255,255,0.3)] bg-gray-800 rounded flex flex-col items-center justify-center relative";
+            }
+            document.getElementById('target-area').style.opacity = '1';
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('streak-val').innerText = currentStreak;
+            document.getElementById('score-multi').innerText = sysBaseMulti.toFixed(1);
+            totalScore = Math.floor(sysBaseScore * sysBaseMulti * 1.0);
+            document.getElementById('score-total').innerText = totalScore;
+            document.getElementById('btn-score').innerText = totalScore;
+        }
+
+        function handleCardClick(cardElement) {
+            if(gameState !== 'GUESSING' || !cardElement.classList.contains('is-flipped')) return;
+            gameState = 'REVEALING'; 
+            
+            cardElement.querySelector('.card-inner').style.transform = `rotateY(0deg)`;
+            cardElement.classList.remove('is-flipped');
+            
+            setTimeout(() => {
+                if (cardElement.dataset.val === 'BOMB') {
+                    cardElement.classList.add('shake');
+                    setTimeout(() => { alert('💥 폭탄을 밟았습니다! 모든 보상을 잃습니다.'); revealAllCards(); }, 400);
+                } 
+                else if (cardElement.dataset.val === currentTarget.val && cardElement.dataset.suit === currentTarget.suit) {
+                    cardElement.classList.add('guess-correct');
+                    currentStreak++;
+                    sysBaseMulti += (currentStreak * 0.1);
+                    
+                    updateScoreDisplay();
+                    
+                    remainingTargets = remainingTargets.filter(t => t.element !== cardElement);
+                    document.getElementById('action-choice').classList.remove('hidden');
+                    document.getElementById('action-choice').classList.add('pop-in');
+                    gameState = 'CHOOSING';
+                } 
+                else {
+                    cardElement.classList.add('guess-wrong');
+                    alert('틀렸습니다! 누적 보상을 모두 잃습니다.');
+                    revealAllCards();
+                }
+            }, 500);
+        }
+
+        function revealAllCards() {
+            document.querySelectorAll('.board-slot .wf-box.is-flipped').forEach(card => {
+                card.querySelector('.card-inner').style.transform = `rotateY(0deg)`;
+                card.classList.remove('is-flipped');
+                card.style.opacity = '0.5';
+            });
+            document.getElementById('action-start').classList.remove('hidden');
+            gameState = 'END';
+        }
+
+        function claimReward() {
+            alert(`🎉 게임 종료! 총 ${totalScore}점을 획득하며 무사히 탈출했습니다.`);
+            revealAllCards();
+        }
+
+        function resetBoard() {
+            placedCount = 0; gameState = 'IDLE'; currentStreak = 0; totalScore = 0; sysBaseScore = 0; sysBaseMulti = 1.0;
+            remainingTargets = []; currentTarget = null;
+            document.getElementById('game-status-log').classList.add('hidden');
+            document.getElementById('game-status-log').classList.remove('flex');
+            document.getElementById('target-area').style.opacity = '0';
+            document.getElementById('action-start').classList.remove('hidden');
+            document.getElementById('action-choice').classList.add('hidden');
+            document.getElementById('action-info').classList.add('hidden');
+            document.getElementById('inventory-overlay').classList.add('hidden');
+            
+            document.getElementById('score-base').innerText = '0';
+            document.getElementById('score-multi').innerText = '1.0';
+            document.getElementById('score-total').innerText = '0';
+            document.getElementById('streak-val').innerText = '0';
+
+            initBoard(); 
+            document.getElementById('placed-counter').innerText = `0 / 9`;
+            document.getElementById('placed-counter').className = "text-xl font-bold text-gray-300";
+        }
+    </script>
+</body>
+</html>
